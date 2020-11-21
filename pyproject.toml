@@ -1,0 +1,57 @@
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
+
+
+[tool.nitpick]
+style = "https://raw.githubusercontent.com/wemake-services/wemake-python-styleguide/master/styles/nitpick-style-wemake.toml"
+
+
+[tool.poetry]
+name = "mkdocs-meta"
+version = "0.1.0"
+description = "Metadata plugin for MkDocs"
+license = "MIT"
+
+authors = []
+
+readme = "README.md"
+
+repository = "https://github.com/anatoly-scherbakov/mkdocs-meta"
+
+keywords = []
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[tool.poetry.plugins."mkdocs.plugins"]
+meta = "mkdocs_meta:MetaPlugin"
+
+
+[tool.poetry.dependencies]
+python = ">=3.6,<4.0"
+mkdocs = "^1.1.2"
+mkdocs-material = "^6.1.0"
+rdflib = "^5.0.0"
+python-frontmatter = "^0.5.0"
+rdflib-jsonld = "^0.5.0"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.790"
+
+wemake-python-styleguide = "^0.14"
+flake8-pytest-style = "^1.3"
+nitpick = "^0.23"
+
+safety = "^1.9"
+
+pytest = "^5.4"
+pytest-cov = "^2.10"
+pytest-randomly = "^3.4"
+
+m2r = "^0.2"
+tomlkit = "^0.7"
