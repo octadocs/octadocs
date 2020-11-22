@@ -16,12 +16,16 @@ markdown_extensions:
 
 plugins:
   - meta
+  - search
+  - macros:
+      modules:
+        - mkdocs_meta
 
 theme:
   name: material
   custom_dir: overrides
-  palette:
-    scheme: slate
+#  palette:
+#    scheme: slate
   features:
     - navigation.tabs
     - header.autohide

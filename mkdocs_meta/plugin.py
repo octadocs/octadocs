@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import TypedDict, Dict, Any
+from typing import TypedDict, Dict, Any, Optional
 
 import frontmatter
 import rdflib
@@ -11,15 +11,20 @@ from pyld import jsonld
 from rdflib.plugins.memory import IOMemory
 
 
+class Extra(TypedDict):
+    graph: rdflib.ConjunctiveGraph
+
+
 class Config(TypedDict):
     """MkDocs configuration."""
 
     docs_dir: str
+    extra: Optional[Extra]
 
 
 class Context(TypedDict):
     """Context."""
-    zet: Dict[str, Any]  # type: ignore
+    graph: Dict[str, Any]  # type: ignore
 
 
 def update_graph_from_n3_file(
@@ -102,7 +107,7 @@ def get_view_content(ref: str, universe: rdflib.ConjunctiveGraph) -> str:
         }
     ''')
 
-    # subgraph = universe.query('CONSTRUCT WHERE { ?s ?p ?o }')
+    # subgraph = graph.query('CONSTRUCT WHERE { ?s ?p ?o }')
 
     graph_dict = json.loads(subgraph.serialize(
         format='json-ld',
@@ -124,25 +129,29 @@ def get_view_content(ref: str, universe: rdflib.ConjunctiveGraph) -> str:
 class MetaPlugin(BasePlugin):
     """MkDocs Meta plugin."""
 
-    universe: rdflib.ConjunctiveGraph = None
+    graph: rdflib.ConjunctiveGraph = None
+
+    def on_config(self, config: Config) -> Config:
+        self.graph = rdflib.ConjunctiveGraph(store=IOMemory())
+
+        if config.get('extra') is None:
+            config['extra'] = {}
+
+        config['extra']['graph'] = self.graph
+
+        return config
 
     def on_files(self, files: Files, config: Config):
         """Extract metadata from files and compose the site graph."""
 
         docs_dir = Path(config['docs_dir'])
 
-        store = IOMemory()
-
-        universe = rdflib.ConjunctiveGraph(store=store)
-
         for f in files:
             update_graph_from_file(
                 mkdocs_file=f,
                 docs_dir=docs_dir,
-                universe=universe,
+                universe=self.graph,
             )
-
-        self.universe = universe
 
     def on_page_context(
         self,
@@ -157,9 +166,8 @@ class MetaPlugin(BasePlugin):
         if ref.endswith('/'):
             ref += 'index.md'
 
-        view_content = get_view_content(ref, self.universe)
+        context['graph'] = self.graph
 
-        context['zet'] = view_content
-        # context['template'] = 'gallery.html'
+        page.meta['graph'] = self.graph
 
         return context
