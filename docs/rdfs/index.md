@@ -6,70 +6,58 @@
 
 {% set cards = graph | sparql('
     SELECT * WHERE {
-        ?url rdfs:label ?label .
-        ?url rdfs:comment ?comment .
+        GRAPH <rdfs/rdfs.n3> {
+            ?url rdfs:comment ?default_comment .
+            ?url rdfs:label ?default_label .
+        }
+
+        OPTIONAL {
+            GRAPH ?g {
+                ?url rdfs:label ?readable_label .
+            }
+            FILTER (?g != <rdfs/rdfs.n3>)
+        }
+
+        OPTIONAL {
+            GRAPH ?g {
+                ?url rdfs:comment ?readable_comment .
+            }
+            FILTER (?g != <rdfs/rdfs.n3>)
+        }
+
+        ?url a ?category .
+        ?category a <kb://Category/> .
+        ?category rdfs:label ?category_label .
+        ?category rdfs:comment ?category_comment .
+        ?category :color ?color .
+
+        BIND(999 AS ?default_priority)
+        OPTIONAL {
+            ?category :priority ?priority .
+        }
+        BIND(COALESCE(?priority, ?default_priority) AS ?priority)
 
         ?url rdfs:isDefinedBy rdfs: .
-    }
+    } ORDER BY ?priority ?default_label
 ') | gallery %}
 
-<div class="ui link cards">
+<div class="ui four cards">
 {% for card in cards %}
-    <div class="card" data-url="{{ card.url }}">
+    <div class="ui {{ card.color }} raised card" data-href="{{ card.url }}">
         <div class="content">
-            <div class="header">{{ card.label }}</div>
-            <div class="description">{{ card.comment }}</div>
+            <div class="header">
+                {{ card.readable_label | d(card.default_label) }}
+            </div>
+            <div class="description">
+                {{ card.readable_comment | default(card.default_comment) }}
+            </div>
         </div>
-        <div class="extra-content">
+        <div class="extra content">
+            <span title="{{ card.category_comment }}">{{ card.category_label }}</span>
             <span class="right floated">
-                rdfs:{{ card.label }}
+                rdfs:{{ card.default_label }}
             </span>
         </div>
     </div>
 {% endfor %}
 </div>
-
-
-
-
-<div class="gallery">
-{% for card in cards %}
-    <div class="card">
-        <div class="card-header">{{ card.label }}</div>
-        <div class="card-body">{{ card.comment }}</div>
-        <div class="card-footer">
-            <small>rdfs:{{ card.label }}</small>
-        </div>
-        
-        <!--div class="card-footer">{{ card.url }}</div-->
-    </div>
-{% endfor %}
-</div>
-
-<!--style>
-.gallery {
-    justify-content: flex-start;
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.card {
-    width: 30%;
-    margin: 16px;
-    border-radius: 8px;
-    padding: 8px;
-    background-color: cornflowerblue;
-}
-
-.card-header {
-    font-weight: bold;
-}
-
-.card-footer {
-    text-align: right;
-}
-</style-->
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
