@@ -2,7 +2,7 @@ import cgi
 import io
 import textwrap
 from base64 import b64encode
-from typing import Any, Dict
+from typing import Any, Dict, List, TypedDict
 from unittest.mock import patch
 
 import pydotplus
@@ -16,9 +16,15 @@ import html
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:
+    """
+    Render RDF graph visually as PNG image.
+
+    Idea: https://stackoverflow.com/a/61483971/1245471
+    """
     dot_description = io.StringIO()
 
     with patch('rdflib.tools.rdf2dot.cgi', html):
+        # FIXME hack, fixes this: https://github.com/RDFLib/rdflib/issues/1110
         rdf2dot(instance, dot_description)
 
     dg = pydotplus.graph_from_dot_data(dot_description.getvalue())
@@ -56,12 +62,28 @@ def table(result: SPARQLResult) -> str:
         for row in result.bindings
     )
 
+    separators = '| ' + (' --- |' * len(result.vars))
+
     return f'''
 ---
 | {headers} |
-| --- | --- | --- | --- |
+{separators}
 {rows}
 '''
+
+
+class Card(TypedDict):
+    url: str
+    label: str
+    comment: str
+
+
+def gallery(query_result: SPARQLResult) -> List[Card]:
+    return [{
+        str(variable): str(rdf_value) if isinstance(rdf_value, rdflib.URIRef) else rdf_value.value
+        for variable, rdf_value
+        in row.items()
+    } for row in query_result.bindings]
 
 
 def define_env(env: MacrosPlugin) -> MacrosPlugin:
@@ -69,5 +91,6 @@ def define_env(env: MacrosPlugin) -> MacrosPlugin:
     env.filter(sparql)
     env.filter(n3)
     env.filter(table)
+    env.filter(gallery)
 
     return env

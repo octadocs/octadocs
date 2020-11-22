@@ -22,10 +22,5 @@ plugins:
         - mkdocs_meta
 
 theme:
-  name: material
-  custom_dir: overrides
-#  palette:
-#    scheme: slate
-  features:
-    - navigation.tabs
-    - header.autohide
+  name: semantic
+  logo: None

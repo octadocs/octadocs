@@ -1,40 +1,75 @@
 ---
-title: "RDF Schema (RDFS)"
-"@graph":
-    - "@id": http://www.w3.org/2000/01/rdf-schema#Class
-      category: Entities
-    - "@id": http://www.w3.org/2000/01/rdf-schema#Resource
-      category: Entities
-    - "@id": http://www.w3.org/2000/01/rdf-schema#Literal
-      category: Entities
-    - "@id": http://www.w3.org/2000/01/rdf-schema#DataType
-      category: Entities
+"@id": "rdfs:"
 ---
 
-{{ graph | sparql('CONSTRUCT WHERE { ?s rdfs:label ?o }') | attr('graph') | graph }}
+# RDF Schema (RDFS)
 
-{{ graph | sparql('
+{% set cards = graph | sparql('
     SELECT * WHERE {
-        ?thing rdfs:isDefinedBy rdfs: .
-        ?thing rdfs:label ?label .
-        ?thing rdfs:comment ?description .
-        ?thing <kb://category> ?category .
-    }
-') | table }}
+        ?url rdfs:label ?label .
+        ?url rdfs:comment ?comment .
 
-{% raw %}
-{{ graph | sparql('
-    CONSTRUCT {
-        ?thing <kb://title> ?label .
-        ?thing <kb://category> ?category .
-        ?thing <kb://description> ?description .
-        rdfs: <kb://cards> ?thing .
-    } WHERE {
-        ?thing rdfs:isDefinedBy rdfs: .
-        ?thing rdfs:label ?label .
-        ?thing rdfs:comment ?description .
-        ?thing <kb://category> ?category .
+        ?url rdfs:isDefinedBy rdfs: .
     }
-').graph | n3 }}
+') | gallery %}
 
-{% endraw %}
+<div class="ui link cards">
+{% for card in cards %}
+    <div class="card" data-url="{{ card.url }}">
+        <div class="content">
+            <div class="header">{{ card.label }}</div>
+            <div class="description">{{ card.comment }}</div>
+        </div>
+        <div class="extra-content">
+            <span class="right floated">
+                rdfs:{{ card.label }}
+            </span>
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+
+
+
+<div class="gallery">
+{% for card in cards %}
+    <div class="card">
+        <div class="card-header">{{ card.label }}</div>
+        <div class="card-body">{{ card.comment }}</div>
+        <div class="card-footer">
+            <small>rdfs:{{ card.label }}</small>
+        </div>
+        
+        <!--div class="card-footer">{{ card.url }}</div-->
+    </div>
+{% endfor %}
+</div>
+
+<!--style>
+.gallery {
+    justify-content: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card {
+    width: 30%;
+    margin: 16px;
+    border-radius: 8px;
+    padding: 8px;
+    background-color: cornflowerblue;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.card-footer {
+    text-align: right;
+}
+</style-->
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>

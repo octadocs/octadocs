@@ -1,4 +1,4 @@
 ---
 "@id": rdfs:Class
-title: Class
+"@type": /rdfs/entities.md
 ---

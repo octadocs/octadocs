@@ -43,6 +43,7 @@ pyld = "^2.0.3"
 mkdocs-macros-plugin = "^0.4.20"
 pydotplus = "^2.0.2"
 graphviz = "^0.15"
+mkdocs-semantic = "^0.0.6"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.790"
