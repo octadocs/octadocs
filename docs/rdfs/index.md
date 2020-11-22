@@ -11,4 +11,30 @@ title: "RDF Schema (RDFS)"
       category: Entities
 ---
 
-{{ graph | sparql('CONSTRUCT WHERE { ?s rdfs:label ?o }') | graph }}
+{{ graph | sparql('CONSTRUCT WHERE { ?s rdfs:label ?o }') | attr('graph') | graph }}
+
+{{ graph | sparql('
+    SELECT * WHERE {
+        ?thing rdfs:isDefinedBy rdfs: .
+        ?thing rdfs:label ?label .
+        ?thing rdfs:comment ?description .
+        ?thing <kb://category> ?category .
+    }
+') | table }}
+
+{% raw %}
+{{ graph | sparql('
+    CONSTRUCT {
+        ?thing <kb://title> ?label .
+        ?thing <kb://category> ?category .
+        ?thing <kb://description> ?description .
+        rdfs: <kb://cards> ?thing .
+    } WHERE {
+        ?thing rdfs:isDefinedBy rdfs: .
+        ?thing rdfs:label ?label .
+        ?thing rdfs:comment ?description .
+        ?thing <kb://category> ?category .
+    }
+').graph | n3 }}
+
+{% endraw %}
