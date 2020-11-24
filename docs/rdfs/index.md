@@ -37,6 +37,13 @@
 
         OPTIONAL {
             GRAPH ?g {
+                ?url rdfs:isDefinedBy ?link .
+            }
+            FILTER (?g != <rdfs/rdfs.n3>)
+        }
+
+        OPTIONAL {
+            GRAPH ?g {
                 ?url rdfs:comment ?readable_comment .
             }
             FILTER (?g != <rdfs/rdfs.n3>)
@@ -60,7 +67,7 @@
 
 <div class="ui four cards">
 {% for card in cards %}
-    <div class="ui {{ card.color }} raised card" data-href="{{ card.url }}">
+    <a class="ui {{ card.color }} raised card" href="{{ card.link }}">
         <div class="content">
             <div class="header">
                 {{ card.readable_label | d(card.default_label) }}
@@ -75,6 +82,6 @@
                 rdfs:{{ card.default_label }}
             </span>
         </div>
-    </div>
+    </a>
 {% endfor %}
 </div>

@@ -7,7 +7,6 @@ import rdflib
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files, File
 from mkdocs.structure.pages import Page
-from pyld import jsonld
 from rdflib.plugins.memory import IOMemory
 
 
@@ -56,8 +55,11 @@ def update_graph_from_markdown_file(
 
     meta_data.update({'@context': context})
 
-    if not meta_data.get('@id'):
+    if meta_data.get('@id') is None:
         meta_data['@id'] = f'kb://{mkdocs_file.src_path}'
+
+    if meta_data.get('rdfs:isDefinedBy') is None:
+        meta_data['rdfs:isDefinedBy'] = f'/{mkdocs_file.url}'
 
     universe.parse(
         data=json.dumps(meta_data),
