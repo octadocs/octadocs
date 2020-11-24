@@ -4,6 +4,23 @@
 
 # RDF Schema (RDFS)
 
+{% set rdfs_url = (graph | sparql('
+    SELECT ?rdfs WHERE {
+        BIND(rdfs: AS ?rdfs)
+    }
+') | gallery | first).rdfs %}
+
+<div class="ui container">
+    <div class="ui large fluid labeled input">
+      <div class="ui label">
+        rdfs:
+      </div>
+      <input readonly type="text" placeholder="" value="{{ rdfs_url }}">
+    </div>
+</div>
+
+<br/>
+
 {% set cards = graph | sparql('
     SELECT * WHERE {
         GRAPH <rdfs/rdfs.n3> {

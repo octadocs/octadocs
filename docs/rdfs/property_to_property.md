@@ -1,8 +1,11 @@
 ---
-"http://www.w3.org/2000/01/rdf-schema#label": "Property → Property"
-"@type": http://www.w3.org/2000/01/rdf-schema#Class
-"@type": Category
+"@type": 
+    - rdfs:Class
+    - Category
+
 color: blue
 priority: 4
-"http://www.w3.org/2000/01/rdf-schema#comment": Properties linked together.
+
+label: Property → Property
+comment: Properties linked together.
 ---

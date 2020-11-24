@@ -1,5 +1,5 @@
 ---
-"@id": http://www.w3.org/2000/01/rdf-schema#label
+"@id": rdfs:label
 "@type": rdfs/textual_descriptions.md
-"http://www.w3.org/2000/01/rdf-schema#label": Label
+label: Label
 ---

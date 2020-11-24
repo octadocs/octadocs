@@ -45,6 +45,7 @@ def update_graph_from_markdown_file(
     mkdocs_file: File,
     docs_dir: Path,
     universe: rdflib.ConjunctiveGraph,
+    context: Dict[str, str],
 ):
     document = frontmatter.load(docs_dir / mkdocs_file.src_path)
 
@@ -53,9 +54,7 @@ def update_graph_from_markdown_file(
     if not meta_data:
         return None
 
-    meta_data.update({'@context': {
-        '@vocab': 'kb://',
-    }})
+    meta_data.update({'@context': context})
 
     if not meta_data.get('@id'):
         meta_data['@id'] = f'kb://{mkdocs_file.src_path}'
@@ -73,12 +72,14 @@ def update_graph_from_file(
     mkdocs_file: File,
     docs_dir: Path,
     universe: rdflib.ConjunctiveGraph,
+    context: Dict[str, str],
 ):
     if mkdocs_file.src_path.endswith('.md'):
         return update_graph_from_markdown_file(
             mkdocs_file=mkdocs_file,
             docs_dir=docs_dir,
             universe=universe,
+            context=context,
         )
 
     elif mkdocs_file.src_path.endswith('.n3'):
@@ -91,39 +92,17 @@ def update_graph_from_file(
     return None
 
 
-def get_view_content(ref: str, universe: rdflib.ConjunctiveGraph) -> str:
-    """Render view content."""
-    subgraph: rdflib.Graph = universe.query('''
-        CONSTRUCT {
-            ?thing <kb://title> ?label .
-            ?thing <kb://category> ?category .
-            ?thing <kb://description> ?description .
-            rdfs: <kb://cards> ?thing .
-        } WHERE {
-            ?thing rdfs:isDefinedBy rdfs: .
-            ?thing rdfs:label ?label .
-            ?thing rdfs:comment ?description .
-            ?thing <kb://category> ?category .
-        }
-    ''')
+def fetch_context(docs_dir: Path) -> Dict[str, str]:
+    """Compose JSON-LD context."""
+    with open(docs_dir / 'context.json', 'r') as context_file:
+        json_document = json.load(context_file)
 
-    # subgraph = graph.query('CONSTRUCT WHERE { ?s ?p ?o }')
-
-    graph_dict = json.loads(subgraph.serialize(
-        format='json-ld',
-    ))
-
-    frame = {
-        '@context': {
-            'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
+    if json_document.get('@vocab') is None:
+        json_document.update({
             '@vocab': 'kb://',
-        },
-        '@id': 'http://www.w3.org/2000/01/rdf-schema#',
-    }
+        })
 
-    graph_dict = jsonld.frame(graph_dict, frame)
-
-    return graph_dict
+    return json_document
 
 
 class MetaPlugin(BasePlugin):
@@ -145,12 +124,14 @@ class MetaPlugin(BasePlugin):
         """Extract metadata from files and compose the site graph."""
 
         docs_dir = Path(config['docs_dir'])
+        context = fetch_context(docs_dir)
 
         for f in files:
             update_graph_from_file(
                 mkdocs_file=f,
                 docs_dir=docs_dir,
                 universe=self.graph,
+                context=context,
             )
 
     def on_page_context(
