@@ -24,3 +24,4 @@ plugins:
 theme:
   name: semantic
   logo: None
+  custom_dir: overrides
