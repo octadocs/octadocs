@@ -2,7 +2,8 @@ import cgi
 import io
 import textwrap
 from base64 import b64encode
-from typing import Any, Dict, List, TypedDict
+from functools import partial, wraps
+from typing import Any, Dict, List, TypedDict, Union, Optional
 from unittest.mock import patch
 
 import pydotplus
@@ -45,8 +46,17 @@ def n3(instance: rdflib.ConjunctiveGraph) -> str:
     )
 
 
-def sparql(instance: rdflib.ConjunctiveGraph, query: str) -> SPARQLResult:
-    return instance.query(query)
+def sparql(
+    instance: rdflib.ConjunctiveGraph,
+    query: str,
+    **kwargs: str,
+) -> SPARQLResult:
+    bindings = {
+        argument_name: argument_value
+        for argument_name, argument_value in kwargs.items()
+    }
+
+    return instance.query(query, initBindings=bindings)
 
 
 def _render_as_row(row: Dict[Variable, Any]) -> str:
@@ -86,11 +96,60 @@ def gallery(query_result: SPARQLResult) -> List[Card]:
     } for row in query_result.bindings]
 
 
+def get_bindings(
+    kwargs: Dict[str, Optional[Union[rdflib.URIRef, str, int, float]]],
+) -> Dict[str, Union[rdflib.URIRef, rdflib.Literal]]:
+    return {
+        argument_name: argument_value if (
+            isinstance(argument_value, rdflib.URIRef)
+        ) else rdflib.Literal(argument_value)
+        for argument_name, argument_value in kwargs.items()
+    }
+
+
+class SelectResult(list):
+    columns: List[str]
+
+    def __init__(self, columns: List[str], items: List[dict]):
+        self.extend(items)
+        self.columns = columns
+
+
+def select(
+    query: str,
+    instance: rdflib.ConjunctiveGraph,
+    **kwargs: str,
+):
+    """Run SPARQL SELECT query and return formatted result."""
+    sparql_result: SPARQLResult = instance.query(
+        query,
+        initBindings=get_bindings(kwargs),
+    )
+
+    return [{
+        str(variable): str(rdf_value) if (
+            isinstance(rdf_value, rdflib.URIRef)
+        ) else rdf_value.value
+        for variable, rdf_value
+        in row.items()
+    } for row in sparql_result.bindings]
+
+
 def define_env(env: MacrosPlugin) -> MacrosPlugin:
     env.filter(graph)
     env.filter(sparql)
     env.filter(n3)
     env.filter(table)
     env.filter(gallery)
+
+    env.macro(partial(
+        select,
+        instance=env.variables.graph,
+    ), name='select')
+
+    # FIXME this is hardcode, needs to be defined dynamically
+    env.variables['rdfs'] = rdflib.Namespace(
+        'http://www.w3.org/2000/01/rdf-schema#',
+    )
 
     return env
