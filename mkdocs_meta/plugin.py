@@ -4,10 +4,12 @@ from typing import TypedDict, Dict, Any, Optional
 
 import frontmatter
 import rdflib
+from boltons.iterutils import remap
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files, File
 from mkdocs.structure.pages import Page
-from rdflib import URIRef
+from mkdocs_meta import settings
+from mkdocs_meta.conversions import src_path_to_iri
 from rdflib.plugins.memory import IOMemory
 
 
@@ -35,10 +37,25 @@ def update_graph_from_n3_file(
     universe.parse(
         source=str(docs_dir / mkdocs_file.src_path),
         format='n3',
-        publicID=f'kb://{mkdocs_file.src_path}',
+        publicID=src_path_to_iri(mkdocs_file.src_path),
     )
 
     return universe
+
+
+def convert_dollar_signs(meta_data):
+    """
+    Convert $ character to @ in keys.
+
+    We use $ by convention to avoid writing quotes.
+    """
+    return remap(
+        meta_data,
+        lambda path, key, value: (
+            key.replace('$', '@') if isinstance(key, str) else key,
+            value,
+        ),
+    )
 
 
 def update_graph_from_markdown_file(
@@ -54,9 +71,11 @@ def update_graph_from_markdown_file(
     if not meta_data:
         return None
 
+    meta_data = convert_dollar_signs(meta_data)
+
     meta_data.update({'@context': context})
 
-    page_id = f'kb://{mkdocs_file.url}'
+    page_id = src_path_to_iri(mkdocs_file.src_path)
 
     if meta_data.get('@id') is None:
         meta_data['@id'] = page_id
@@ -67,7 +86,7 @@ def update_graph_from_markdown_file(
     universe.parse(
         data=json.dumps(meta_data),
         format='json-ld',
-        publicID=f'kb://{mkdocs_file.url}',
+        publicID=page_id,
     )
 
     return universe
@@ -102,10 +121,9 @@ def fetch_context(docs_dir: Path) -> Dict[str, str]:
     with open(docs_dir / 'context.json', 'r') as context_file:
         json_document = json.load(context_file)
 
-    if json_document.get('@vocab') is None:
-        json_document.update({
-            '@vocab': 'kb://',
-        })
+    json_document.update({
+        '@vocab': settings.LOCAL_IRI_SCHEME,
+    })
 
     return json_document
 
@@ -147,13 +165,5 @@ class MetaPlugin(BasePlugin):
         nav: Page,
     ) -> Context:
         """Attach the views to certain pages."""
-        ref = f'kb://{page.url}'
-
-        if ref.endswith('/'):
-            ref += 'index.md'
-
         context['graph'] = self.graph
-
-        page.meta['graph'] = self.graph
-
         return context

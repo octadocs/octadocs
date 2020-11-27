@@ -9,6 +9,7 @@ import pydotplus
 import rdflib
 from macros.plugin import MacrosPlugin
 from mkdocs.structure.pages import Page
+from mkdocs_meta.conversions import iri_to_url, src_path_to_iri
 from rdflib import Variable
 from rdflib.plugins.sparql.processor import SPARQLResult
 from rdflib.tools.rdf2dot import rdf2dot
@@ -125,28 +126,21 @@ def query(
     } for row in sparql_result.bindings]
 
 
-def iri_of(page: Page) -> rdflib.URIRef:
-    """Construct IRI for a MkDocs site page."""
-    return rdflib.URIRef(f'kb://{page.url}')
-
-
-def iri_to_url(iri: str) -> str:
-    return iri.replace('kb://', '/')
-
-
 def define_env(env: MacrosPlugin) -> MacrosPlugin:
     env.filter(graph)
     env.filter(sparql)
     env.filter(n3)
     env.filter(table)
-    env.filter(iri_to_url)
 
     env.macro(partial(
         query,
         instance=env.variables.graph,
     ), name='query')
 
-    env.macro(iri_of)
+    env.macro(iri_to_url)
+    env.macro(src_path_to_iri)
+
+    env.filter(iri_to_url)
 
     # FIXME this is hardcode, needs to be defined dynamically
     env.variables['rdfs'] = rdflib.Namespace(

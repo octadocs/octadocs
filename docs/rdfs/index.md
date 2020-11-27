@@ -1,5 +1,5 @@
 ---
-"@id": "rdfs:"
+$id: "rdfs:"
 "label": "RDF Schema (RDFS)"
 ---
 
@@ -28,7 +28,7 @@
 
 {% set cards = query('
     SELECT * WHERE {
-        GRAPH <kb://rdfs/rdfs.n3> {
+        GRAPH <local:rdfs/rdfs.n3> {
             ?url rdfs:comment ?default_comment .
             ?url rdfs:label ?default_label .
         }
@@ -37,25 +37,25 @@
             GRAPH ?g {
                 ?url rdfs:label ?readable_label .
             }
-            FILTER (?g != <kb://rdfs/rdfs.n3>)
+            FILTER (?g != <local:rdfs/rdfs.n3>)
         }
 
         OPTIONAL {
             GRAPH ?g {
                 ?url rdfs:isDefinedBy ?link .
             }
-            FILTER (?g != <kb://rdfs/rdfs.n3>)
+            FILTER (?g != <local:rdfs/rdfs.n3>)
         }
 
         OPTIONAL {
             GRAPH ?g {
                 ?url rdfs:comment ?readable_comment .
             }
-            FILTER (?g != <kb://rdfs/rdfs.n3>)
+            FILTER (?g != <local:rdfs/rdfs.n3>)
         }
 
         ?url a ?category .
-        ?category a <kb://Category/> .
+        ?category a <local:Category> .
         ?category rdfs:label ?category_label .
         ?category rdfs:comment ?category_comment .
         ?category :color ?color .

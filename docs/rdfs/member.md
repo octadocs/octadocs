@@ -1,6 +1,6 @@
 ---
-"@id": rdfs:member
-"@type": rdfs/containers/
+$id: rdfs:member
+$type: rdfs/containers.md
 label: Member
 ---
 

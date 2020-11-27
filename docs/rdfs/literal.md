@@ -1,6 +1,6 @@
 ---
-"@id": rdfs:Literal
-"@type": rdfs/entities/
+$id: rdfs:Literal
+$type: rdfs/entities.md
 comment: Number, string, date, your cat's color, ...
 ---
 

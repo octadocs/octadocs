@@ -1,3 +1,5 @@
+{{ src_path_to_iri(page.src_path) }}
+
 {% set title = query(
     'SELECT ?label WHERE {
         ?entity rdfs:isDefinedBy ?iri .    
@@ -9,14 +11,14 @@
         }
 
         OPTIONAL {
-            GRAPH <rdfs/rdfs.n3> {
+            GRAPH <local:rdfs/rdfs.n3> {
                 ?entity rdfs:label ?default_label .
             }
         }
 
         BIND(COALESCE(?readable_label, ?default_label) AS ?label)
     }',
-    iri=iri_of(page),
+    iri=src_path_to_iri(page.src_path),
 ).0.label %}
 
 # {{ title }}

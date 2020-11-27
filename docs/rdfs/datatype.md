@@ -1,6 +1,6 @@
 ---
-"@id": rdfs:Datatype
-"@type": rdfs/entities/
+$id: rdfs:Datatype
+$type: rdfs/entities.md
 label: Data Type
 ---
 
