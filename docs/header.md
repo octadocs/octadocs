@@ -1,5 +1,3 @@
-{{ src_path_to_iri(page.src_path) }}
-
 {% set title = query(
     'SELECT ?label WHERE {
         ?entity rdfs:isDefinedBy ?iri .    
@@ -18,7 +16,7 @@
 
         BIND(COALESCE(?readable_label, ?default_label) AS ?label)
     }',
-    iri=src_path_to_iri(page.src_path),
+    iri=src_path_to_iri(page.file.src_path),
 ).0.label %}
 
 # {{ title }}

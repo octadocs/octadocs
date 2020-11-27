@@ -22,10 +22,6 @@ $id: "rdfs:"
 
 <br/>
 
-{{ query('SELECT * WHERE {
-        rdfs:subPropertyOf a ?t .
-}') }}
-
 {% set cards = query('
     SELECT * WHERE {
         GRAPH <local:rdfs/rdfs.n3> {
@@ -72,7 +68,7 @@ $id: "rdfs:"
 
 <div class="ui four cards">
 {% for card in cards %}
-    <a class="ui {{ card.color }} raised card" href="{{ card.link|iri_to_url }}">
+    <a class="ui {{ card.color }} raised card" href="/{{ card.link|iri_to_url }}">
         <div class="content">
             <div class="header">
                 {{ card.readable_label | d(card.default_label) }}

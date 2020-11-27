@@ -1,11 +1,12 @@
 import re
 
 from mkdocs_meta.settings import LOCAL_IRI_SCHEME
+from rdflib import URIRef
 
 
-def src_path_to_iri(src_path: str) -> str:
+def src_path_to_iri(src_path: str) -> URIRef:
     """Convert src_path of a file to a Zet IRI."""
-    return f'{LOCAL_IRI_SCHEME}{src_path}'
+    return URIRef(f'{LOCAL_IRI_SCHEME}{src_path}')
 
 
 def iri_to_url(iri: str) -> str:
