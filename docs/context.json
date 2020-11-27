@@ -1,5 +1,8 @@
 {
   "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
   "label": "rdfs:label",
-  "comment": "rdfs:comment"
+  "comment": "rdfs:comment",
+  "rdfs:isDefinedBy": {
+    "@type": "@id"
+  }
 }

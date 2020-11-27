@@ -1,14 +1,15 @@
 ---
 "@id": "rdfs:"
+"label": "RDF Schema (RDFS)"
 ---
 
-# RDF Schema (RDFS)
+{% include "header.md" with context %}
 
-{% set rdfs_url = (graph | sparql('
+{% set rdfs_url = query('
     SELECT ?rdfs WHERE {
         BIND(rdfs: AS ?rdfs)
     }
-') | gallery | first).rdfs %}
+').0.rdfs %}
 
 <div class="ui container">
     <div class="ui large fluid labeled input">
@@ -21,9 +22,13 @@
 
 <br/>
 
-{% set cards = graph | sparql('
+{{ query('SELECT * WHERE {
+        rdfs:subPropertyOf a ?t .
+}') }}
+
+{% set cards = query('
     SELECT * WHERE {
-        GRAPH <rdfs/rdfs.n3> {
+        GRAPH <kb://rdfs/rdfs.n3> {
             ?url rdfs:comment ?default_comment .
             ?url rdfs:label ?default_label .
         }
@@ -32,21 +37,21 @@
             GRAPH ?g {
                 ?url rdfs:label ?readable_label .
             }
-            FILTER (?g != <rdfs/rdfs.n3>)
+            FILTER (?g != <kb://rdfs/rdfs.n3>)
         }
 
         OPTIONAL {
             GRAPH ?g {
                 ?url rdfs:isDefinedBy ?link .
             }
-            FILTER (?g != <rdfs/rdfs.n3>)
+            FILTER (?g != <kb://rdfs/rdfs.n3>)
         }
 
         OPTIONAL {
             GRAPH ?g {
                 ?url rdfs:comment ?readable_comment .
             }
-            FILTER (?g != <rdfs/rdfs.n3>)
+            FILTER (?g != <kb://rdfs/rdfs.n3>)
         }
 
         ?url a ?category .
@@ -63,11 +68,11 @@
 
         ?url rdfs:isDefinedBy rdfs: .
     } ORDER BY ?priority ?default_label
-') | gallery %}
+') %}
 
 <div class="ui four cards">
 {% for card in cards %}
-    <a class="ui {{ card.color }} raised card" href="{{ card.link }}">
+    <a class="ui {{ card.color }} raised card" href="{{ card.link|iri_to_url }}">
         <div class="content">
             <div class="header">
                 {{ card.readable_label | d(card.default_label) }}

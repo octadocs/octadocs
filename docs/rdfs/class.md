@@ -1,13 +1,7 @@
 ---
 "@id": rdfs:Class
-"@type": rdfs/entities.md
+"@type": rdfs/entities/
 comment: Class, group, category.
 ---
 
-{% set info = graph | sparql('
-SELECT ?label WHERE {
-    rdfs:Class rdfs:label ?label .
-}
-') | gallery | first %}
-
-# {{ info.label }}
+{% include "header.md" with context %}

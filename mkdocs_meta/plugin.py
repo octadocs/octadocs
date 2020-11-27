@@ -7,6 +7,7 @@ import rdflib
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files, File
 from mkdocs.structure.pages import Page
+from rdflib import URIRef
 from rdflib.plugins.memory import IOMemory
 
 
@@ -34,7 +35,7 @@ def update_graph_from_n3_file(
     universe.parse(
         source=str(docs_dir / mkdocs_file.src_path),
         format='n3',
-        publicID=mkdocs_file.src_path,
+        publicID=f'kb://{mkdocs_file.src_path}',
     )
 
     return universe
@@ -55,16 +56,18 @@ def update_graph_from_markdown_file(
 
     meta_data.update({'@context': context})
 
+    page_id = f'kb://{mkdocs_file.url}'
+
     if meta_data.get('@id') is None:
-        meta_data['@id'] = f'kb://{mkdocs_file.src_path}'
+        meta_data['@id'] = page_id
 
     if meta_data.get('rdfs:isDefinedBy') is None:
-        meta_data['rdfs:isDefinedBy'] = f'/{mkdocs_file.url}'
+        meta_data['rdfs:isDefinedBy'] = page_id
 
     universe.parse(
         data=json.dumps(meta_data),
         format='json-ld',
-        publicID=mkdocs_file.src_path,
+        publicID=f'kb://{mkdocs_file.url}',
     )
 
     return universe

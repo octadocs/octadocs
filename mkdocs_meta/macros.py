@@ -1,19 +1,17 @@
-import cgi
+import html
 import io
-import textwrap
 from base64 import b64encode
-from functools import partial, wraps
+from functools import partial
 from typing import Any, Dict, List, TypedDict, Union, Optional
 from unittest.mock import patch
 
 import pydotplus
 import rdflib
 from macros.plugin import MacrosPlugin
+from mkdocs.structure.pages import Page
 from rdflib import Variable
 from rdflib.plugins.sparql.processor import SPARQLResult
 from rdflib.tools.rdf2dot import rdf2dot
-
-import html
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:
@@ -88,19 +86,11 @@ class Card(TypedDict):
     comment: str
 
 
-def gallery(query_result: SPARQLResult) -> List[Card]:
-    return [{
-        str(variable): str(rdf_value) if isinstance(rdf_value, rdflib.URIRef) else rdf_value.value
-        for variable, rdf_value
-        in row.items()
-    } for row in query_result.bindings]
-
-
 def get_bindings(
     kwargs: Dict[str, Optional[Union[rdflib.URIRef, str, int, float]]],
 ) -> Dict[str, Union[rdflib.URIRef, rdflib.Literal]]:
     return {
-        argument_name: argument_value if (
+        argument_name: argument_value if True or (
             isinstance(argument_value, rdflib.URIRef)
         ) else rdflib.Literal(argument_value)
         for argument_name, argument_value in kwargs.items()
@@ -115,14 +105,14 @@ class SelectResult(list):
         self.columns = columns
 
 
-def select(
-    query: str,
+def query(
+    query_text: str,
     instance: rdflib.ConjunctiveGraph,
     **kwargs: str,
 ):
     """Run SPARQL SELECT query and return formatted result."""
     sparql_result: SPARQLResult = instance.query(
-        query,
+        query_text,
         initBindings=get_bindings(kwargs),
     )
 
@@ -135,21 +125,34 @@ def select(
     } for row in sparql_result.bindings]
 
 
+def iri_of(page: Page) -> rdflib.URIRef:
+    """Construct IRI for a MkDocs site page."""
+    return rdflib.URIRef(f'kb://{page.url}')
+
+
+def iri_to_url(iri: str) -> str:
+    return iri.replace('kb://', '/')
+
+
 def define_env(env: MacrosPlugin) -> MacrosPlugin:
     env.filter(graph)
     env.filter(sparql)
     env.filter(n3)
     env.filter(table)
-    env.filter(gallery)
+    env.filter(iri_to_url)
 
     env.macro(partial(
-        select,
+        query,
         instance=env.variables.graph,
-    ), name='select')
+    ), name='query')
+
+    env.macro(iri_of)
 
     # FIXME this is hardcode, needs to be defined dynamically
     env.variables['rdfs'] = rdflib.Namespace(
         'http://www.w3.org/2000/01/rdf-schema#',
     )
+
+    env.variables['URIRef'] = rdflib.URIRef
 
     return env

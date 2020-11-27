@@ -1,6 +1,8 @@
 ---
 "@id": rdfs:range
-"@type": rdfs/domain_and_range.md
+"@type": rdfs/domain_and_range/
 comment: What values can the property have?
 label: Range
 ---
+
+{% include "header.md" with context %}
