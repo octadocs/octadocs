@@ -796,6 +796,18 @@ tgrep = ["pyparsing"]
 twitter = ["twython"]
 
 [[package]]
+category = "main"
+description = "OWL-RL and RDFS based RDF Closure inferencing for Python"
+name = "owlrl"
+optional = false
+python-versions = "*"
+version = "5.2.1"
+
+[package.dependencies]
+rdflib = ">=4.2.2"
+rdflib-jsonld = ">=0.4.0"
+
+[[package]]
 category = "dev"
 description = "Core utilities for Python packages"
 name = "packaging"
@@ -1340,7 +1352,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "b01744dd33356300b465fe6a3e7301f7edf704008659e705ac52f0ed99682e77"
+content-hash = "292b7cebdc7463b74d0468b63aa4ed8842e1d3ad21c2acf181157d19aceeee7e"
 python-versions = ">=3.6,<4.0"
 
 [metadata.files]
@@ -1706,6 +1718,10 @@ nitpick = [
 ]
 nltk = [
     {file = "nltk-3.5.zip", hash = "sha256:845365449cd8c5f9731f7cb9f8bd6fd0767553b9d53af9eb1b3abf7700936b35"},
+]
+owlrl = [
+    {file = "owlrl-5.2.1-py3-none-any.whl", hash = "sha256:2ad753f5ba6d1fe2d88bf36f427df31553f2eaa0283692e3cd06cab20ac8aec3"},
+    {file = "owlrl-5.2.1.tar.gz", hash = "sha256:efdebe76cf9ad148f316a9ae92e898e12b3b3690bd90218c898a2b676955b266"},
 ]
 packaging = [
     {file = "packaging-20.4-py2.py3-none-any.whl", hash = "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"},

@@ -12,11 +12,14 @@ $id: "rdfs:"
 ').0.rdfs %}
 
 <div class="ui container">
-    <div class="ui large fluid labeled input">
+    <div class="ui large fluid action labeled input">
       <div class="ui label">
         rdfs:
       </div>
       <input readonly type="text" placeholder="" value="{{ rdfs_url }}">
+      <a class="ui green button" href="{{ rdfs_url }}">
+        <i class="external alternate icon"></i>
+      </a>
     </div>
 </div>
 

@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import TypedDict, Dict, Any, Optional
 
 import frontmatter
+import owlrl
 import rdflib
 from boltons.iterutils import remap
 from mkdocs.plugins import BasePlugin
@@ -83,8 +84,14 @@ def update_graph_from_markdown_file(
     if meta_data.get('rdfs:isDefinedBy') is None:
         meta_data['rdfs:isDefinedBy'] = page_id
 
+    serialized_meta_data = json.dumps(meta_data, indent=4)
+
+    if 'subclass' in str(page_id):
+        print(serialized_meta_data)
+        raise Exception()
+
     universe.parse(
-        data=json.dumps(meta_data),
+        data=serialized_meta_data,
         format='json-ld',
         publicID=page_id,
     )
@@ -123,6 +130,7 @@ def fetch_context(docs_dir: Path) -> Dict[str, str]:
 
     json_document.update({
         '@vocab': settings.LOCAL_IRI_SCHEME,
+        '@base': settings.LOCAL_IRI_SCHEME,
     })
 
     return json_document
@@ -156,6 +164,8 @@ class MetaPlugin(BasePlugin):
                 universe=self.graph,
                 context=context,
             )
+
+        owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(self.graph)
 
     def on_page_context(
         self,
