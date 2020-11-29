@@ -57,11 +57,11 @@ $id: "rdfs:"
         ?category a <local:Category> .
         ?category rdfs:label ?category_label .
         ?category rdfs:comment ?category_comment .
-        ?category :color ?color .
+        ?category <local:color> ?color .
 
         BIND(999 AS ?default_priority)
         OPTIONAL {
-            ?category :priority ?priority .
+            ?category <local:priority> ?priority .
         }
         BIND(COALESCE(?priority, ?default_priority) AS ?priority)
 

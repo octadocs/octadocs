@@ -4,5 +4,8 @@
   "comment": "rdfs:comment",
   "rdfs:isDefinedBy": {
     "@type": "@id"
+  },
+  "rdfs:subClassOf": {
+    "@type": "@id"
   }
 }
