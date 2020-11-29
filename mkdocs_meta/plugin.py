@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
-from typing import TypedDict, Dict, Any, Optional
+from typing import Dict, Any, Optional
+from typing_extensions import TypedDict
 
 import frontmatter
 import owlrl

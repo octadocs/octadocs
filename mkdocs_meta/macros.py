@@ -2,7 +2,7 @@ import html
 import io
 from base64 import b64encode
 from functools import partial
-from typing import Any, Dict, List, TypedDict, Union, Optional
+from typing import Any, Dict, List, Union, Optional
 from unittest.mock import patch
 
 import pydotplus
@@ -79,12 +79,6 @@ def table(result: SPARQLResult) -> str:
 {separators}
 {rows}
 '''
-
-
-class Card(TypedDict):
-    url: str
-    label: str
-    comment: str
 
 
 def get_bindings(

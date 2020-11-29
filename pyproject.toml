@@ -46,6 +46,7 @@ graphviz = "^0.15"
 mkdocs-semantic = "^0.0.6"
 boltons = "^20.2.1"
 owlrl = "^5.2.1"
+typing-extensions = "^3.7.4"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.790"
