@@ -3,7 +3,7 @@ $id: rdfs:subClassOf
 $type: rdfs/class_to_class.md
 label: SubClass Of
 
-$graph:
+$included:
     - $id: Robot
       $type: rdfs:Class
     - $id: Rover
@@ -20,4 +20,4 @@ $graph:
     g=src_path_to_iri(page.file.src_path),
 ) | n3 }}
 
-{{ query('SELECT * WHERE { GRAPH ?g { ?s ?p "Opportunity" } }') }}
+{{ query('SELECT ?g WHERE { GRAPH ?g { ?s ?p "Opportunity" } }') }}

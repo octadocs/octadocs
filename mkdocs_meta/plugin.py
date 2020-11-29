@@ -91,9 +91,13 @@ def update_graph_from_markdown_file(
     meta_data = jsonld.expand(
         meta_data,
         options={
-            'base': 'local:',
+            'base': settings.LOCAL_IRI_SCHEME,
         },
     )
+
+    # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/98
+    # If we don't flatten, @included sections will not be imported.
+    meta_data = jsonld.flatten(meta_data)
 
     serialized_meta_data = json.dumps(meta_data)
 
