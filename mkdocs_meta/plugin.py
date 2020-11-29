@@ -9,6 +9,8 @@ from boltons.iterutils import remap
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files, File
 from mkdocs.structure.pages import Page
+from pyld import jsonld
+
 from mkdocs_meta import settings
 from mkdocs_meta.conversions import src_path_to_iri
 from rdflib.plugins.memory import IOMemory
@@ -84,11 +86,16 @@ def update_graph_from_markdown_file(
     if meta_data.get('rdfs:isDefinedBy') is None:
         meta_data['rdfs:isDefinedBy'] = page_id
 
-    serialized_meta_data = json.dumps(meta_data, indent=4)
+    # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
+    # If we don't expand with an explicit @base, import will fail silently.
+    meta_data = jsonld.expand(
+        meta_data,
+        options={
+            'base': 'local:',
+        },
+    )
 
-    if 'subclass' in str(page_id):
-        print(serialized_meta_data)
-        raise Exception()
+    serialized_meta_data = json.dumps(meta_data)
 
     universe.parse(
         data=serialized_meta_data,
