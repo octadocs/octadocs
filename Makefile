@@ -2,7 +2,7 @@ SHELL:=/usr/bin/env bash
 
 .PHONY: lint
 lint:
-	mypy mkdocs_meta tests/**/*.py
+	mypy octadocs tests/**/*.py
 	flake8 .
 	doc8 -q docs
 

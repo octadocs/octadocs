@@ -19,7 +19,7 @@ plugins:
   - search
   - macros:
       modules:
-        - mkdocs_meta
+        - octadocs
 
 theme:
   name: semantic
