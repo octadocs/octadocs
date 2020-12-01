@@ -12,7 +12,7 @@ from rdflib import Variable
 from rdflib.plugins.sparql.processor import SPARQLResult
 from rdflib.tools.rdf2dot import rdf2dot
 
-from mkdocs_meta.conversions import iri_to_url, src_path_to_iri
+from octadocs.conversions import iri_to_url, src_path_to_iri
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:

@@ -1,5 +1,10 @@
-# OctaDocs
+# {{ config.site_name }}
 
-!!! info
-    TODO
 
+{{ query('
+    SELECT * WHERE {
+        ?ontology a owl:Ontology .
+        ?ontology rdfs:isDefinedBy ?page .
+        ?page octa:url ?url .
+    }
+') }}

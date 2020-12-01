@@ -1,6 +1,6 @@
 import re
 
-from mkdocs_meta.settings import LOCAL_IRI_SCHEME
+from octadocs.settings import LOCAL_IRI_SCHEME
 from rdflib import URIRef
 
 

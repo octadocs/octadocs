@@ -9,7 +9,7 @@ style = "https://raw.githubusercontent.com/wemake-services/wemake-python-stylegu
 
 [tool.poetry]
 name = "octadocs"
-version = "0.0.1"
+version = "0.1.0"
 description = "MkDocs wiki made smart"
 license = "MIT"
 
@@ -29,13 +29,12 @@ classifiers = [
 ]
 
 [tool.poetry.plugins."mkdocs.plugins"]
-meta = "mkdocs_meta:MetaPlugin"
+octadocs = "octadocs:OctaDocsPlugin"
 
 
 [tool.poetry.dependencies]
 python = ">=3.6,<4.0"
 mkdocs = "^1.1.2"
-mkdocs-material = "^6.1.0"
 rdflib = "^5.0.0"
 python-frontmatter = "^0.5.0"
 rdflib-jsonld = "^0.5.0"

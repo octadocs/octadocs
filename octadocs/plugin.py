@@ -12,8 +12,8 @@ from mkdocs.structure.files import Files, File
 from mkdocs.structure.pages import Page
 from pyld import jsonld
 
-from mkdocs_meta import settings
-from mkdocs_meta.conversions import src_path_to_iri
+from octadocs import settings
+from octadocs.conversions import src_path_to_iri
 from rdflib.plugins.memory import IOMemory
 
 
@@ -148,13 +148,14 @@ def fetch_context(docs_dir: Path) -> Dict[str, str]:
     return json_document
 
 
-class MetaPlugin(BasePlugin):
+class OctaDocsPlugin(BasePlugin):
     """MkDocs Meta plugin."""
 
     graph: rdflib.ConjunctiveGraph = None
 
     def on_config(self, config: Config) -> Config:
         self.graph = rdflib.ConjunctiveGraph(store=IOMemory())
+        self.graph.bind('octa', 'https://ns.octadocs.io/')
 
         if config.get('extra') is None:
             config['extra'] = {}
