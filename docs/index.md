@@ -1,6 +1,6 @@
 # {{ config.site_name }}
 
-OctaDocs is a plugin for [MkDocs](https://mkdocs.org/) to make it smarter.
+OctaDocs is a plugin for [MkDocs](https://www.mkdocs.org/) to make it smarter.
 
 # 📚 Vocabularies
 

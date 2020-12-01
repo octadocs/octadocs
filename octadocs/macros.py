@@ -146,6 +146,42 @@ def construct(
     return sparql_result.graph
 
 
+def url(
+    resource: rdflib.URIRef,
+    graph: rdflib.ConjunctiveGraph
+) -> Optional[str]:
+    """Convert a URIRef to a clickable URL."""
+    bindings = graph.query(
+        'SELECT ?url WHERE { ?resource rdfs:isDefinedBy/octa:url ?url . } ',
+        initBindings={
+            'resource': resource,
+        }
+    ).bindings
+
+    if not bindings:
+        return None
+
+    return '/' + bindings[0][rdflib.Variable('url')].value
+
+
+def label(
+    resource: rdflib.URIRef,
+    graph: rdflib.ConjunctiveGraph
+) -> Optional[str]:
+    """Convert a URIRef to a clickable URL."""
+    bindings = graph.query(
+        'SELECT ?label WHERE { ?resource rdfs:label ?label . } ',
+        initBindings={
+            'resource': resource,
+        }
+    ).bindings
+
+    if not bindings:
+        return None
+
+    return bindings[0][rdflib.Variable('label')].value
+
+
 def define_env(env: MacrosPlugin) -> MacrosPlugin:
     env.filter(graph)
     env.filter(sparql)
@@ -161,6 +197,21 @@ def define_env(env: MacrosPlugin) -> MacrosPlugin:
         construct,
         instance=env.variables.graph,
     ), name='construct')
+
+    env.macro(partial(
+        url,
+        graph=env.variables.graph,
+    ), name='url')
+
+    env.filter(partial(
+        url,
+        graph=env.variables.graph,
+    ), name='url')
+
+    env.filter(partial(
+        label,
+        graph=env.variables.graph,
+    ), name='label')
 
     env.macro(iri_to_url)
     env.macro(src_path_to_iri)

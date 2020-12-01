@@ -91,3 +91,7 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
     </a>
 {% endfor %}
 </div>
+
+## Also
+
+- [Logical Inference Rules](/rdfs/inference/)
