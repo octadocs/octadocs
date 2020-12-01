@@ -85,7 +85,12 @@ def update_graph_from_markdown_file(
         meta_data['@id'] = page_id
 
     if meta_data.get('rdfs:isDefinedBy') is None:
-        meta_data['rdfs:isDefinedBy'] = page_id
+        meta_data['rdfs:isDefinedBy'] = {
+            '@id': page_id,
+
+            # For some reason, this one does not correctly work with prefix
+            'https://ns.octadocs.io/url': mkdocs_file.url,
+        }
 
     # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
     # If we don't expand with an explicit @base, import will fail silently.
@@ -156,6 +161,7 @@ class OctaDocsPlugin(BasePlugin):
     def on_config(self, config: Config) -> Config:
         self.graph = rdflib.ConjunctiveGraph(store=IOMemory())
         self.graph.bind('octa', 'https://ns.octadocs.io/')
+        self.graph.bind('schema', 'https://schema.org/')
 
         if config.get('extra') is None:
             config['extra'] = {}

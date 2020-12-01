@@ -1,5 +1,8 @@
 {
   "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+  "schema": "https://schema.org/",
+  "octa": "https://ns.octadocs.io/",
+
   "label": "rdfs:label",
   "comment": "rdfs:comment",
   "rdfs:isDefinedBy": {

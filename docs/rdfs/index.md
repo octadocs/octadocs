@@ -1,6 +1,8 @@
 ---
 $id: "rdfs:"
-"label": "RDF Schema (RDFS)"
+label: "RDF Schema (RDFS)"
+schema:image: rdfs/logo.svg
+rdfs:comment: Basic notions of classes, properties, and relations between them.
 ---
 
 {% include "header.md" with context %}
