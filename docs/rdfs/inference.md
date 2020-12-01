@@ -56,3 +56,15 @@ label: RDF & RDFS Inference Rules
         </tr>
     </tbody>
 </table>
+
+## Possible YAML syntax for inference rules
+
+```yaml
+rules:
+  - name: "Every triple implies types for its parts"
+    given: [_:subject, _:predicate, _:object]
+    implies:
+      - [_:subject, rdf:type, rdfs:Resource]
+      - [_:predicate, rdf:type, rdf:Property]
+      - [_:object, rdf:type, rdfs:Resource]
+```

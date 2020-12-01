@@ -1,7 +1,7 @@
-site_name: mkdocs-meta
-repo_url: https://github.com/anatoly-scherbakov/mkdocs-meta
-repo_name: mkdocs-meta
-copyright: Copyright &copy; 2020 Anatoly Scherbakov
+site_name: octadocs
+repo_url: https://github.com/anatoly-scherbakov/octadocs
+repo_name: octadocs
+copyright: Copyright &copy; 2020 OctaDocs
 
 nav:
   - RDFS: rdfs/index.md

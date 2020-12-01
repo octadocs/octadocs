@@ -4,6 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.pytest_cache" />
       <excludeFolder url="file://$MODULE_DIR$/mkdocs_meta/htmlcov" />
+      <excludeFolder url="file://$MODULE_DIR$/site" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (mkdocs-meta)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

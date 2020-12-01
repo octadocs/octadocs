@@ -1,8 +1,8 @@
 # mkdocs meta
 
-[![Build Status](https://travis-ci.com/anatoly-scherbakov/mkdocs-meta.svg?branch=master)](https://travis-ci.com/anatoly-scherbakov/mkdocs-meta)
-[![Coverage](https://coveralls.io/repos/github/anatoly-scherbakov/mkdocs-meta/badge.svg?branch=master)](https://coveralls.io/github/anatoly-scherbakov/mkdocs-meta?branch=master)
-[![Python Version](https://img.shields.io/pypi/pyversions/mkdocs-meta.svg)](https://pypi.org/project/mkdocs-meta/)
+[![Build Status](https://travis-ci.com/anatoly-scherbakov/octadocs.svg?branch=master)](https://travis-ci.com/anatoly-scherbakov/octadocs)
+[![Coverage](https://coveralls.io/repos/github/anatoly-scherbakov/octadocs/badge.svg?branch=master)](https://coveralls.io/github/anatoly-scherbakov/octadocs?branch=master)
+[![Python Version](https://img.shields.io/pypi/pyversions/octadocs.svg)](https://pypi.org/project/octadocs/)
 [![wemake-python-styleguide](https://img.shields.io/badge/style-wemake-000000.svg)](https://github.com/wemake-services/wemake-python-styleguide)
 
 ## Features
@@ -14,12 +14,12 @@
 ## Installation
 
 ```bash
-pip install mkdocs-meta
+pip install octadocs
 ```
 
 ## License
 
-[MIT](https://github.com/anatoly-scherbakov/mkdocs-meta/blob/master/LICENSE)
+[MIT](https://github.com/anatoly-scherbakov/octadocs/blob/master/LICENSE)
 
 
 ## Credits
