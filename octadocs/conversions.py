@@ -1,5 +1,7 @@
 import re
 
+from mkdocs.structure.pages import Page
+
 from octadocs.settings import LOCAL_IRI_SCHEME
 from rdflib import URIRef
 
@@ -7,6 +9,11 @@ from rdflib import URIRef
 def src_path_to_iri(src_path: str) -> URIRef:
     """Convert src_path of a file to a Zet IRI."""
     return URIRef(f'{LOCAL_IRI_SCHEME}{src_path}')
+
+
+def iri_by_page(page: Page) -> URIRef:
+    """Convert src_path of a file to a Zet IRI."""
+    return src_path_to_iri(page.file.src_path)
 
 
 def iri_to_url(iri: str) -> str:

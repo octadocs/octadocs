@@ -4,5 +4,5 @@ $type: rdfs/textual_descriptions.md
 label: Comment
 ---
 
-{% include "header.md" with context %}
+{% include "templates/term.md" with context %}
 

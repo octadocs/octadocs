@@ -4,4 +4,4 @@ $type: rdfs/resource_to_resource.md
 label: See Also
 ---
 
-{% include "header.md" with context %}
+{% include "templates/term.md" with context %}

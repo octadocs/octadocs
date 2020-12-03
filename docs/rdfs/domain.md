@@ -5,4 +5,4 @@ comment: Who can have this property?
 label: Domain
 ---
 
-{% include "header.md" with context %}
+{% include "templates/term.md" with context %}

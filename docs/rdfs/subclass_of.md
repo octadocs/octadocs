@@ -13,7 +13,7 @@ $included:
       label: Opportunity
 ---
 
-{% include "header.md" with context %}
+{% include "templates/term.md" with context %}
 
 {{ construct(
     'CONSTRUCT { ?s ?p ?o } where { graph ?g { ?s ?p ?o . } }',

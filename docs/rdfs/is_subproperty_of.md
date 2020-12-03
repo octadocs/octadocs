@@ -1,7 +1,18 @@
 ---
 $id: rdfs:subPropertyOf
 $type: rdfs/property_to_property.md
-"label": Is SubProperty Of
+"label": SubProperty Of
 ---
 
-{% include "header.md" with context %}
+{% include "templates/term.md" with context %}
+
+<div class="ui warning icon message">
+    <i class="exclamation icon"></i>
+    <div class="content">
+        <div class="header">
+            The domain and range are incorrect
+        </div>
+        <p>That's because we do not have an entry for <code>rdf:Property</code>.
+        We will fix that.</p>
+    </div>
+</div>

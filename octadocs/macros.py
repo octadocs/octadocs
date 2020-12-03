@@ -12,7 +12,7 @@ from rdflib import Variable
 from rdflib.plugins.sparql.processor import SPARQLResult
 from rdflib.tools.rdf2dot import rdf2dot
 
-from octadocs.conversions import iri_to_url, src_path_to_iri
+from octadocs.conversions import iri_to_url, src_path_to_iri, iri_by_page
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:
@@ -129,6 +129,9 @@ def query(
         initBindings=get_bindings(kwargs),
     )
 
+    if sparql_result.askAnswer is not None:
+        return sparql_result.askAnswer
+
     return _format_query_bindings(sparql_result.bindings)
 
 
@@ -217,6 +220,9 @@ def define_env(env: MacrosPlugin) -> MacrosPlugin:
     env.macro(src_path_to_iri)
 
     env.filter(iri_to_url)
+
+    env.filter(iri_by_page)
+    env.macro(iri_by_page)
 
     # FIXME this is hardcode, needs to be defined dynamically
     env.variables['rdfs'] = rdflib.Namespace(

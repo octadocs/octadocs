@@ -4,4 +4,4 @@ $type: rdfs/resource_to_resource.md
 label: Defined By
 ---
 
-{% include "header.md" with context %}
+{% include "templates/term.md" with context %}

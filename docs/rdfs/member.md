@@ -4,4 +4,4 @@ $type: rdfs/containers.md
 label: Member
 ---
 
-{% include "header.md" with context %}
+{% include "templates/term.md" with context %}

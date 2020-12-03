@@ -87,9 +87,8 @@ def update_graph_from_markdown_file(
     if meta_data.get('rdfs:isDefinedBy') is None:
         meta_data['rdfs:isDefinedBy'] = {
             '@id': page_id,
-
-            # For some reason, this one does not correctly work with prefix
-            'https://ns.octadocs.io/url': mkdocs_file.url,
+            'octa:url': mkdocs_file.url,
+            '@type': 'octa:Page',
         }
 
     # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
