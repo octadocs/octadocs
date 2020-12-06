@@ -257,5 +257,9 @@ class OctaDocsPlugin(BasePlugin):
             query,
             instance=self.graph,
         )
+        # FIXME this is hardcode, needs to be defined dynamically
+        context['rdfs'] = rdflib.Namespace(
+            'http://www.w3.org/2000/01/rdf-schema#',
+        )
 
         return context

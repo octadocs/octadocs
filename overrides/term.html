@@ -27,8 +27,16 @@
         ?term rdfs:isDefinedBy ?iri .
 
         GRAPH ?iri {
-            ?term rdfs:comment ?summary .
+            OPTIONAL {
+                ?term rdfs:comment ?readable_summary .
+            }
         }
+
+        GRAPH <local:rdfs/rdfs.n3> {
+            ?term rdfs:comment ?default_summary .
+        }
+
+        BIND(COALESCE(?readable_summary, ?default_summary) AS ?summary)
     }
 ', iri=iri) %}
 
@@ -55,16 +63,6 @@
     }
 ', iri=iri) %}
 
-{% set domains = query('
-    SELECT ?link ?label WHERE {
-        ?term rdfs:isDefinedBy ?iri .
-        ?term rdfs:domain ?domain .
-
-        ?domain rdfs:isDefinedBy/octa:url ?link .
-        ?domain rdfs:label ?label .
-    }
-', iri=iri) %}
-
 
 {% set classes = query('
     SELECT ?link ?label WHERE {
@@ -82,14 +80,26 @@
     }
 ', iri=iri) %}
 
-{% set ranges = query('
+{% set related_objects_query = '
     SELECT ?link ?label WHERE {
         ?term rdfs:isDefinedBy ?iri .
-        ?term rdfs:range ?range .
-        ?range rdfs:isDefinedBy/octa:url ?link .
-        ?range rdfs:label ?label .
+
+        GRAPH <local:rdfs/rdfs.n3> {
+            ?term ?relation ?related_object .
+        }
+
+        ?related_object rdfs:label ?label .
+
+        OPTIONAL {
+            ?related_object rdfs:isDefinedBy ?page .
+            ?page a octa:Page .
+            ?page octa:url ?link .
+        }
     }
-', iri=iri) %}
+' %}
+
+{% set ranges = query(related_objects_query, iri=iri, relation=rdfs.range) %}
+{% set domains = query(related_objects_query, iri=iri, relation=rdfs.domain) %}
 
 {% set is_property = query('ASK {
     ?term rdfs:isDefinedBy ?page .
@@ -102,9 +112,15 @@
         <div class="content">
             <div class="header">Instance of:</div>
             {% for class in classes %}
-                <a href="{{ class.link }}">{{ class.label }}</a>{% filter trim %}
-                {% if not loop.last %}, {% endif %}
-                {% endfilter %}
+                {% if class.link %}
+                    <a href="/{{ class.link }}">{{ class.label }}</a>{% filter trim %}
+                    {% if not loop.last %}, {% endif %}
+                    {% endfilter %}
+                {% else %}
+                    <strong>{{ class.label }}</strong>{% filter trim %}
+                    {% if not loop.last %}, {% endif %}
+                    {% endfilter %}
+                {% endif %}
             {% endfor %}
         </div>
     </div>
@@ -115,9 +131,15 @@
         <div class="content">
             <div class="header">Subclass of:</div>
             {% for superclass in superclasses %}
-                <a href="{{ superclass.link }}">{{ superclass.label }}</a>{% filter trim %}
-                {% if not loop.last %}, {% endif %}
-                {% endfilter %}
+                {% if superclass.link %}
+                    <a href="/{{ superclass.link }}">{{ superclass.label }}</a>{% filter trim %}
+                    {% if not loop.last %}, {% endif %}
+                    {% endfilter %}
+                {% else %}
+                    <strong>{{ superclass.label }}</strong>{% filter trim %}
+                    {% if not loop.last %}, {% endif %}
+                    {% endfilter %}
+                {% endif %}
             {% endfor %}
         </div>
     </div>
@@ -127,15 +149,23 @@
     <div class="item">
         <div class="content">
             <div class="header">Property:</div>
-            {% for range in ranges %}
-                <a href="{{ range.link }}">{{ range.label }}</a>
+            {% for domain in domains %}
+                {% if domain.link %}
+                    <a href="/{{ domain.link }}">{{ domain.label }}</a>
+                {% else %}
+                    <strong>{{ domain.label }}</strong>
+                {% endif %}
                 {% if loop.revindex == 2 %} or {% elif not loop.last %}, {% endif %}
             {% endfor %}
 
             →
 
-            {% for domain in domains %}
-                <a href="{{ domain.link }}">{{ domain.label }}</a>
+            {% for range in ranges %}
+                {% if range.link %}
+                    <a href="/{{ range.link }}">{{ range.label }}</a>
+                {% else %}
+                    <strong>{{ range.label }}</strong>
+                {% endif %}
                 {% if loop.revindex == 2 %} or {% elif not loop.last %}, {% endif %}
             {% endfor %}
         </div>
