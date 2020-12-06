@@ -53,6 +53,10 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
         ?category rdfs:label ?category_label .
         ?category rdfs:comment ?category_comment .
         ?category <local:color> ?color .
+        
+        OPTIONAL {
+            ?term <local:symbol> ?symbol .
+        }
 
         BIND(999 AS ?default_priority)
         OPTIONAL {
@@ -69,6 +73,9 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
     <a class="ui {{ card.color }} raised card" href="/{{ card.url|default('?') }}">
         <div class="content">
             <div class="header">
+                {% if card.symbol %}
+                    {{ card.symbol }}
+                {% endif %}
                 {{ card.readable_label | d(card.default_label) }}
             </div>
             <div class="description">

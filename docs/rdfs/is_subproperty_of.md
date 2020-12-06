@@ -1,7 +1,8 @@
 ---
 $id: rdfs:subPropertyOf
 $type: rdfs/property_to_property.md
-"label": SubProperty Of
+label: SubProperty Of
+symbol: 🔵
 ---
 
 <div class="ui warning icon message">

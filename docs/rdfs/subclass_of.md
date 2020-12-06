@@ -2,6 +2,7 @@
 $id: rdfs:subClassOf
 $type: rdfs/class_to_class.md
 label: SubClass Of
+symbol: ⊂
 
 $included:
     - $id: Robot

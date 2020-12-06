@@ -1,4 +1,5 @@
 import json
+import operator
 from functools import partial
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -198,8 +199,10 @@ class OctaDocsPlugin(BasePlugin):
 
     def on_config(self, config: Config) -> Config:
         self.graph = rdflib.ConjunctiveGraph(store=IOMemory())
+
         self.graph.bind('octa', 'https://ns.octadocs.io/')
         self.graph.bind('schema', 'https://schema.org/')
+        self.graph.bind('local', 'local')
 
         if config.get('extra') is None:
             config['extra'] = {}
@@ -249,10 +252,28 @@ class OctaDocsPlugin(BasePlugin):
         nav: Page,
     ) -> Context:
         """Attach the views to certain pages."""
-        context['graph'] = self.graph
-        context['iri'] = rdflib.URIRef(
+        page_iri = rdflib.URIRef(
             f'{settings.LOCAL_IRI_SCHEME}{page.file.src_path}',
         )
+
+        this_choices = list(map(
+            operator.itemgetter(rdflib.Variable('this')),
+            self.graph.query(
+                'SELECT * WHERE { ?this rdfs:isDefinedBy ?page_iri }',
+                initBindings={
+                    'page_iri': page_iri,
+                },
+            ).bindings,
+        ))
+
+        if this_choices:
+            context['this'] = this_choices[0]
+        else:
+            context['this'] = page_iri
+
+        context['graph'] = self.graph
+        context['iri'] = page_iri
+
         context['query'] = partial(
             query,
             instance=self.graph,

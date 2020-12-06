@@ -19,7 +19,7 @@
 
         BIND(COALESCE(?readable_label, ?default_label) AS ?label)
     }',
-    iri=iri,
+    iri=iri
 ) %}
 
 {% set summaries = query('
@@ -40,8 +40,17 @@
     }
 ', iri=iri) %}
 
+{% set symbols = query('
+    SELECT * WHERE {
+        ?this <local:symbol> ?symbol .
+    }
+', this=this) %}
+
 {% if headers %}
 <h1 class="ui header">
+    {% if symbols %}
+        {{ symbols.0.symbol }}
+    {% endif %}
     {{ headers.0.label }}
     {% if summaries %}
         <div class="sub header">
@@ -172,6 +181,8 @@
     </div>
 {% endif %}
 </div>
+
+<div class="ui horizontal divider"></div>
 
 {{ super() }}
 {% endblock %}
