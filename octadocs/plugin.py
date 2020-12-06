@@ -169,8 +169,7 @@ def get_template_by_page(
     ).bindings
 
     if bindings:
-        print(f"{page} -> {bindings[0]['template_name']}")
-        return bindings[0]['template_name']
+        return bindings[0]['template_name'].value
 
     else:
         return None
@@ -180,16 +179,14 @@ def apply_inference_in_place(graph: rdflib.ConjunctiveGraph) -> None:
     """Apply inference rules."""
     owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(graph)
 
-    if False:
+    if True:
         graph.update('''
             INSERT {
-                ?page octa:template "term.html"
+                ?page octa:template "term.html" .
             } WHERE {
                 ?page a octa:Page .
                 ?term rdfs:isDefinedBy ?page .
                 ?term rdfs:isDefinedBy rdfs: .
-
-                FILTER(?term = rdfs:comment)
             }
         ''')
 
@@ -236,7 +233,7 @@ class OctaDocsPlugin(BasePlugin):
     ):
         template_name = get_template_by_page(
             page=page,
-            graph=self.graph
+            graph=self.graph,
         )
 
         if template_name is not None:

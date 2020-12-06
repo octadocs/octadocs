@@ -4,4 +4,3 @@ $type: rdfs/entities.md
 comment: Number, string, date, your cat's color, ...
 ---
 
-{% include "templates/term.md" with context %}

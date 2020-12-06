@@ -4,8 +4,6 @@ $type: rdfs/property_to_property.md
 "label": SubProperty Of
 ---
 
-{% include "templates/term.md" with context %}
-
 <div class="ui warning icon message">
     <i class="exclamation icon"></i>
     <div class="content">

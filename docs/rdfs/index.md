@@ -30,32 +30,25 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
 {% set cards = query('
     SELECT * WHERE {
         GRAPH <local:rdfs/rdfs.n3> {
-            ?url rdfs:comment ?default_comment .
-            ?url rdfs:label ?default_label .
+            ?term rdfs:comment ?default_comment .
+            ?term rdfs:label ?default_label .
         }
-
-        OPTIONAL {
-            GRAPH ?g {
-                ?url rdfs:label ?readable_label .
+        
+        ?term rdfs:isDefinedBy ?page .
+        ?page a octa:Page .
+        ?page octa:url ?url .
+        
+        GRAPH ?page {
+            OPTIONAL {
+                ?term rdfs:label ?readable_label .
             }
-            FILTER (?g != <local:rdfs/rdfs.n3>)
-        }
-
-        OPTIONAL {
-            GRAPH ?g {
-                ?url rdfs:isDefinedBy ?link .
+            
+            OPTIONAL {
+                ?term rdfs:comment ?readable_comment .
             }
-            FILTER (?g != <local:rdfs/rdfs.n3>)
         }
-
-        OPTIONAL {
-            GRAPH ?g {
-                ?url rdfs:comment ?readable_comment .
-            }
-            FILTER (?g != <local:rdfs/rdfs.n3>)
-        }
-
-        ?url a ?category .
+        
+        ?term a ?category .
         ?category a <local:Category> .
         ?category rdfs:label ?category_label .
         ?category rdfs:comment ?category_comment .
@@ -67,13 +60,13 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
         }
         BIND(COALESCE(?priority, ?default_priority) AS ?priority)
 
-        ?url rdfs:isDefinedBy rdfs: .
+        ?term rdfs:isDefinedBy rdfs: .
     } ORDER BY ?priority ?default_label
 ') %}
 
 <div class="ui four cards">
 {% for card in cards %}
-    <a class="ui {{ card.color }} raised card" href="/{{ card.link|iri_to_url }}">
+    <a class="ui {{ card.color }} raised card" href="/{{ card.url|default('?') }}">
         <div class="content">
             <div class="header">
                 {{ card.readable_label | d(card.default_label) }}

@@ -2,7 +2,6 @@
 $id: rdfs:comment
 $type: rdfs/textual_descriptions.md
 label: Comment
-template: term.html
 ---
 
 ## Examples

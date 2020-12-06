@@ -13,8 +13,6 @@ $included:
       label: Opportunity
 ---
 
-{% include "templates/term.md" with context %}
-
 {{ construct(
     'CONSTRUCT { ?s ?p ?o } where { graph ?g { ?s ?p ?o . } }',
     g=src_path_to_iri(page.file.src_path),

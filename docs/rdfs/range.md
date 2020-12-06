@@ -5,4 +5,3 @@ comment: What values can the property have?
 label: Range
 ---
 
-{% include "templates/term.md" with context %}
