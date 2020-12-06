@@ -1,4 +1,5 @@
 import json
+from functools import partial
 from pathlib import Path
 from typing import Dict, Any, Optional
 from typing_extensions import TypedDict
@@ -15,6 +16,8 @@ from pyld import jsonld
 from octadocs import settings
 from octadocs.conversions import src_path_to_iri
 from rdflib.plugins.memory import IOMemory
+
+from octadocs.macros import query
 
 
 class Extra(TypedDict):
@@ -152,6 +155,45 @@ def fetch_context(docs_dir: Path) -> Dict[str, str]:
     return json_document
 
 
+def get_template_by_page(
+    page: Page,
+    graph: rdflib.ConjunctiveGraph,
+) -> Optional[str]:
+    iri = rdflib.URIRef(f'{settings.LOCAL_IRI_SCHEME}{page.file.src_path}')
+
+    bindings = graph.query(
+        'SELECT ?template_name WHERE { ?iri octa:template ?template_name }',
+        initBindings={
+            'iri': iri,
+        },
+    ).bindings
+
+    if bindings:
+        print(f"{page} -> {bindings[0]['template_name']}")
+        return bindings[0]['template_name']
+
+    else:
+        return None
+
+
+def apply_inference_in_place(graph: rdflib.ConjunctiveGraph) -> None:
+    """Apply inference rules."""
+    owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(graph)
+
+    if False:
+        graph.update('''
+            INSERT {
+                ?page octa:template "term.html"
+            } WHERE {
+                ?page a octa:Page .
+                ?term rdfs:isDefinedBy ?page .
+                ?term rdfs:isDefinedBy rdfs: .
+
+                FILTER(?term = rdfs:comment)
+            }
+        ''')
+
+
 class OctaDocsPlugin(BasePlugin):
     """MkDocs Meta plugin."""
 
@@ -183,7 +225,24 @@ class OctaDocsPlugin(BasePlugin):
                 context=context,
             )
 
-        owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(self.graph)
+        apply_inference_in_place(self.graph)
+
+    def on_page_markdown(
+        self,
+        markdown: str,
+        page: Page,
+        config: Config,
+        files: Files,
+    ):
+        template_name = get_template_by_page(
+            page=page,
+            graph=self.graph
+        )
+
+        if template_name is not None:
+            page.meta['template'] = template_name
+
+        return markdown
 
     def on_page_context(
         self,
@@ -194,4 +253,12 @@ class OctaDocsPlugin(BasePlugin):
     ) -> Context:
         """Attach the views to certain pages."""
         context['graph'] = self.graph
+        context['iri'] = rdflib.URIRef(
+            f'{settings.LOCAL_IRI_SCHEME}{page.file.src_path}',
+        )
+        context['query'] = partial(
+            query,
+            instance=self.graph,
+        )
+
         return context
