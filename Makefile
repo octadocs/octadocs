@@ -21,7 +21,7 @@ package:
 .PHONY: test
 test: lint package unit
 
-.PHONY: docs
-.ONESHELL:
-docs:
-	cd docs && make dirhtml
+docs/rdfs/class/classes.svg: docs/rdfs/class/classes.drawio
+	drawio --export docs/rdfs/class/classes.drawio --output docs/rdfs/class/classes.svg --transparent
+
+update: docs/rdfs/class/classes.svg

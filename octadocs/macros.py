@@ -228,6 +228,7 @@ def define_env(env: MacrosPlugin) -> MacrosPlugin:
     env.variables['rdfs'] = rdflib.Namespace(
         'http://www.w3.org/2000/01/rdf-schema#',
     )
+    env.variables['local'] = rdflib.Namespace('local:')
 
     env.variables['URIRef'] = rdflib.URIRef
 
