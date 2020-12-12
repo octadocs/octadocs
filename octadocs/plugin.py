@@ -108,7 +108,7 @@ def update_graph_from_markdown_file(
     # If we don't flatten, @included sections will not be imported.
     meta_data = jsonld.flatten(meta_data)
 
-    serialized_meta_data = json.dumps(meta_data)
+    serialized_meta_data = json.dumps(meta_data, indent=4)
 
     universe.parse(
         data=serialized_meta_data,

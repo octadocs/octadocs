@@ -38,16 +38,6 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
         ?page a octa:Page .
         ?page octa:url ?url .
         
-        GRAPH ?page {
-            OPTIONAL {
-                ?term rdfs:label ?readable_label .
-            }
-            
-            OPTIONAL {
-                ?term rdfs:comment ?readable_comment .
-            }
-        }
-        
         ?term a ?category .
         ?category a <local:Category> .
         ?category rdfs:label ?category_label .
@@ -64,9 +54,22 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
         }
         BIND(COALESCE(?priority, ?default_priority) AS ?priority)
 
+        OPTIONAL {
+            GRAPH ?page {
+                ?term rdfs:label ?readable_label .
+            }
+        }
+        
+        OPTIONAL {
+            GRAPH ?page {
+                ?term rdfs:comment ?readable_comment .
+            }
+        }
+
         ?term rdfs:isDefinedBy rdfs: .
     } ORDER BY ?priority ?default_label
 ') %}
+
 
 <div class="ui four cards">
 {% for card in cards %}
