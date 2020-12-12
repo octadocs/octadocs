@@ -3,9 +3,6 @@ repo_url: https://github.com/anatoly-scherbakov/octadocs
 repo_name: octadocs
 copyright: Copyright &copy; 2020 OctaDocs
 
-nav:
-  - RDFS: rdfs/index.md
-
 markdown_extensions:
   - admonition
   - codehilite
@@ -23,5 +20,6 @@ plugins:
 
 theme:
   name: semantic
-  logo: None
+  logo:
+    image: logo.png
   custom_dir: overrides
