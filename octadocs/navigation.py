@@ -88,6 +88,7 @@ class OctadocsNavigationProcessor:
             index_page = index_page_candidates[0]
             section.title = index_page.title
 
-            index_page.parent = section.parent
+            if section.parent is not None:
+                index_page.parent = section.parent
 
         return section
