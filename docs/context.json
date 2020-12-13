@@ -10,5 +10,6 @@
   },
   "rdfs:subClassOf": {
     "@type": "@id"
-  }
+  },
+  "show_at_navigation": "octa:show_at_navigation"
 }
