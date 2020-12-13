@@ -3,7 +3,7 @@
 {% block content %}
 {% set headers = query(
     'SELECT ?label WHERE {
-        ?entity rdfs:isDefinedBy ?iri .
+        ?entity octa:subjectOf ?iri .
 
         OPTIONAL {
             GRAPH ?iri {
@@ -24,7 +24,7 @@
 
 {% set summaries = query('
     SELECT ?summary WHERE {
-        ?term rdfs:isDefinedBy ?iri .
+        ?term octa:subjectOf ?iri .
 
         GRAPH ?iri {
             OPTIONAL {
@@ -64,9 +64,9 @@
 
 {% set superclasses = query('
     SELECT ?link ?label ?link WHERE {
-        ?term rdfs:isDefinedBy ?iri .
+        ?term octa:subjectOf ?iri .
         ?term rdfs:subClassOf ?superclass .
-        ?superclass rdfs:isDefinedBy/octa:url ?link .
+        ?superclass octa:subjectOf/octa:url ?link .
         ?superclass rdfs:label ?label .
         FILTER(?superclass != ?term)
     }
@@ -75,7 +75,7 @@
 
 {% set classes = query('
     SELECT ?link ?label WHERE {
-        ?term rdfs:isDefinedBy ?iri .
+        ?term octa:subjectOf ?iri .
 
         GRAPH <local:rdfs/rdfs.n3> {
             ?term a ?class .
@@ -84,14 +84,14 @@
         ?class rdfs:label ?label .
 
         OPTIONAL {
-            ?class rdfs:isDefinedBy/octa:url ?link .
+            ?class octa:subjectOf/octa:url ?link .
         }
     }
 ', iri=iri) %}
 
 {% set related_objects_query = '
     SELECT ?link ?label WHERE {
-        ?term rdfs:isDefinedBy ?iri .
+        ?term octa:subjectOf ?iri .
 
         GRAPH <local:rdfs/rdfs.n3> {
             ?term ?relation ?related_object .
@@ -100,7 +100,7 @@
         ?related_object rdfs:label ?label .
 
         OPTIONAL {
-            ?related_object rdfs:isDefinedBy ?page .
+            ?related_object octa:subjectOf ?page .
             ?page a octa:Page .
             ?page octa:url ?link .
         }
@@ -111,7 +111,7 @@
 {% set domains = query(related_objects_query, iri=iri, relation=rdfs.domain) %}
 
 {% set is_property = query('ASK {
-    ?term rdfs:isDefinedBy ?page .
+    ?term octa:subjectOf ?page .
     ?term rdf:type rdf:Property
 }', page=iri) %}
 
@@ -122,7 +122,7 @@
             <div class="header">Instance of:</div>
             {% for class in classes %}
                 {% if class.link %}
-                    <a href="/{{ class.link }}">{{ class.label }}</a>{% filter trim %}
+                    <a href="{{ class.link }}">{{ class.label }}</a>{% filter trim %}
                     {% if not loop.last %}, {% endif %}
                     {% endfilter %}
                 {% else %}
@@ -141,7 +141,7 @@
             <div class="header">Subclass of:</div>
             {% for superclass in superclasses %}
                 {% if superclass.link %}
-                    <a href="/{{ superclass.link }}">{{ superclass.label }}</a>{% filter trim %}
+                    <a href="{{ superclass.link }}">{{ superclass.label }}</a>{% filter trim %}
                     {% if not loop.last %}, {% endif %}
                     {% endfilter %}
                 {% else %}
@@ -160,7 +160,7 @@
             <div class="header">Property:</div>
             {% for domain in domains %}
                 {% if domain.link %}
-                    <a href="/{{ domain.link }}">{{ domain.label }}</a>
+                    <a href="{{ domain.link }}">{{ domain.label }}</a>
                 {% else %}
                     <strong>{{ domain.label }}</strong>
                 {% endif %}
@@ -171,7 +171,7 @@
 
             {% for range in ranges %}
                 {% if range.link %}
-                    <a href="/{{ range.link }}">{{ range.label }}</a>
+                    <a href="{{ range.link }}">{{ range.label }}</a>
                 {% else %}
                     <strong>{{ range.label }}</strong>
                 {% endif %}

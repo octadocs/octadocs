@@ -11,13 +11,13 @@ OctaDocs is a plugin for [MkDocs](https://www.mkdocs.org/) to make it smarter.
             rdfs:label ?title ;
             rdfs:comment ?description ;
             schema:image ?image ;
-            rdfs:isDefinedBy/octa:url ?url .
+            octa:subjectOf/octa:url ?url .
     }
 ') %}
 
 <div class="ui four cards">
 {% for card in cards %}
-    <a class="ui raised card" href="/{{ card.url }}">
+    <a class="ui raised card" href="{{ card.url }}">
         <div class="image">
             <img src="{{ card.image }}" />
         </div>
@@ -36,7 +36,7 @@ OctaDocs is a plugin for [MkDocs](https://www.mkdocs.org/) to make it smarter.
 {{ owl.Ontology.objects | cards(
     title=rdfs.label,
     image=schema.image,
-    url=rdfs.isDefinedBy / octa.url,
+    url=octa.subjectOf/octa.url,
 ) }}
 ```
 #}

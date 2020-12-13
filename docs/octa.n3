@@ -1,0 +1,15 @@
+@prefix schema: <http://schema.org/> .
+@prefix octa: <https://ns.octadocs.io/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+octa:Page rdfs:SubClassOf schema:WebPage .
+octa:about rdfs:SubPropertyOf schema:about .
+octa:title rdfs:SubPropertyOf schema:name .
+octa:url rdfs:SubPropertyOf schema:url .
+octa:subjectOf rdfs:SubPropertyOf schema:SubjectOf .
+
+octa:template
+  rdfs:domain octa:Page ;
+  rdfs:range rdfs:Literal ;
+  rdfs:label "HTML/Jinja2 template" ;
+  rdfs:comment "Path to an MkDocs template file used to render particular page, relative to the `overrides` directory." .

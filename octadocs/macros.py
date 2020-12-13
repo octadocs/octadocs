@@ -155,7 +155,7 @@ def url(
 ) -> Optional[str]:
     """Convert a URIRef to a clickable URL."""
     bindings = graph.query(
-        'SELECT ?url WHERE { ?resource rdfs:isDefinedBy/octa:url ?url . } ',
+        'SELECT ?url WHERE { ?resource octa:subjectOf/octa:url ?url . } ',
         initBindings={
             'resource': resource,
         }

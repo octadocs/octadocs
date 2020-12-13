@@ -1,6 +1,6 @@
 {% set results = query(
     'SELECT ?label WHERE {
-        ?entity rdfs:isDefinedBy ?iri .    
+        ?entity octa:subjectOf ?iri .
     
         OPTIONAL {
             GRAPH ?iri {
