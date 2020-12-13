@@ -1,14 +1,10 @@
-import re
+from typing import Optional
 
+import rdflib
 from mkdocs.structure.pages import Page
 
-from octadocs.settings import LOCAL_IRI_SCHEME
+from octadocs.environment import query, src_path_to_iri
 from rdflib import URIRef
-
-
-def src_path_to_iri(src_path: str) -> URIRef:
-    """Convert src_path of a file to a Zet IRI."""
-    return URIRef(f'{LOCAL_IRI_SCHEME}{src_path}')
 
 
 def iri_by_page(page: Page) -> URIRef:
@@ -16,20 +12,22 @@ def iri_by_page(page: Page) -> URIRef:
     return src_path_to_iri(page.file.src_path)
 
 
-def iri_to_url(iri: str) -> str:
-    """Convert Zet IRI into clickable URL."""
-    iri = iri.replace(LOCAL_IRI_SCHEME, '')
+def get_page_title_by_iri(
+    iri: str,
+    graph: rdflib.ConjunctiveGraph,
+) -> Optional[str]:
+    results = query(
+        query_text='''
+            SELECT ?title WHERE {
+                ?page octa:title ?title .
+            }
+        ''',
+        instance=graph,
 
-    if iri.endswith('index.md'):
-        return re.sub(
-            r'/index\.md$',
-            '/',
-            iri,
-        )
+        page=iri,
+    )
 
-    else:
-        return re.sub(
-            r'\.md$',
-            '',
-            iri,
-        )
+    if results:
+        return results[0]['title']
+
+    return None

@@ -2,7 +2,7 @@ import html
 import io
 from base64 import b64encode
 from functools import partial
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Optional
 from unittest.mock import patch
 
 import pydotplus
@@ -12,7 +12,11 @@ from rdflib import Variable
 from rdflib.plugins.sparql.processor import SPARQLResult
 from rdflib.tools.rdf2dot import rdf2dot
 
-from octadocs.conversions import iri_to_url, src_path_to_iri, iri_by_page
+from octadocs.conversions import iri_by_page
+from octadocs.environment import (
+    query, iri_to_url, src_path_to_iri,
+    get_bindings,
+)
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:
@@ -81,58 +85,12 @@ def table(result: SPARQLResult) -> str:
 '''
 
 
-def get_bindings(
-    kwargs: Dict[str, Optional[Union[rdflib.URIRef, str, int, float]]],
-) -> Dict[str, Union[rdflib.URIRef, rdflib.Literal]]:
-    return {
-        argument_name: argument_value if True or (
-            isinstance(argument_value, rdflib.URIRef)
-        ) else rdflib.Literal(argument_value)
-        for argument_name, argument_value in kwargs.items()
-    }
-
-
 class SelectResult(list):
     columns: List[str]
 
     def __init__(self, columns: List[str], items: List[dict]):
         self.extend(items)
         self.columns = columns
-
-
-def _format_sparql_variable_value(rdf_value):
-    if isinstance(rdf_value, rdflib.URIRef):
-        return str(rdf_value)
-
-    elif isinstance(rdf_value, rdflib.BNode):
-        return str(rdf_value)
-
-    return rdf_value.value
-
-
-def _format_query_bindings(bindings):
-    return [{
-        str(variable): _format_sparql_variable_value(rdf_value)
-        for variable, rdf_value
-        in row.items()
-    } for row in bindings]
-
-
-def query(
-    query_text: str,
-    instance: rdflib.ConjunctiveGraph,
-    **kwargs: str,
-):
-    """Run SPARQL SELECT query and return formatted result."""
-    sparql_result: SPARQLResult = instance.query(
-        query_text,
-        initBindings=get_bindings(kwargs),
-    )
-
-    if sparql_result.askAnswer is not None:
-        return sparql_result.askAnswer
-
-    return _format_query_bindings(sparql_result.bindings)
 
 
 def construct(
