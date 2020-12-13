@@ -88,8 +88,8 @@ def update_graph_from_markdown_file(
     if meta_data.get('@id') is None:
         meta_data['@id'] = page_id
 
-    if meta_data.get('rdfs:isDefinedBy') is None:
-        meta_data['rdfs:isDefinedBy'] = {
+    if meta_data.get('octa:subjectOf') is None:
+        meta_data['octa:subjectOf'] = {
             '@id': page_id,
             'octa:url': mkdocs_file.url,
             '@type': 'octa:Page',
@@ -186,7 +186,7 @@ def apply_inference_in_place(graph: rdflib.ConjunctiveGraph) -> None:
                 ?page octa:template "term.html" .
             } WHERE {
                 ?page a octa:Page .
-                ?term rdfs:isDefinedBy ?page .
+                ?term octa:subjectOf ?page .
                 ?term rdfs:isDefinedBy rdfs: .
             }
         ''')
@@ -259,7 +259,7 @@ class OctaDocsPlugin(BasePlugin):
         this_choices = list(map(
             operator.itemgetter(rdflib.Variable('this')),
             self.graph.query(
-                'SELECT * WHERE { ?this rdfs:isDefinedBy ?page_iri }',
+                'SELECT * WHERE { ?this octa:subjectOf ?page_iri }',
                 initBindings={
                     'page_iri': page_iri,
                 },

@@ -34,7 +34,7 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
             ?term rdfs:label ?default_label .
         }
         
-        ?term rdfs:isDefinedBy ?page .
+        ?term octa:subjectOf ?page .
         ?page a octa:Page .
         ?page octa:url ?url .
         
