@@ -122,7 +122,7 @@
             <div class="header">Instance of:</div>
             {% for class in classes %}
                 {% if class.link %}
-                    <a href="/{{ class.link }}">{{ class.label }}</a>{% filter trim %}
+                    <a href="{{ class.link }}">{{ class.label }}</a>{% filter trim %}
                     {% if not loop.last %}, {% endif %}
                     {% endfilter %}
                 {% else %}
@@ -141,7 +141,7 @@
             <div class="header">Subclass of:</div>
             {% for superclass in superclasses %}
                 {% if superclass.link %}
-                    <a href="/{{ superclass.link }}">{{ superclass.label }}</a>{% filter trim %}
+                    <a href="{{ superclass.link }}">{{ superclass.label }}</a>{% filter trim %}
                     {% if not loop.last %}, {% endif %}
                     {% endfilter %}
                 {% else %}
@@ -160,7 +160,7 @@
             <div class="header">Property:</div>
             {% for domain in domains %}
                 {% if domain.link %}
-                    <a href="/{{ domain.link }}">{{ domain.label }}</a>
+                    <a href="{{ domain.link }}">{{ domain.label }}</a>
                 {% else %}
                     <strong>{{ domain.label }}</strong>
                 {% endif %}
@@ -171,7 +171,7 @@
 
             {% for range in ranges %}
                 {% if range.link %}
-                    <a href="/{{ range.link }}">{{ range.label }}</a>
+                    <a href="{{ range.link }}">{{ range.label }}</a>
                 {% else %}
                     <strong>{{ range.label }}</strong>
                 {% endif %}

@@ -73,7 +73,7 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
 
 <div class="ui four cards">
 {% for card in cards %}
-    <a class="ui {{ card.color }} raised card" href="/{{ card.url|default('?') }}">
+    <a class="ui {{ card.color }} raised card" href="{{ card.url|default('?') }}">
         <div class="content">
             <div class="header">
                 {% if card.symbol %}

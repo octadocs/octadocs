@@ -2,7 +2,9 @@ import json
 import operator
 from functools import partial
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Union
+
+from mkdocs.structure.nav import Navigation, Section
 from typing_extensions import TypedDict
 
 import frontmatter
@@ -15,7 +17,7 @@ from mkdocs.structure.pages import Page
 from pyld import jsonld
 
 from octadocs import settings
-from octadocs.conversions import src_path_to_iri
+from octadocs.conversions import src_path_to_iri, iri_by_page
 from rdflib.plugins.memory import IOMemory
 
 from octadocs.macros import query
@@ -91,7 +93,7 @@ def update_graph_from_markdown_file(
     if meta_data.get('octa:subjectOf') is None:
         meta_data['octa:subjectOf'] = {
             '@id': page_id,
-            'octa:url': mkdocs_file.url,
+            'octa:url': f'/{mkdocs_file.url}',
             '@type': 'octa:Page',
         }
 
@@ -180,16 +182,60 @@ def apply_inference_in_place(graph: rdflib.ConjunctiveGraph) -> None:
     """Apply inference rules."""
     owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(graph)
 
-    if True:
-        graph.update('''
-            INSERT {
-                ?page octa:template "term.html" .
-            } WHERE {
-                ?page a octa:Page .
-                ?term octa:subjectOf ?page .
-                ?term rdfs:isDefinedBy rdfs: .
+    # FIXME The following is obviously hardcode. We need a method which the user
+    #   could use to specify inference rules.
+
+    # Every term of RDFS vocabulary should be rendered with term.html template.
+    graph.update('''
+        INSERT {
+            ?page octa:template "term.html" .
+        } WHERE {
+            ?page a octa:Page .
+            ?term octa:subjectOf ?page .
+            ?term rdfs:isDefinedBy rdfs: .
+        }
+    ''')
+
+    # Fill in octa:about relationships.
+    graph.update('''
+        INSERT {
+            ?page octa:about ?thing .
+        } WHERE {
+            ?thing octa:subjectOf ?page .
+        }
+    ''')
+
+    # If ?thing
+    graph.update('''
+        INSERT {
+            ?page octa:title ?title .
+        } WHERE {
+            ?subject
+                rdfs:label ?title ;
+                octa:subjectOf ?page .
+        }
+    ''')
+
+
+def get_page_title_by_iri(
+    iri: str,
+    graph: rdflib.ConjunctiveGraph,
+) -> Optional[str]:
+    results = query(
+        query_text='''
+            SELECT ?title WHERE {
+                ?page octa:title ?title .
             }
-        ''')
+        ''',
+        instance=graph,
+
+        page=iri,
+    )
+
+    if results:
+        return results[0]['title']
+
+    return None
 
 
 class OctaDocsPlugin(BasePlugin):
@@ -284,3 +330,40 @@ class OctaDocsPlugin(BasePlugin):
         )
 
         return context
+
+    def on_nav(
+        self,
+        nav: Navigation,
+        config: Config,
+        files: Files,
+    ) -> Navigation:
+        """Update the site's navigation from the knowledge graph."""
+        for item in nav.items:
+            self._process_nav_item(item)
+
+        return nav
+
+    def _process_nav_item(self, item: Union[Page, Section]):
+        if isinstance(item, Page):
+            self._process_nav_page(item)
+
+        elif isinstance(item, Section):
+            self._process_nav_section(item)
+
+        else:
+            raise Exception(f'What the heck is {item}?')
+
+    def _process_nav_page(self, page: Page) -> None:
+        iri = iri_by_page(page)
+
+        title = get_page_title_by_iri(
+            iri=iri,
+            graph=self.graph,
+        )
+
+        if title:
+            page.title = title
+
+    def _process_nav_section(self, section: Section) -> None:
+        for child in section.children:
+            self._process_nav_item(child)
