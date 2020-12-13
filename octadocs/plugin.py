@@ -23,6 +23,9 @@ from rdflib.plugins.memory import IOMemory
 from octadocs.macros import query
 
 
+NavigationItem = Union[Page, Section]
+
+
 class Extra(TypedDict):
     graph: rdflib.ConjunctiveGraph
 
@@ -338,22 +341,25 @@ class OctaDocsPlugin(BasePlugin):
         files: Files,
     ) -> Navigation:
         """Update the site's navigation from the knowledge graph."""
-        for item in nav.items:
-            self._process_nav_item(item)
+        nav.items = list(map(
+            self._process_nav_item,
+            nav.items,
+        ))
 
         return nav
 
-    def _process_nav_item(self, item: Union[Page, Section]):
+    def _process_nav_item(self, item: NavigationItem) -> NavigationItem:
         if isinstance(item, Page):
-            self._process_nav_page(item)
+            return self._process_nav_page(item)
 
         elif isinstance(item, Section):
-            self._process_nav_section(item)
+            return self._process_nav_section(item)
 
         else:
             raise Exception(f'What the heck is {item}?')
 
-    def _process_nav_page(self, page: Page) -> None:
+    def _process_nav_page(self, page: Page) -> Page:
+        """Add title to a page."""
         iri = iri_by_page(page)
 
         title = get_page_title_by_iri(
@@ -364,6 +370,33 @@ class OctaDocsPlugin(BasePlugin):
         if title:
             page.title = title
 
-    def _process_nav_section(self, section: Section) -> None:
-        for child in section.children:
-            self._process_nav_item(child)
+        return page
+
+    def _process_nav_section(self, section: Section) -> NavigationItem:
+        """Process section."""
+        section.children = list(map(
+            self._process_nav_item,
+            section.children,
+        ))
+
+        if len(section.children) == 1:
+            index_page = section.children[0]
+            index_page.parent = section.parent
+            return index_page
+
+        index_page_candidates = list(filter(
+            lambda page: page.file.src_path.endswith('index.md'),
+            section.children,
+        ))
+
+        if index_page_candidates:
+            index_page = index_page_candidates[0]
+            section.title = index_page.title
+
+            if section.parent:
+                index_page.parent = section.parent
+            else:
+                # FIXME replace with home page
+                index_page.parent = None
+
+        return section

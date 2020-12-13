@@ -7,6 +7,8 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
 
 {% include "header.md" with context %}
 
+{{ page.ancestors }}
+
 {% set rdfs_url = query('
     SELECT ?rdfs WHERE {
         BIND(rdfs: AS ?rdfs)
