@@ -4,24 +4,21 @@ from functools import partial
 from pathlib import Path
 from typing import Dict, Any, Optional, Union
 
-from mkdocs.structure.nav import Navigation, Section
-from typing_extensions import TypedDict
-
 import frontmatter
 import owlrl
 import rdflib
 from boltons.iterutils import remap
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files, File
+from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from pyld import jsonld
+from rdflib.plugins.memory import IOMemory
+from typing_extensions import TypedDict
 
 from octadocs import settings
-from octadocs.conversions import src_path_to_iri, iri_by_page
-from rdflib.plugins.memory import IOMemory
-
-from octadocs.macros import query
-
+from octadocs.environment import query, src_path_to_iri
+from octadocs.navigation import OctadocsNavigationProcessor
 
 NavigationItem = Union[Page, Section]
 
@@ -220,27 +217,6 @@ def apply_inference_in_place(graph: rdflib.ConjunctiveGraph) -> None:
     ''')
 
 
-def get_page_title_by_iri(
-    iri: str,
-    graph: rdflib.ConjunctiveGraph,
-) -> Optional[str]:
-    results = query(
-        query_text='''
-            SELECT ?title WHERE {
-                ?page octa:title ?title .
-            }
-        ''',
-        instance=graph,
-
-        page=iri,
-    )
-
-    if results:
-        return results[0]['title']
-
-    return None
-
-
 class OctaDocsPlugin(BasePlugin):
     """MkDocs Meta plugin."""
 
@@ -341,62 +317,7 @@ class OctaDocsPlugin(BasePlugin):
         files: Files,
     ) -> Navigation:
         """Update the site's navigation from the knowledge graph."""
-        nav.items = list(map(
-            self._process_nav_item,
-            nav.items,
-        ))
-
-        return nav
-
-    def _process_nav_item(self, item: NavigationItem) -> NavigationItem:
-        if isinstance(item, Page):
-            return self._process_nav_page(item)
-
-        elif isinstance(item, Section):
-            return self._process_nav_section(item)
-
-        else:
-            raise Exception(f'What the heck is {item}?')
-
-    def _process_nav_page(self, page: Page) -> Page:
-        """Add title to a page."""
-        iri = iri_by_page(page)
-
-        title = get_page_title_by_iri(
-            iri=iri,
+        return OctadocsNavigationProcessor(
             graph=self.graph,
-        )
-
-        if title:
-            page.title = title
-
-        return page
-
-    def _process_nav_section(self, section: Section) -> NavigationItem:
-        """Process section."""
-        section.children = list(map(
-            self._process_nav_item,
-            section.children,
-        ))
-
-        if len(section.children) == 1:
-            index_page = section.children[0]
-            index_page.parent = section.parent
-            return index_page
-
-        index_page_candidates = list(filter(
-            lambda page: page.file.src_path.endswith('index.md'),
-            section.children,
-        ))
-
-        if index_page_candidates:
-            index_page = index_page_candidates[0]
-            section.title = index_page.title
-
-            if section.parent:
-                index_page.parent = section.parent
-            else:
-                # FIXME replace with home page
-                index_page.parent = None
-
-        return section
+            navigation=nav,
+        ).generate()
