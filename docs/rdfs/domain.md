@@ -1,6 +1,6 @@
 ---
 $id: rdfs:domain
-$type: rdfs/domain_and_range.md
+$type: DomainAndRange
 comment: Who can have this property?
 label: Domain
 symbol: ⤚

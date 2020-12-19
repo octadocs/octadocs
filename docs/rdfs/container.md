@@ -1,5 +1,5 @@
 ---
 $id: rdfs:Container
-$type: rdfs/containers.md
+$type: Containers
 symbol: 📦
 ---

@@ -1,6 +1,6 @@
 ---
 $id: rdfs:subPropertyOf
-$type: rdfs/property_to_property.md
+$type: PropertyToProperty
 label: SubProperty Of
 symbol: 🔵
 ---

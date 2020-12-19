@@ -1,6 +1,6 @@
 ---
 $id: rdfs:Class
-$type: rdfs/entities.md
+$type: Entities
 comment: Class, group, category.
 symbol: 🔴
 

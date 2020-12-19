@@ -1,6 +1,4 @@
-import operator
 from dataclasses import dataclass
-from functools import cached_property
 from typing import Union
 
 import rdflib
@@ -8,6 +6,13 @@ from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 
 from octadocs.conversions import iri_by_page, get_page_title_by_iri
+
+try:
+    from functools import cached_property
+
+except ImportError:  # pragma: nocover
+    # For Python <3.8
+    from backports.cached_property import cached_property  # noqa
 
 NavigationItem = Union[Page, Section]
 

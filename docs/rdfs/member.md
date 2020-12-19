@@ -1,6 +1,6 @@
 ---
 $id: rdfs:member
-$type: rdfs/containers.md
+$type: Containers
 label: Member
 symbol: ∈
 ---

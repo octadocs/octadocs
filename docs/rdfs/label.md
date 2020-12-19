@@ -1,6 +1,6 @@
 ---
 $id: rdfs:label
-$type: rdfs/textual_descriptions.md
+$type: TextualDescriptions
 label: Label
 symbol: 🏷️
 ---

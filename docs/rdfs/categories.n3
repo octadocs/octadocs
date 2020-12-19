@@ -1,0 +1,58 @@
+@prefix : <local:> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:Category rdfs:SubClassOf rdfs:Class .
+
+
+:Entities
+  a :Category ;
+  :color "red" ;
+  :priority 1 ;
+  rdfs:label "Entities" ;
+  rdfs:comment "Well, you know... things." .
+
+
+:Containers
+  a :Category ;
+  :color "purple" ;
+  :priority 9 ;
+  rdfs:label "Containers" ;
+  rdfs:comment "Lists, sets, boxes, crates, bags, ..." .
+
+
+:ClassToClass
+  a :Category ;
+  :color "blue" ;
+  :priority 4 ;
+  rdfs:label "Class → Class" ;
+  rdfs:comment "Relationship between classes" .
+
+
+:DomainAndRange
+  a :Category ;
+  :color "orange" ;
+  :priority 1 ;
+  rdfs:label "Properties." .
+
+
+:PropertyToProperty
+  a :Category ;
+  :color "blue" ;
+  :priority 4 ;
+  rdfs:label "Property → Property" ;
+  rdfs:comment "Properties linked together." .
+
+
+:ResourceToResource
+  a :Category ;
+  :color "yellow" ;
+  :priority 2 ;
+  rdfs:comment "Links from one thing to another." ;
+  rdfs:label "Resource → Resource" .
+
+:TextualDescriptions
+  a :Category ;
+  :color "green" ;
+  :priority 3 ;
+  rdfs:label "Textual Descriptions" ;
+  rdfs:comment "Telling the humans what's going on." .
