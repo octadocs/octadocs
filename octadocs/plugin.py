@@ -1,4 +1,5 @@
 import json
+import logging
 import operator
 from functools import partial
 from pathlib import Path
@@ -21,6 +22,8 @@ from octadocs.environment import query, src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
 
 NavigationItem = Union[Page, Section]
+
+logger = logging.getLogger(__name__)
 
 
 class Extra(TypedDict):
@@ -178,25 +181,15 @@ def get_template_by_page(
         return None
 
 
-def apply_inference_in_place(graph: rdflib.ConjunctiveGraph) -> None:
+def apply_inference_in_place(graph: rdflib.ConjunctiveGraph, docs_dir: Path) -> None:
     """Apply inference rules."""
+    logger.info('Inference: OWL RL')
     owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(graph)
 
-    # FIXME The following is obviously hardcode. We need a method which the user
-    #   could use to specify inference rules.
-
-    # Every term of RDFS vocabulary should be rendered with term.html template.
-    graph.update('''
-        INSERT {
-            ?page octa:template "term.html" .
-        } WHERE {
-            ?page a octa:Page .
-            ?term octa:subjectOf ?page .
-            ?term rdfs:isDefinedBy rdfs: .
-        }
-    ''')
-
     # Fill in octa:about relationships.
+    logger.info(
+        'Inference: ?thing octa:subjectOf ?page ⇒ ?page octa:about ?thing .',
+    )
     graph.update('''
         INSERT {
             ?page octa:about ?thing .
@@ -205,7 +198,10 @@ def apply_inference_in_place(graph: rdflib.ConjunctiveGraph) -> None:
         }
     ''')
 
-    # If ?thing
+    logger.info(
+        'Inference: ?thing rdfs:label ?label & '
+        '?thing octa:page ?page ⇒ ?page octa:title ?label',
+    )
     graph.update('''
         INSERT {
             ?page octa:title ?title .
@@ -215,6 +211,13 @@ def apply_inference_in_place(graph: rdflib.ConjunctiveGraph) -> None:
                 octa:subjectOf ?page .
         }
     ''')
+
+    inference_dir = docs_dir.parent / 'inference'
+    if inference_dir.is_dir():
+        for sparql_file in inference_dir.iterdir():
+            logger.info('Inference: %s', sparql_file.name)
+            sparql_text = sparql_file.read_text()
+            graph.update(sparql_text)
 
 
 class OctaDocsPlugin(BasePlugin):
@@ -250,7 +253,7 @@ class OctaDocsPlugin(BasePlugin):
                 context=context,
             )
 
-        apply_inference_in_place(self.graph)
+        apply_inference_in_place(self.graph, docs_dir=docs_dir)
 
     def on_page_markdown(
         self,
