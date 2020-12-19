@@ -5,19 +5,9 @@
     'SELECT ?label WHERE {
         ?entity octa:subjectOf ?iri .
 
-        OPTIONAL {
-            GRAPH ?iri {
-                ?entity rdfs:label ?readable_label .
-            }
+        GRAPH <local:rdfs/rdfs.n3> {
+            ?entity rdfs:label ?label .
         }
-
-        OPTIONAL {
-            GRAPH <local:rdfs/rdfs.n3> {
-                ?entity rdfs:label ?default_label .
-            }
-        }
-
-        BIND(COALESCE(?readable_label, ?default_label) AS ?label)
     }',
     iri=iri
 ) %}
