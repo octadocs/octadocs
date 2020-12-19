@@ -1,0 +1,13 @@
+@base <mailto:> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<class_to_class>
+  a
+    rdfs:Class ,
+    <Category> ;
+
+  <color> "blue" ;
+  <priority> 4 ;
+
+  rdfs:label "Class → Class" ;
+  rdfs:comment "Relationship between classes" .
