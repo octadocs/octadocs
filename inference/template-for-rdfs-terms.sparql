@@ -1,0 +1,8 @@
+# Every term of RDFS vocabulary should be rendered with term.html template.
+INSERT {
+    ?page octa:template "term.html" .
+} WHERE {
+    ?term
+        octa:subjectOf ?page ;
+        rdfs:isDefinedBy rdfs: .
+}
