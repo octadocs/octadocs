@@ -1,6 +1,6 @@
 ---
 $id: rdfs:subClassOf
-$type: rdfs/class_to_class.md
+$type: ClassToClass
 label: SubClass Of
 symbol: ⊂
 

@@ -1,7 +1,7 @@
 """
 Test for GitHub issue: https://github.com/RDFLib/rdflib/issues/1216
 """
-
+import pytest
 import rdflib
 
 DOCUMENT = """
@@ -18,6 +18,7 @@ DOCUMENT = """
 """
 
 
+@pytest.mark.skip('https://github.com/RDFLib/rdflib/issues/1216')
 def test_no_slash_after_colon():
     """Test @base directive with no slash after colon."""
     graph = rdflib.ConjunctiveGraph()

@@ -1,6 +1,6 @@
 ---
 $id: rdfs:ContainerMembershipProperty
-$type: rdfs/containers.md
+$type: Containers
 label: "Container Membership"
 symbol: ∈
 ---

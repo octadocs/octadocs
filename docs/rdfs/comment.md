@@ -1,6 +1,6 @@
 ---
 $id: rdfs:comment
-$type: rdfs/textual_descriptions.md
+$type: TextualDescriptions
 label: Comment
 symbol: 💬
 ---

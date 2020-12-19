@@ -1,6 +1,6 @@
 ---
 $id: rdfs:Datatype
-$type: rdfs/entities.md
+$type: Entities
 label: Data Type
 symbol: 🔴
 ---

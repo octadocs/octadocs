@@ -1,6 +1,6 @@
 ---
 $id: rdfs:seeAlso
-$type: rdfs/resource_to_resource.md
+$type: ResourceToResource
 label: See Also
 symbol: ⋯
 ---

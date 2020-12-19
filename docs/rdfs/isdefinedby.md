@@ -1,6 +1,6 @@
 ---
 $id: rdfs:isDefinedBy
-$type: rdfs/resource_to_resource.md
+$type: ResourceToResource
 label: Defined By
 symbol: 📙
 ---
