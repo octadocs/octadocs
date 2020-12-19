@@ -22,4 +22,4 @@ theme:
   name: semantic
   logo:
     image: logo.png
-  custom_dir: overrides
+  custom_dir: templates

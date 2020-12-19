@@ -213,10 +213,11 @@ def apply_inference_in_place(graph: rdflib.ConjunctiveGraph, docs_dir: Path) -> 
     ''')
 
     inference_dir = docs_dir.parent / 'inference'
-    for sparql_file in inference_dir.iterdir():
-        logger.info('Inference: %s', sparql_file.name)
-        sparql_text = sparql_file.read_text()
-        graph.update(sparql_text)
+    if inference_dir.is_dir():
+        for sparql_file in inference_dir.iterdir():
+            logger.info('Inference: %s', sparql_file.name)
+            sparql_text = sparql_file.read_text()
+            graph.update(sparql_text)
 
 
 class OctaDocsPlugin(BasePlugin):
