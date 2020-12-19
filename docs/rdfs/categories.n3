@@ -7,8 +7,9 @@
 :Entities
   a :Category ;
   :color "red" ;
-  :priority 1 ;
-  rdfs:label "Entities" ;
+  :priority 0 ;
+  rdfs:label "Classes" ;
+  :column_width "sixteen" ;
   rdfs:comment "Well, you know... things." .
 
 
@@ -16,35 +17,29 @@
   a :Category ;
   :color "purple" ;
   :priority 9 ;
+  :column_width "sixteen" ;
   rdfs:label "Containers" ;
   rdfs:comment "Lists, sets, boxes, crates, bags, ..." .
 
 
-:ClassToClass
-  a :Category ;
-  :color "blue" ;
-  :priority 4 ;
-  rdfs:label "Class → Class" ;
-  rdfs:comment "Relationship between classes" .
-
-
 :DomainAndRange
   a :Category ;
-  :color "orange" ;
+  :column_width "eight" ;
   :priority 1 ;
-  rdfs:label "Properties." .
+  rdfs:label "Domain & Range" .
 
 
-:PropertyToProperty
+:Sub
   a :Category ;
-  :color "blue" ;
+  :column_width "eight" ;
   :priority 4 ;
-  rdfs:label "Property → Property" ;
+  rdfs:label "Sub" ;
   rdfs:comment "Properties linked together." .
 
 
 :ResourceToResource
   a :Category ;
+  :column_width "eight" ;
   :color "yellow" ;
   :priority 2 ;
   rdfs:comment "Links from one thing to another." ;
@@ -52,6 +47,7 @@
 
 :TextualDescriptions
   a :Category ;
+  :column_width "eight" ;
   :color "green" ;
   :priority 3 ;
   rdfs:label "Textual Descriptions" ;

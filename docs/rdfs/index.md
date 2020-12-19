@@ -32,6 +32,7 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
         GRAPH <local:rdfs/rdfs.n3> {
             ?term rdfs:comment ?default_comment .
             ?term rdfs:label ?default_label .
+            ?term rdfs:label ?default_label .
         }
         
         ?term octa:subjectOf ?page .
@@ -71,28 +72,73 @@ rdfs:comment: Basic notions of classes, properties, and relations between them.
 ') %}
 
 
-<div class="ui four cards">
-{% for card in cards %}
-    <a class="ui {{ card.color }} raised card" href="{{ card.url|default('?') }}">
-        <div class="content">
-            <div class="header">
-                {% if card.symbol %}
-                    {{ card.symbol }}
-                {% endif %}
-                {{ card.readable_label | d(card.default_label) }}
-            </div>
-            <div class="description">
-                {{ card.readable_comment | default(card.default_comment) }}
-            </div>
-        </div>
-        <div class="extra content">
-            <span title="{{ card.category_comment }}">{{ card.category_label }}</span>
-            <span class="right floated">
-                rdfs:{{ card.default_label }}
-            </span>
-        </div>
-    </a>
-{% endfor %}
+<style>
+.ui.tangible.card,
+a.ui.card:hover,
+.ui.link.card:hover,
+.ui.cards a.card:hover,
+.ui.link.cards .card:hover {
+    background: url(/rdfs/backgrounds/classy_fabric/classy_fabric/classy_fabric.png);
+}
+
+.ui.tangible.card .content .header {
+    color: white;
+    padding-bottom: 36px;
+    padding-top: 36px;
+}
+</style>
+
+
+{% set categories = query('
+    SELECT * WHERE {
+        ?iri
+            a :Category ;
+            :priority ?priority ;
+            rdfs:label ?label ;
+            :column_width ?column_width .
+    } ORDER BY ?priority
+') %}
+
+{% macro cards_for_category(category) %}
+    {% set cards_per_category = query('
+        SELECT * WHERE {
+            ?term
+                a ?category ;
+                octa:subjectOf / octa:url ?url .
+            
+            GRAPH <local:rdfs/rdfs.n3> {
+                ?term rdfs:label ?label .
+            }
+        } ORDER BY ?label
+    ', category=URIRef(category)) %}
+    
+    {% set card_count = {
+        1: "one",
+        2: "two",
+        3: "three",
+        4: "four",
+    }[cards_per_category.__len__()] %}
+
+    <div class="ui {{ card_count }} cards">
+        {% for card in cards_per_category %}
+            <a class="ui tangible raised card" href="{{ card.url|default('#') }}">
+                <div class="ui content">
+                    <div class="header center aligned">
+                        {{ card.label }}
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+<div class="ui grid">
+    {% for category in categories %}
+    <div class="{{ category.column_width }} wide column">
+        <h2>{{ category.label }}</h2>
+        {{ cards_for_category(category.iri) }}
+    </div>
+    {% endfor %}
 </div>
 
 ## Also
