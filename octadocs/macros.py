@@ -13,9 +13,7 @@ from rdflib.plugins.sparql.processor import SPARQLResult
 from rdflib.tools.rdf2dot import rdf2dot
 
 from octadocs.conversions import iri_by_page
-from octadocs.environment import (
-    query, iri_to_url, src_path_to_iri,
-)
+from octadocs.environment import iri_to_url, query, src_path_to_iri
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:
@@ -63,20 +61,20 @@ def sparql(
 
 def _render_as_row(row: Dict[Variable, Any]) -> str:  # type: ignore
     """Render row of a Markdown table."""
-    result = ' | '.join(row.values())
-    return f'| {result} |'
+    formatted_row = ' | '.join(row.values())
+    return f'| {formatted_row} |'
 
 
-def table(result: SPARQLResult) -> str:
+def table(query_result: SPARQLResult) -> str:
     """Render as a Markdown table."""
-    headers = ' | '.join(str(v) for v in result.vars)
+    headers = ' | '.join(str(cell) for cell in query_result.vars)
 
     rows = '\n'.join(
         _render_as_row(row)
-        for row in result.bindings
+        for row in query_result.bindings
     )
 
-    separators = '| ' + (' --- |' * len(result.vars))
+    separators = '| ' + (' --- |' * len(query_result.vars))  # noqa: WPS336
 
     return f'''
 ---

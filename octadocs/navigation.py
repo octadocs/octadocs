@@ -1,20 +1,20 @@
 from dataclasses import dataclass
-from typing import Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import rdflib
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 
-from octadocs.conversions import iri_by_page, get_page_title_by_iri
+from octadocs.conversions import get_page_title_by_iri, iri_by_page
 
-if TYPE_CHECKING:
-    from functools import cached_property
+if TYPE_CHECKING:  # pragma: nocover
+    from functools import cached_property  # noqa
 
-else:
+else:  # pragma: nocover
     try:
-        from functools import cached_property
+        from functools import cached_property  # noqa
 
-    except ImportError:  # pragma: nocover
+    except ImportError:
         # For Python <3.8
         from backports.cached_property import cached_property  # noqa
 

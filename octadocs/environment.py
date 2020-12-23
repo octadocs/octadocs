@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Optional, Union, List
+from typing import Dict, List
 
 import rdflib
 from rdflib import URIRef, term
@@ -60,8 +60,7 @@ def _format_sparql_variable_value(rdf_value: term.Identifier) -> str:
     elif isinstance(rdf_value, rdflib.Literal):
         return rdf_value.value
 
-    else:
-        raise ValueError(f'Cannot interpret value: {rdf_value}')
+    raise ValueError(f'Cannot interpret value: {rdf_value}')
 
 
 def _format_query_bindings(
@@ -72,8 +71,11 @@ def _format_query_bindings(
 
     FIXME: I am not sure this is really necessary.
     """
-    return [{
-        str(variable): _format_sparql_variable_value(rdf_value)
-        for variable, rdf_value
-        in row.items()
-    } for row in bindings]
+    return [
+        {
+            str(variable_name): _format_sparql_variable_value(rdf_value)
+            for variable_name, rdf_value
+            in row.items()
+        }
+        for row in bindings
+    ]

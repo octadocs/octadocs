@@ -3,7 +3,7 @@ SHELL:=/usr/bin/env bash
 .PHONY: lint
 lint:
 	mypy octadocs tests/**/*.py
-	flakehell .
+	git diff origin/master | flakehell lint --diff
 
 .PHONY: unit
 unit:

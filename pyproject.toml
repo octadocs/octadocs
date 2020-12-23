@@ -64,3 +64,7 @@ pytest-randomly = "^3.4"
 m2r = "^0.2"
 tomlkit = "^0.7"
 flakehell = "^0.7.1"
+
+[tool.flakehell]
+# Will replace by my own ignorelist later
+base = "https://raw.githubusercontent.com/Recall-Masters/standards/main/pyproject.toml"

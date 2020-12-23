@@ -3,14 +3,14 @@ import logging
 import operator
 from functools import partial
 from pathlib import Path
-from typing import Dict, Any, Optional, Union, Callable
+from typing import Any, Callable, Dict, Optional, Union
 
 import frontmatter
 import owlrl
 import rdflib
 from boltons.iterutils import remap
 from mkdocs.plugins import BasePlugin
-from mkdocs.structure.files import Files, File
+from mkdocs.structure.files import File, Files
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from pyld import jsonld
@@ -28,7 +28,9 @@ MetaData = Dict[str, Any]   # type: ignore
 logger = logging.getLogger(__name__)
 
 
-class Extra(TypedDict):
+class ConfigExtra(TypedDict):
+    """Extra portion of the config which we put our graph into."""
+
     graph: rdflib.ConjunctiveGraph
 
 
@@ -36,7 +38,7 @@ class Config(TypedDict):
     """MkDocs configuration."""
 
     docs_dir: str
-    extra: Optional[Extra]
+    extra: Optional[ConfigExtra]
 
 
 class TemplateContext(TypedDict):
@@ -56,6 +58,7 @@ def update_graph_from_n3_file(
     docs_dir: Path,
     universe: rdflib.ConjunctiveGraph,
 ):
+    """Load data from Turtle file into the graph."""
     universe.parse(
         source=str(docs_dir / mkdocs_file.src_path),
         format='n3',
@@ -188,11 +191,13 @@ def get_template_by_page(
     if bindings:
         return bindings[0]['template_name'].value
 
-    else:
-        return None
+    return None
 
 
-def apply_inference_in_place(graph: rdflib.ConjunctiveGraph, docs_dir: Path) -> None:
+def apply_inference_in_place(
+    graph: rdflib.ConjunctiveGraph,
+    docs_dir: Path,
+) -> None:
     """Apply inference rules."""
     logger.info('Inference: OWL RL')
     owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(graph)
@@ -276,6 +281,7 @@ class OctaDocsPlugin(BasePlugin):
         config: Config,
         files: Files,
     ):
+        """Inject page template path, if necessary."""
         template_name = get_template_by_page(
             page=page,
             graph=self.graph,
