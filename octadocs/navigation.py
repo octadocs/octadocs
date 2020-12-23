@@ -12,7 +12,7 @@ try:
 
 except ImportError:  # pragma: nocover
     # For Python <3.8
-    from backports.cached_property import cached_property  # noqa
+    from backports.cached_property import cached_property  # noqa # type: ignore
 
 NavigationItem = Union[Page, Section]
 
