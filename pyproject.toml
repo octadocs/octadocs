@@ -63,3 +63,4 @@ pytest-randomly = "^3.4"
 
 m2r = "^0.2"
 tomlkit = "^0.7"
+flakehell = "^0.7.1"
