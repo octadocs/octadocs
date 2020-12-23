@@ -53,6 +53,7 @@ JSONLD_DOCUMENT = {
 }
 
 
+@pytest.mark.skip('Illustrates a bug')
 @pytest.mark.parametrize('flatten_before_import', [False, True])
 def test_import_jsonld_into_named_graph(flatten_before_import: bool):
     """Test named graphs we use."""
