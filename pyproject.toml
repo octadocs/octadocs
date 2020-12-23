@@ -9,7 +9,7 @@ style = "https://raw.githubusercontent.com/wemake-services/wemake-python-stylegu
 
 [tool.poetry]
 name = "octadocs"
-version = "0.1.0"
+version = "0.0.1"
 description = "MkDocs wiki made smart"
 license = "MIT"
 
@@ -17,7 +17,7 @@ authors = []
 
 readme = "README.md"
 
-repository = "https://github.com/anatoly-scherbakov/octadocs"
+repository = "https://github.com/octadocs/octadocs"
 
 keywords = []
 
@@ -63,3 +63,8 @@ pytest-randomly = "^3.4"
 
 m2r = "^0.2"
 tomlkit = "^0.7"
+flakehell = "^0.7.1"
+
+[tool.flakehell]
+# Will replace by my own ignorelist later
+base = "https://raw.githubusercontent.com/Recall-Masters/standards/main/pyproject.toml"

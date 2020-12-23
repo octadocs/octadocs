@@ -3,14 +3,14 @@ import logging
 import operator
 from functools import partial
 from pathlib import Path
-from typing import Dict, Any, Optional, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 import frontmatter
 import owlrl
 import rdflib
 from boltons.iterutils import remap
 from mkdocs.plugins import BasePlugin
-from mkdocs.structure.files import Files, File
+from mkdocs.structure.files import File, Files
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from pyld import jsonld
@@ -23,10 +23,14 @@ from octadocs.navigation import OctadocsNavigationProcessor
 
 NavigationItem = Union[Page, Section]
 
+MetaData = Dict[str, Any]   # type: ignore
+
 logger = logging.getLogger(__name__)
 
 
-class Extra(TypedDict):
+class ConfigExtra(TypedDict):
+    """Extra portion of the config which we put our graph into."""
+
     graph: rdflib.ConjunctiveGraph
 
 
@@ -34,12 +38,19 @@ class Config(TypedDict):
     """MkDocs configuration."""
 
     docs_dir: str
-    extra: Optional[Extra]
+    extra: Optional[ConfigExtra]
 
 
-class Context(TypedDict):
-    """Context."""
-    graph: Dict[str, Any]  # type: ignore
+class TemplateContext(TypedDict):
+    """Context for the native MkDocs page rendering engine."""
+
+    graph: rdflib.ConjunctiveGraph
+    iri: rdflib.URIRef
+    this: rdflib.URIRef
+    query: Callable[[str], Dict[str, rdflib.term.Identifier]]
+
+    # FIXME this is hardcode and should be removed
+    rdfs: rdflib.Namespace
 
 
 def update_graph_from_n3_file(
@@ -47,6 +58,7 @@ def update_graph_from_n3_file(
     docs_dir: Path,
     universe: rdflib.ConjunctiveGraph,
 ):
+    """Load data from Turtle file into the graph."""
     universe.parse(
         source=str(docs_dir / mkdocs_file.src_path),
         format='n3',
@@ -56,7 +68,9 @@ def update_graph_from_n3_file(
     return universe
 
 
-def convert_dollar_signs(meta_data):
+def convert_dollar_signs(
+    meta_data: MetaData,
+) -> MetaData:
     """
     Convert $ character to @ in keys.
 
@@ -177,11 +191,13 @@ def get_template_by_page(
     if bindings:
         return bindings[0]['template_name'].value
 
-    else:
-        return None
+    return None
 
 
-def apply_inference_in_place(graph: rdflib.ConjunctiveGraph, docs_dir: Path) -> None:
+def apply_inference_in_place(
+    graph: rdflib.ConjunctiveGraph,
+    docs_dir: Path,
+) -> None:
     """Apply inference rules."""
     logger.info('Inference: OWL RL')
     owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(graph)
@@ -233,9 +249,12 @@ class OctaDocsPlugin(BasePlugin):
         self.graph.bind('local', 'local')
 
         if config.get('extra') is None:
-            config['extra'] = {}
+            config['extra'] = {'graph': self.graph}
 
-        config['extra']['graph'] = self.graph
+        else:
+            config['extra'].update(  # type: ignore
+                graph=self.graph,
+            )
 
         return config
 
@@ -262,6 +281,7 @@ class OctaDocsPlugin(BasePlugin):
         config: Config,
         files: Files,
     ):
+        """Inject page template path, if necessary."""
         template_name = get_template_by_page(
             page=page,
             graph=self.graph,
@@ -274,11 +294,11 @@ class OctaDocsPlugin(BasePlugin):
 
     def on_page_context(
         self,
-        context: Context,
+        context: TemplateContext,
         page: Page,
         config: Config,
         nav: Page,
-    ) -> Context:
+    ) -> TemplateContext:
         """Attach the views to certain pages."""
         page_iri = rdflib.URIRef(
             f'{settings.LOCAL_IRI_SCHEME}{page.file.src_path}',

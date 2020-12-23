@@ -2,7 +2,7 @@ import html
 import io
 from base64 import b64encode
 from functools import partial
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 from unittest.mock import patch
 
 import pydotplus
@@ -13,10 +13,7 @@ from rdflib.plugins.sparql.processor import SPARQLResult
 from rdflib.tools.rdf2dot import rdf2dot
 
 from octadocs.conversions import iri_by_page
-from octadocs.environment import (
-    query, iri_to_url, src_path_to_iri,
-    get_bindings,
-)
+from octadocs.environment import iri_to_url, query, src_path_to_iri
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:
@@ -62,20 +59,22 @@ def sparql(
     return instance.query(query, initBindings=bindings)
 
 
-def _render_as_row(row: Dict[Variable, Any]) -> str:
-    result = ' | '.join(row.values())
-    return f'| {result} |'
+def _render_as_row(row: Dict[Variable, Any]) -> str:  # type: ignore
+    """Render row of a Markdown table."""
+    formatted_row = ' | '.join(row.values())
+    return f'| {formatted_row} |'
 
 
-def table(result: SPARQLResult) -> str:
-    headers = ' | '.join(str(v) for v in result.vars)
+def table(query_result: SPARQLResult) -> str:
+    """Render as a Markdown table."""
+    headers = ' | '.join(str(cell) for cell in query_result.vars)
 
     rows = '\n'.join(
         _render_as_row(row)
-        for row in result.bindings
+        for row in query_result.bindings
     )
 
-    separators = '| ' + (' --- |' * len(result.vars))
+    separators = '| ' + (' --- |' * len(query_result.vars))  # noqa: WPS336
 
     return f'''
 ---
@@ -83,14 +82,6 @@ def table(result: SPARQLResult) -> str:
 {separators}
 {rows}
 '''
-
-
-class SelectResult(list):
-    columns: List[str]
-
-    def __init__(self, columns: List[str], items: List[dict]):
-        self.extend(items)
-        self.columns = columns
 
 
 def construct(
@@ -101,7 +92,7 @@ def construct(
     """Run SPARQL SELECT query and return formatted result."""
     sparql_result: SPARQLResult = instance.query(
         query_text,
-        initBindings=get_bindings(kwargs),
+        initBindings=kwargs,
     )
 
     return sparql_result.graph

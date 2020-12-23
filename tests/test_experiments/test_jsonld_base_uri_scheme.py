@@ -45,6 +45,7 @@ def get_n3_form(base: str) -> str:
     ''').strip()
 
 
+@pytest.mark.skip('Illustrates a bug')
 @pytest.mark.parametrize(
     'base',
     [
