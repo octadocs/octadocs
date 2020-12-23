@@ -3,7 +3,7 @@ import logging
 import operator
 from functools import partial
 from pathlib import Path
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional, Union, Callable
 
 import frontmatter
 import owlrl
@@ -23,6 +23,8 @@ from octadocs.navigation import OctadocsNavigationProcessor
 
 NavigationItem = Union[Page, Section]
 
+MetaData = Dict[str, Any]   # type: ignore
+
 logger = logging.getLogger(__name__)
 
 
@@ -37,9 +39,16 @@ class Config(TypedDict):
     extra: Optional[Extra]
 
 
-class Context(TypedDict):
-    """Context."""
-    graph: Dict[str, Any]  # type: ignore
+class TemplateContext(TypedDict):
+    """Context for the native MkDocs page rendering engine."""
+
+    graph: rdflib.ConjunctiveGraph
+    iri: rdflib.URIRef
+    this: rdflib.URIRef
+    query: Callable[[str], Dict[str, rdflib.term.Identifier]]
+
+    # FIXME this is hardcode and should be removed
+    rdfs: rdflib.Namespace
 
 
 def update_graph_from_n3_file(
@@ -56,7 +65,9 @@ def update_graph_from_n3_file(
     return universe
 
 
-def convert_dollar_signs(meta_data):
+def convert_dollar_signs(
+    meta_data: MetaData,
+) -> MetaData:
     """
     Convert $ character to @ in keys.
 
@@ -233,9 +244,12 @@ class OctaDocsPlugin(BasePlugin):
         self.graph.bind('local', 'local')
 
         if config.get('extra') is None:
-            config['extra'] = {}
+            config['extra'] = {'graph': self.graph}
 
-        config['extra']['graph'] = self.graph
+        else:
+            config['extra'].update(  # type: ignore
+                graph=self.graph,
+            )
 
         return config
 
@@ -274,11 +288,11 @@ class OctaDocsPlugin(BasePlugin):
 
     def on_page_context(
         self,
-        context: Context,
+        context: TemplateContext,
         page: Page,
         config: Config,
         nav: Page,
-    ) -> Context:
+    ) -> TemplateContext:
         """Attach the views to certain pages."""
         page_iri = rdflib.URIRef(
             f'{settings.LOCAL_IRI_SCHEME}{page.file.src_path}',
