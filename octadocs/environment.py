@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, List
 
 import rdflib
 from rdflib import URIRef, term
@@ -49,15 +49,6 @@ def src_path_to_iri(src_path: str) -> URIRef:
     return URIRef(f'{LOCAL_IRI_SCHEME}{src_path}')
 
 
-def get_bindings(
-    kwargs: Dict[str, Optional[Union[rdflib.URIRef, str, int, float]]],
-) -> Dict[str, Union[rdflib.URIRef, rdflib.Literal]]:
-    return {
-        argument_name: argument_value
-        for argument_name, argument_value in kwargs.items()
-    }
-
-
 def _format_sparql_variable_value(rdf_value: term.Identifier) -> str:
     """Format a RDF value as a primitive type value."""
     if isinstance(rdf_value, rdflib.URIRef):
@@ -73,7 +64,9 @@ def _format_sparql_variable_value(rdf_value: term.Identifier) -> str:
         raise ValueError(f'Cannot interpret value: {rdf_value}')
 
 
-def _format_query_bindings(bindings):
+def _format_query_bindings(
+    bindings: List[Dict[rdflib.Variable, term.Identifier]],
+) -> List[Dict[str, str]]:
     """
     Format bindings before returning them.
 

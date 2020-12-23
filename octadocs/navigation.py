@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, TYPE_CHECKING
 
 import rdflib
 from mkdocs.structure.nav import Navigation, Section
@@ -12,7 +12,7 @@ try:
 
 except ImportError:  # pragma: nocover
     # For Python <3.8
-    from backports.cached_property import cached_property  # noqa # type: ignore
+    from backports.cached_property import cached_property  # noqa
 
 NavigationItem = Union[Page, Section]
 
