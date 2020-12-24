@@ -42,11 +42,11 @@ pyld = "^2.0.3"
 mkdocs-macros-plugin = "^0.4.20"
 pydotplus = "^2.0.2"
 graphviz = "^0.15"
-mkdocs-semantic = "^0.0.6"
 boltons = "^20.2.1"
 owlrl = "^5.2.1"
 typing-extensions = "^3.7.4"
 "backports.cached-property" = { version = "^1.0.0", python = "<3.8" }
+requests = "^2.25.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.790"
