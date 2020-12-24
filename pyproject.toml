@@ -47,6 +47,7 @@ owlrl = "^5.2.1"
 typing-extensions = "^3.7.4"
 "backports.cached-property" = { version = "^1.0.0", python = "<3.8" }
 requests = "^2.25.1"
+deepmerge = "^0.1.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.790"

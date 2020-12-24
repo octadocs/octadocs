@@ -17,7 +17,7 @@ from pyld import jsonld
 from rdflib.plugins.memory import IOMemory
 from typing_extensions import TypedDict
 
-from octadocs import settings
+from octadocs.settings import LOCAL_IRI_SCHEME
 from octadocs.environment import query, src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
 
@@ -119,7 +119,7 @@ def update_graph_from_markdown_file(
     meta_data = jsonld.expand(
         meta_data,
         options={
-            'base': settings.LOCAL_IRI_SCHEME,
+            'base': LOCAL_IRI_SCHEME,
         },
     )
 
@@ -142,8 +142,12 @@ def update_graph_from_file(
     mkdocs_file: File,
     docs_dir: Path,
     universe: rdflib.ConjunctiveGraph,
-    context: Dict[str, str],
 ):
+    context = fetch_context(
+        docs_dir=docs_dir,
+        mkdocs_file=mkdocs_file,
+    )
+
     if mkdocs_file.src_path.endswith('.md'):
         return update_graph_from_markdown_file(
             mkdocs_file=mkdocs_file,
@@ -160,19 +164,6 @@ def update_graph_from_file(
         )
 
     return None
-
-
-def fetch_context(docs_dir: Path) -> Dict[str, str]:
-    """Compose JSON-LD context."""
-    with open(docs_dir / 'context.json', 'r') as context_file:
-        json_document = json.load(context_file)
-
-    json_document.update({
-        '@vocab': settings.LOCAL_IRI_SCHEME,
-        '@base': settings.LOCAL_IRI_SCHEME,
-    })
-
-    return json_document
 
 
 def get_template_by_page(
@@ -262,7 +253,6 @@ class OctaDocsPlugin(BasePlugin):
         """Extract metadata from files and compose the site graph."""
 
         docs_dir = Path(config['docs_dir'])
-        context = fetch_context(docs_dir)
 
         for f in files:
             update_graph_from_file(
