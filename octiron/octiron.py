@@ -85,7 +85,7 @@ class Octiron:
         )
 
     def update_from_file(self, path: Path) -> None:
-        """Update the graph from file determined by path."""
+        """Update the graph from file determined by given path."""
         # FIXME how to register and call plugins? Every plugin should yield
         #   a stream of triples. That will ensure independence of rdflib.
         #   I think a regex for file path will be a good idea.
