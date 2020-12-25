@@ -1,10 +1,10 @@
 from pathlib import Path
-from typing import Iterable
+from typing import Iterator
 
 from octiron.types import Triple
 
 
-class OctironPlugin:
+class Loader:
     """Data importer for Octiron."""
 
     regex: str
@@ -14,6 +14,6 @@ class OctironPlugin:
         """Initialize the plugin."""
         self.path = path
 
-    def stream(self) -> Iterable[Triple]:
+    def stream(self) -> Iterator[Triple]:
         """Read the source data and return a stream of triples."""
         raise NotImplementedError()

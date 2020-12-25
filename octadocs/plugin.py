@@ -3,12 +3,11 @@ import logging
 import operator
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Callable, Dict, Optional, Union
 
 import frontmatter
 import owlrl
 import rdflib
-from boltons.iterutils import remap
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import File, Files
 from mkdocs.structure.nav import Navigation, Section
@@ -20,10 +19,9 @@ from typing_extensions import TypedDict
 from octadocs.settings import LOCAL_IRI_SCHEME
 from octadocs.environment import query, src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
+from octiron.yaml_extensions import convert_dollar_signs
 
 NavigationItem = Union[Page, Section]
-
-MetaData = Dict[str, Any]   # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -66,23 +64,6 @@ def update_graph_from_n3_file(
     )
 
     return universe
-
-
-def convert_dollar_signs(
-    meta_data: MetaData,
-) -> MetaData:
-    """
-    Convert $ character to @ in keys.
-
-    We use $ by convention to avoid writing quotes.
-    """
-    return remap(
-        meta_data,
-        lambda path, key, value: (
-            key.replace('$', '@') if isinstance(key, str) else key,
-            value,
-        ),
-    )
 
 
 def update_graph_from_markdown_file(

@@ -4,11 +4,11 @@ from typing import Iterable, Iterator
 
 import rdflib
 
-from octiron.plugins.base import OctironPlugin
+from octiron.plugins.base import Loader
 from octiron.types import Triple
 
 
-class TurtlePlugin(OctironPlugin):
+class TurtleLoader(Loader):
     """Read data from Turtle files."""
 
     regex = r'\.ttl$'
