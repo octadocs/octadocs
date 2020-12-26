@@ -40,6 +40,9 @@ DEFAULT_CONTEXT = {
     'rdfs:subClassOf': {
         '@type': '@id',
     },
+    'octa:subjectOf': {
+        '@type': '@id',
+    }
 }
 
 
@@ -100,17 +103,18 @@ class Octiron:
             DEFAULT_CONTEXT,
         )
 
-    def update_from_file(self, path: Path, iri: rdflib.URIRef) -> None:
+    def update_from_file(self, path: Path, local_iri: rdflib.URIRef) -> None:
         """Update the graph from file determined by given path."""
         context = self.get_context_per_directory(path.parent)
         loader_class = self.get_loader_class_for_path(path)
         loader_instance = loader_class(
             path=path,
             context=context,
+            local_iri=local_iri,
         )
         triples = loader_instance.stream()
 
-        quads = triples_to_quads(triples=triples, graph=iri)
+        quads = triples_to_quads(triples=triples, graph=local_iri)
 
         self.graph.addN(quads)
 

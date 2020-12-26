@@ -5,9 +5,10 @@ from typing import Iterator
 import frontmatter
 import rdflib
 from pyld import jsonld
+from rdflib import RDF
 
 from octiron.plugins.base import Loader
-from octiron.types import Triple
+from octiron.types import Triple, OCTA
 from octiron.yaml_extensions import convert_dollar_signs
 
 
@@ -28,7 +29,16 @@ class MarkdownLoader(Loader):
         if meta_data.get('@context'):
             raise ValueError('A-A-A!!! @context is specified in front matter!')
 
-        # meta_data['@context'] = self.context
+        if '@id' in meta_data:
+            # The author specified an IRI the document tells us about. Let us
+            # link this IRI to the local document IRI.
+            meta_data['octa:subjectOf'] = self.local_iri
+
+        else:
+            # The document author did not tell us about what their document is.
+            # In this case, we assume that the local_iri of the document file
+            # is the subject of the document description.
+            meta_data['@id'] = self.local_iri
 
         # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
         # If we don't expand with an explicit @base, import will fail silently.
@@ -52,5 +62,9 @@ class MarkdownLoader(Loader):
             data=serialized_meta_data,
             format='json-ld',
         )
+
+        # The IRI of the local page is a page.
+        # FIXME: maybe this should be in octiron.py and work globally.
+        yield Triple(self.local_iri, RDF.type, OCTA.Page)
 
         yield from starmap(Triple, iter(graph))

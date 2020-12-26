@@ -3,6 +3,9 @@ from typing import Union, NamedTuple, Dict, Optional
 import rdflib
 
 
+OCTA = rdflib.Namespace('https://ns.octadocs.io/')
+
+
 class Triple(NamedTuple):
     """RDF triple."""
 

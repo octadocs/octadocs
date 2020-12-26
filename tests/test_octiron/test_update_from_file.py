@@ -1,8 +1,9 @@
 from pathlib import Path
 
-from rdflib import URIRef, RDFS, DC, Literal, Graph
+from rdflib import URIRef, RDFS, DC, Literal, Graph, RDF
 
 from octiron import Octiron
+from octiron.types import OCTA
 
 
 def test_turtle():
@@ -13,7 +14,7 @@ def test_turtle():
 
     octiron.update_from_file(
         path=data_dir / 'rdfs.ttl',
-        iri=URIRef('local:rdfs.ttl'),
+        local_iri=URIRef('local:rdfs.ttl'),
     )
 
     assert next(octiron.graph.quads()) == (
@@ -32,12 +33,53 @@ def test_markdown():
 
     octiron.update_from_file(
         path=data_dir / 'test.md',
-        iri=URIRef('local:test.md'),
+        local_iri=URIRef('local:test.md'),
     )
 
-    assert next(octiron.graph.quads()) == (
-        URIRef('local:test'),
-        URIRef('local:title'),
-        Literal('Hey, I am a test!'),
-        Graph(identifier=URIRef('local:test.md')),
+    assert set(octiron.graph.quads()) == {
+        (
+            URIRef('local:test'),
+            URIRef('local:title'),
+            Literal('Hey, I am a test!'),
+            Graph(identifier=URIRef('local:test.md')),
+        ),
+        (
+            URIRef('local:test'),
+            OCTA.subjectOf,
+            URIRef('local:test.md'),
+            Graph(identifier=URIRef('local:test.md')),
+        ),
+        (
+            URIRef('local:test.md'),
+            RDF.type,
+            OCTA.Page,
+            Graph(identifier=URIRef('local:test.md')),
+        ),
+    }
+
+
+def test_markdown_without_id():
+    """Update Octiron graph from a Markdown file without a $id."""
+    data_dir = Path(__file__).parent / 'data'
+
+    octiron = Octiron(root_directory=data_dir)
+
+    octiron.update_from_file(
+        path=data_dir / 'test_without_id.md',
+        local_iri=URIRef('local:test.md'),
     )
+
+    assert set(octiron.graph.quads()) == {
+        (
+            URIRef('local:test.md'),
+            URIRef('local:title'),
+            Literal('Hey, I am a test!'),
+            Graph(identifier=URIRef('local:test.md')),
+        ),
+        (
+            URIRef('local:test.md'),
+            RDF.type,
+            OCTA.Page,
+            Graph(identifier=URIRef('local:test.md')),
+        ),
+    }
