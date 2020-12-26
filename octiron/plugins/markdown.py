@@ -28,12 +28,7 @@ class MarkdownLoader(Loader):
         if meta_data.get('@context'):
             raise ValueError('A-A-A!!! @context is specified in front matter!')
 
-        # If the user did not say what we are talking about on this page, we
-        # will assume we're talking about the page itself.
-        if meta_data.get('@id') is None:
-            meta_data['@id'] = self.iri
-
-        meta_data['@context'] = self.context
+        # meta_data['@context'] = self.context
 
         # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
         # If we don't expand with an explicit @base, import will fail silently.
@@ -41,6 +36,7 @@ class MarkdownLoader(Loader):
             meta_data,
             options={
                 'base': 'local:',
+                'expandContext': self.context,
             },
         )
 

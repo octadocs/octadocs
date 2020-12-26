@@ -1,6 +1,6 @@
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import partial, reduce
 from pathlib import Path
 from typing import Iterable, Dict, Any, Optional, Type, Iterator
@@ -35,10 +35,10 @@ DEFAULT_CONTEXT = {
     'label': 'rdfs:label',
     'comment': 'rdfs:comment',
     'rdfs:isDefinedBy': {
-        '$type': '@id',
+        '@type': '@id',
     },
     'rdfs:subClassOf': {
-        '$type': '@id',
+        '@type': '@id',
     },
 }
 
@@ -59,7 +59,9 @@ class Octiron:
     """Convert a lump of goo and data into a semantic graph."""
 
     root_directory: Path
-    graph: Optional[rdflib.ConjunctiveGraph] = None
+    graph: rdflib.ConjunctiveGraph = field(
+        default_factory=rdflib.ConjunctiveGraph,
+    )
 
     def _find_context_files(self, directory: Path) -> Iterable[Path]:
         """
@@ -119,7 +121,7 @@ class Octiron:
             MarkdownLoader,
             TurtleLoader,
         ]:
-            if re.match(loader.regex, str(path)):
+            if re.search(loader.regex, str(path)) is not None:
                 return loader
 
         raise ValueError(f'Cannot find appropriate loader for path: {path}')
