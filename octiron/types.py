@@ -1,4 +1,4 @@
-from typing import Tuple, Union, NewType, NamedTuple
+from typing import Union, NamedTuple, Dict, Optional
 
 import rdflib
 
@@ -9,3 +9,16 @@ class Triple(NamedTuple):
     subject: rdflib.URIRef
     predicate: rdflib.URIRef
     object: Union[rdflib.URIRef, rdflib.Literal]
+
+    def as_quad(self, graph: rdflib.URIRef) -> 'Quad':
+        """Add graph to this triple and hence get a quad."""
+        return Quad(*self, graph)
+
+
+class Quad(Triple):
+    """Triple assigned to a named graph."""
+
+    graph: rdflib.URIRef
+
+
+Context = Optional[Union[str, int, float, Dict[str, 'Context']]]

@@ -1,13 +1,18 @@
 import json
+import re
 from dataclasses import dataclass
-from functools import lru_cache, partial, reduce
+from functools import partial, reduce
 from pathlib import Path
-from typing import Iterable, Dict, Any, Optional
+from typing import Iterable, Dict, Any, Optional, Type, Iterator
 
 import rdflib
 import yaml
 from deepmerge import always_merger
-from yaml import Loader
+
+from octiron.plugins.base import Loader
+from octiron.plugins.markdown import MarkdownLoader
+from octiron.plugins.turtle import TurtleLoader
+from octiron.types import Context, Triple, Quad
 
 CONTEXT_FORMATS = {
     'context.json': json.load,
@@ -38,6 +43,17 @@ DEFAULT_CONTEXT = {
 }
 
 
+def triples_to_quads(
+    triples: Iterator[Triple],
+    graph: rdflib.URIRef,
+) -> Iterator[Quad]:
+    """Convert sequence of triples to sequence of quads."""
+    yield from (
+        triple.as_quad(graph)
+        for triple in triples
+    )
+
+
 @dataclass
 class Octiron:
     """Convert a lump of goo and data into a semantic graph."""
@@ -61,7 +77,6 @@ class Octiron:
             if context_directory == self.root_directory:
                 return
 
-    @lru_cache
     def _get_context_file(self, path: Path) -> Dict[str, Any]:
         """Read and return context file by path."""
         loader = CONTEXT_FORMATS[path.name]
@@ -69,11 +84,10 @@ class Octiron:
         with path.open('r') as context_data_stream:
             yield loader(context_data_stream)
 
-    @lru_cache
     def get_context_per_directory(
         self,
         directory: Path,
-    ) -> Dict[str, Any]:
+    ) -> Context:
         """Find context file per disk directory."""
         return reduce(
             always_merger.merge,
@@ -84,9 +98,28 @@ class Octiron:
             DEFAULT_CONTEXT,
         )
 
-    def update_from_file(self, path: Path) -> None:
+    def update_from_file(self, path: Path, iri: rdflib.URIRef) -> None:
         """Update the graph from file determined by given path."""
-        # FIXME how to register and call plugins? Every plugin should yield
-        #   a stream of triples. That will ensure independence of rdflib.
-        #   I think a regex for file path will be a good idea.
         context = self.get_context_per_directory(path.parent)
+        loader_class = self.get_loader_class_for_path(path)
+        loader_instance = loader_class(
+            path=path,
+            context=context,
+        )
+        triples = loader_instance.stream()
+
+        quads = triples_to_quads(triples=triples, graph=iri)
+
+        self.graph.addN(quads)
+
+    def get_loader_class_for_path(self, path: Path) -> Type[Loader]:
+        """Based on file path, determine the loader to use."""
+        # TODO dependency inversion
+        for loader in [
+            MarkdownLoader,
+            TurtleLoader,
+        ]:
+            if re.match(loader.regex, str(path)):
+                return loader
+
+        raise ValueError(f'Cannot find appropriate loader for path: {path}')

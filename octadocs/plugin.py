@@ -95,27 +95,6 @@ def update_graph_from_markdown_file(
             '@type': 'octa:Page',
         }
 
-    # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
-    # If we don't expand with an explicit @base, import will fail silently.
-    meta_data = jsonld.expand(
-        meta_data,
-        options={
-            'base': LOCAL_IRI_SCHEME,
-        },
-    )
-
-    # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/98
-    # If we don't flatten, @included sections will not be imported.
-    meta_data = jsonld.flatten(meta_data)
-
-    serialized_meta_data = json.dumps(meta_data, indent=4)
-
-    universe.parse(
-        data=serialized_meta_data,
-        format='json-ld',
-        publicID=page_id,
-    )
-
     return universe
 
 
