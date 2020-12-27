@@ -1,26 +1,22 @@
-import json
 import logging
 import operator
 from functools import partial
 from pathlib import Path
 from typing import Callable, Dict, Optional, Union
 
-import frontmatter
 import owlrl
 import rdflib
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import File, Files
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
-from pyld import jsonld
-from rdflib.plugins.memory import IOMemory
 from typing_extensions import TypedDict
 
-from octadocs.settings import LOCAL_IRI_SCHEME
+from octadocs import settings
 from octadocs.environment import query, src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
 from octiron import Octiron
-from octiron.yaml_extensions import convert_dollar_signs
+from octiron.types import OCTA, LOCAL
 
 NavigationItem = Union[Page, Section]
 
@@ -86,48 +82,6 @@ def get_template_by_page(
     return None
 
 
-def apply_inference_in_place(
-    graph: rdflib.ConjunctiveGraph,
-    docs_dir: Path,
-) -> None:
-    """Apply inference rules."""
-    logger.info('Inference: OWL RL')
-    owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(graph)
-
-    # Fill in octa:about relationships.
-    logger.info(
-        'Inference: ?thing octa:subjectOf ?page ⇒ ?page octa:about ?thing .',
-    )
-    graph.update('''
-        INSERT {
-            ?page octa:about ?thing .
-        } WHERE {
-            ?thing octa:subjectOf ?page .
-        }
-    ''')
-
-    logger.info(
-        'Inference: ?thing rdfs:label ?label & '
-        '?thing octa:page ?page ⇒ ?page octa:title ?label',
-    )
-    graph.update('''
-        INSERT {
-            ?page octa:title ?title .
-        } WHERE {
-            ?subject
-                rdfs:label ?title ;
-                octa:subjectOf ?page .
-        }
-    ''')
-
-    inference_dir = docs_dir.parent / 'inference'
-    if inference_dir.is_dir():
-        for sparql_file in inference_dir.iterdir():
-            logger.info('Inference: %s', sparql_file.name)
-            sparql_text = sparql_file.read_text()
-            graph.update(sparql_text)
-
-
 class OctaDocsPlugin(BasePlugin):
     """MkDocs Meta plugin."""
 
@@ -136,7 +90,17 @@ class OctaDocsPlugin(BasePlugin):
     def on_config(self, config: Config) -> Config:
         self.octiron = Octiron(
             root_directory=Path(config['docs_dir']),
+            namespaces={
+                'octa': OCTA,
+                'local': LOCAL,
+            }
         )
+
+        if config['extra'] is None:
+            config['extra'] = {}
+
+        config['extra']['graph'] = self.octiron.graph
+
         return config
 
     def on_files(self, files: Files, config: Config):
@@ -145,15 +109,12 @@ class OctaDocsPlugin(BasePlugin):
         docs_dir = Path(config['docs_dir'])
 
         for mkdocs_file in files:
+            mkdocs_file: File
             self.octiron.update_from_file(
-                path=Path(mkdocs_file.src_path),
+                path=Path(mkdocs_file.abs_src_path),
                 local_iri=src_path_to_iri(mkdocs_file.src_path),
                 global_url=mkdocs_file.url,
             )
-
-        self.octiron.apply_inference()
-
-        apply_inference_in_place(self.graph, docs_dir=docs_dir)
 
     def on_page_markdown(
         self,
@@ -165,7 +126,7 @@ class OctaDocsPlugin(BasePlugin):
         """Inject page template path, if necessary."""
         template_name = get_template_by_page(
             page=page,
-            graph=self.graph,
+            graph=self.octiron.graph,
         )
 
         if template_name is not None:
@@ -187,7 +148,7 @@ class OctaDocsPlugin(BasePlugin):
 
         this_choices = list(map(
             operator.itemgetter(rdflib.Variable('this')),
-            self.graph.query(
+            self.octiron.graph.query(
                 'SELECT * WHERE { ?this octa:subjectOf ?page_iri }',
                 initBindings={
                     'page_iri': page_iri,
@@ -200,12 +161,12 @@ class OctaDocsPlugin(BasePlugin):
         else:
             context['this'] = page_iri
 
-        context['graph'] = self.graph
+        context['graph'] = self.octiron.graph
         context['iri'] = page_iri
 
         context['query'] = partial(
             query,
-            instance=self.graph,
+            instance=self.octiron.graph,
         )
         # FIXME this is hardcode, needs to be defined dynamically
         context['rdfs'] = rdflib.Namespace(
@@ -222,6 +183,6 @@ class OctaDocsPlugin(BasePlugin):
     ) -> Navigation:
         """Update the site's navigation from the knowledge graph."""
         return OctadocsNavigationProcessor(
-            graph=self.graph,
+            graph=self.octiron.graph,
             navigation=nav,
         ).generate()

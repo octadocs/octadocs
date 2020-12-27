@@ -1,10 +1,12 @@
 import json
+import logging
 import re
 from dataclasses import dataclass, field
-from functools import partial, reduce
+from functools import partial, reduce, cached_property
 from pathlib import Path
 from typing import Iterable, Dict, Any, Optional, Type, Iterator
 
+import owlrl
 import rdflib
 import yaml
 from deepmerge import always_merger
@@ -13,6 +15,8 @@ from octiron.plugins.base import Loader
 from octiron.plugins.markdown import MarkdownLoader
 from octiron.plugins.turtle import TurtleLoader
 from octiron.types import Context, Triple, Quad
+
+logger = logging.getLogger(__name__)
 
 CONTEXT_FORMATS = {
     'context.json': json.load,
@@ -62,9 +66,16 @@ class Octiron:
     """Convert a lump of goo and data into a semantic graph."""
 
     root_directory: Path
-    graph: rdflib.ConjunctiveGraph = field(
-        default_factory=rdflib.ConjunctiveGraph,
-    )
+    namespaces: Dict[str, rdflib.URIRef] = field(default_factory=dict)
+
+    @cached_property
+    def graph(self) -> rdflib.ConjunctiveGraph:
+        conjunctive_graph = rdflib.ConjunctiveGraph()
+
+        for short_name, uri in self.namespaces.items():
+            conjunctive_graph.bind(short_name, uri)
+
+        return conjunctive_graph
 
     def _find_context_files(self, directory: Path) -> Iterable[Path]:
         """
@@ -112,6 +123,10 @@ class Octiron:
         """Update the graph from file determined by given path."""
         context = self.get_context_per_directory(path.parent)
         loader_class = self.get_loader_class_for_path(path)
+
+        if loader_class is None:
+            return
+
         loader_instance = loader_class(
             path=path,
             context=context,
@@ -124,7 +139,58 @@ class Octiron:
 
         self.graph.addN(quads)
 
-    def get_loader_class_for_path(self, path: Path) -> Type[Loader]:
+        self.on_update_from_file(
+            path=path,
+            local_iri=local_iri,
+            global_url=global_url,
+        )
+
+    def on_update_from_file(
+        self,
+        path: Path,
+        local_iri: rdflib.URIRef,
+        global_url: Optional[rdflib.URIRef] = None,
+    ) -> None:
+        """Do whatever is needed after the graph was updated from a file."""
+        # FIXME this should be customizable via dependency inversion. Right now
+        #   this is hardcoded to run inference rules formulated as SPARQL files.
+        logger.info('Inference: OWL RL')
+        owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(self.graph)
+
+        # Fill in octa:about relationships.
+        logger.info(
+            'Inference: ?thing octa:subjectOf ?page ⇒ ?page octa:about ?thing .',
+        )
+        self.graph.update('''
+            INSERT {
+                ?page octa:about ?thing .
+            } WHERE {
+                ?thing octa:subjectOf ?page .
+            }
+        ''')
+
+        logger.info(
+            'Inference: ?thing rdfs:label ?label & '
+            '?thing octa:page ?page ⇒ ?page octa:title ?label',
+        )
+        self.graph.update('''
+            INSERT {
+                ?page octa:title ?title .
+            } WHERE {
+                ?subject
+                    rdfs:label ?title ;
+                    octa:subjectOf ?page .
+            }
+        ''')
+
+        inference_dir = self.root_directory.parent / 'inference'
+        if inference_dir.is_dir():
+            for sparql_file in inference_dir.iterdir():
+                logger.info('Inference: %s', sparql_file.name)
+                sparql_text = sparql_file.read_text()
+                self.graph.update(sparql_text)
+
+    def get_loader_class_for_path(self, path: Path) -> Optional[Type[Loader]]:
         """Based on file path, determine the loader to use."""
         # TODO dependency inversion
         for loader in [
@@ -134,4 +200,4 @@ class Octiron:
             if re.search(loader.regex, str(path)) is not None:
                 return loader
 
-        raise ValueError(f'Cannot find appropriate loader for path: {path}')
+        logger.info('Cannot find appropriate loader for path: %s', path)

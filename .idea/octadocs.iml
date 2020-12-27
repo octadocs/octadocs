@@ -7,6 +7,9 @@
       <excludeFolder url="file://$MODULE_DIR$/octadocs/htmlcov" />
       <excludeFolder url="file://$MODULE_DIR$/site" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/test_octiron/htmlcov" />
+      <excludeFolder url="file://$MODULE_DIR$/htmlcov" />
+      <excludeFolder url="file://$MODULE_DIR$/.mypy_cache" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (octadocs)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

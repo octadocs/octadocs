@@ -19,7 +19,7 @@ plugins:
         - octadocs
 
 theme:
-  name: semantic
+  name: mkdocs
   logo:
     image: logo.png
   custom_dir: templates
