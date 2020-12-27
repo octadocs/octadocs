@@ -2,8 +2,8 @@ from pathlib import Path
 
 from rdflib import URIRef, RDFS, DC, Literal, Graph, RDF
 
-from octiron import Octiron
-from octiron.types import OCTA
+from octadocs.octiron import Octiron
+from octadocs.octiron import OCTA
 
 
 def test_turtle():

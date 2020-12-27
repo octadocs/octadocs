@@ -1,11 +1,10 @@
 from itertools import starmap
-from pathlib import Path
-from typing import Iterable, Iterator
+from typing import Iterator
 
 import rdflib
 
-from octiron.plugins.base import Loader
-from octiron.types import Triple
+from octadocs.octiron.plugins import Loader
+from octadocs.octiron.types import Triple
 
 
 class TurtleLoader(Loader):

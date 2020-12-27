@@ -4,10 +4,9 @@ from functools import partial
 from pathlib import Path
 from typing import Callable, Dict, Optional, Union
 
-import owlrl
 import rdflib
 from mkdocs.plugins import BasePlugin
-from mkdocs.structure.files import File, Files
+from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from typing_extensions import TypedDict
@@ -15,8 +14,7 @@ from typing_extensions import TypedDict
 from octadocs import settings
 from octadocs.environment import query, src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
-from octiron import Octiron
-from octiron.types import OCTA, LOCAL
+from octadocs.octiron import Octiron
 
 NavigationItem = Union[Page, Section]
 
@@ -87,15 +85,14 @@ class OctaDocsPlugin(BasePlugin):
     def on_files(self, files: Files, config: Config):
         """Extract metadata from files and compose the site graph."""
 
-        docs_dir = Path(config['docs_dir'])
-
         for mkdocs_file in files:
-            mkdocs_file: File
             self.octiron.update_from_file(
                 path=Path(mkdocs_file.abs_src_path),
                 local_iri=src_path_to_iri(mkdocs_file.src_path),
                 global_url=f'/{mkdocs_file.url}',
             )
+
+        self.octiron.apply_inference()
 
     def on_page_markdown(
         self,

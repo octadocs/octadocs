@@ -7,9 +7,9 @@ import rdflib
 from pyld import jsonld
 from rdflib import RDF
 
-from octiron.plugins.base import Loader
-from octiron.types import Triple, OCTA
-from octiron.yaml_extensions import convert_dollar_signs
+from octadocs.octiron.plugins import Loader
+from octadocs.octiron.types import Triple, OCTA
+from octadocs.octiron.yaml_extensions import convert_dollar_signs
 
 
 class MarkdownLoader(Loader):

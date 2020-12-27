@@ -3,7 +3,7 @@ from typing import Iterator, Optional
 
 import rdflib
 
-from octiron.types import Triple, Context
+from octadocs.octiron.types import Triple, Context
 
 
 class Loader:

@@ -11,10 +11,10 @@ import rdflib
 import yaml
 from deepmerge import always_merger
 
-from octiron.plugins.base import Loader
-from octiron.plugins.markdown import MarkdownLoader
-from octiron.plugins.turtle import TurtleLoader
-from octiron.types import Context, Triple, Quad, DEFAULT_NAMESPACES
+from octadocs.octiron.plugins import Loader
+from octadocs.octiron.plugins import MarkdownLoader
+from octadocs.octiron.plugins import TurtleLoader
+from octadocs.octiron.types import Context, Triple, Quad, DEFAULT_NAMESPACES
 
 logger = logging.getLogger(__name__)
 
@@ -142,18 +142,7 @@ class Octiron:
 
         self.graph.addN(quads)
 
-        self.on_update_from_file(
-            path=path,
-            local_iri=local_iri,
-            global_url=global_url,
-        )
-
-    def on_update_from_file(
-        self,
-        path: Path,
-        local_iri: rdflib.URIRef,
-        global_url: Optional[rdflib.URIRef] = None,
-    ) -> None:
+    def apply_inference(self) -> None:
         """Do whatever is needed after the graph was updated from a file."""
         # FIXME this should be customizable via dependency inversion. Right now
         #   this is hardcoded to run inference rules formulated as SPARQL files.
@@ -203,4 +192,4 @@ class Octiron:
             if re.search(loader.regex, str(path)) is not None:
                 return loader
 
-        logger.info('Cannot find appropriate loader for path: %s', path)
+        logger.warning('Cannot find appropriate loader for path: %s', path)

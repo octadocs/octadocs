@@ -1,7 +1,7 @@
 import tempfile
 from pathlib import Path
 
-from octiron import Octiron
+from octadocs.octiron import Octiron
 
 
 def test_file_in_upper_directory():

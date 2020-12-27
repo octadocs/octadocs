@@ -2,8 +2,8 @@ from pathlib import Path
 
 from rdflib import RDFS, DC, Literal
 
-from octiron.plugins.turtle import TurtleLoader
-from octiron.types import Triple
+from octadocs.octiron.plugins import TurtleLoader
+from octadocs.octiron import Triple
 
 
 def test_turtle():

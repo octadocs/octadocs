@@ -38,7 +38,7 @@ def graph(instance: rdflib.ConjunctiveGraph) -> str:
 
 def turtle(instance: rdflib.ConjunctiveGraph) -> str:
     """Serialize graph as n3."""
-    serialized_document = instance.serialize(format='n3').decode('utf-8')
+    serialized_document = instance.serialize(format='turtle').decode('utf-8')
     return (
         '```n3\n'
         f'{serialized_document}\n'
