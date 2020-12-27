@@ -2,20 +2,18 @@ import json
 import logging
 import re
 from dataclasses import dataclass, field
-from functools import partial, reduce, cached_property
+from functools import cached_property, partial, reduce
 from pathlib import Path
 from types import MappingProxyType
-from typing import Iterable, Dict, Optional, Type, Iterator
+from typing import Dict, Iterable, Iterator, Optional, Type
 
 import owlrl
 import rdflib
 import yaml
 from deepmerge import always_merger
 
-from octadocs.octiron.plugins import Loader
-from octadocs.octiron.plugins import MarkdownLoader
-from octadocs.octiron.plugins import TurtleLoader
-from octadocs.octiron.types import Context, Triple, Quad, DEFAULT_NAMESPACES
+from octadocs.octiron.plugins import Loader, MarkdownLoader, TurtleLoader
+from octadocs.octiron.types import DEFAULT_NAMESPACES, Context, Quad, Triple
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +45,7 @@ DEFAULT_CONTEXT = MappingProxyType({
     },
     'octa:subjectOf': {
         '@type': '@id',
-    }
+    },
 })
 
 
@@ -71,6 +69,7 @@ class Octiron:
 
     @cached_property
     def graph(self) -> rdflib.ConjunctiveGraph:
+        """Generate and instantiate the RDFLib graph instance."""
         conjunctive_graph = rdflib.ConjunctiveGraph()
 
         namespaces = dict(DEFAULT_NAMESPACES)
@@ -80,29 +79,6 @@ class Octiron:
             conjunctive_graph.bind(short_name, uri)
 
         return conjunctive_graph
-
-    def _find_context_files(self, directory: Path) -> Iterable[Path]:
-        """
-        Find all context files relevant to particular directory.
-
-        Files are ordered from the deepest to the upmost.
-        """
-        for context_directory in (directory, *directory.parents):
-            for filename in CONTEXT_FORMATS.keys():
-                context_path = context_directory / filename
-
-                if context_path.is_file():
-                    yield context_path
-
-            if context_directory == self.root_directory:
-                return
-
-    def _get_context_file(self, path: Path) -> Context:
-        """Read and return context file by path."""
-        loader = CONTEXT_FORMATS[path.name]
-
-        with path.open('r') as context_data_stream:
-            return loader(context_data_stream)  # type: ignore
 
     def get_context_per_directory(
         self,
@@ -152,7 +128,8 @@ class Octiron:
 
         # Fill in octa:about relationships.
         logger.info(
-            'Inference: ?thing octa:subjectOf ?page ⇒ ?page octa:about ?thing .',
+            'Inference: '
+            '?thing octa:subjectOf ?page ⇒ ?page octa:about ?thing .',
         )
         self.graph.update('''
             INSERT {
@@ -194,3 +171,26 @@ class Octiron:
 
         logger.warning('Cannot find appropriate loader for path: %s', path)
         return None
+
+    def _find_context_files(self, directory: Path) -> Iterable[Path]:
+        """
+        Find all context files relevant to particular directory.
+
+        Files are ordered from the deepest to the upmost.
+        """
+        for context_directory in (directory, *directory.parents):
+            for filename in CONTEXT_FORMATS.keys():
+                context_path = context_directory / filename
+
+                if context_path.is_file():
+                    yield context_path
+
+            if context_directory == self.root_directory:
+                return
+
+    def _get_context_file(self, path: Path) -> Context:
+        """Read and return context file by path."""
+        loader = CONTEXT_FORMATS[path.name]
+
+        with path.open('r') as context_data_stream:
+            return loader(context_data_stream)  # type: ignore
