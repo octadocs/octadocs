@@ -2,9 +2,27 @@ from typing import Union, NamedTuple, Dict, Optional
 
 import rdflib
 
-
 OCTA = rdflib.Namespace('https://ns.octadocs.io/')
 LOCAL = rdflib.Namespace('local:')
+
+
+DEFAULT_NAMESPACES = {
+    'octa': OCTA,
+    'local': LOCAL,
+    '': LOCAL,
+
+    'rdf': rdflib.RDF,
+    'rdfs': rdflib.RDFS,
+    'xsd': rdflib.XSD,
+    'schema': rdflib.SDO,
+    'sh': rdflib.SH,
+    'skos': rdflib.SKOS,
+    'owl': rdflib.OWL,
+    'dc': rdflib.DC,
+    'dcat': rdflib.DCAT,
+    'dcterms': rdflib.DCTERMS,
+    'foaf': rdflib.FOAF,
+}
 
 
 class Triple(NamedTuple):

@@ -48,21 +48,6 @@ class TemplateContext(TypedDict):
     rdfs: rdflib.Namespace
 
 
-def update_graph_from_n3_file(
-    mkdocs_file: File,
-    docs_dir: Path,
-    universe: rdflib.ConjunctiveGraph,
-):
-    """Load data from Turtle file into the graph."""
-    universe.parse(
-        source=str(docs_dir / mkdocs_file.src_path),
-        format='n3',
-        publicID=src_path_to_iri(mkdocs_file.src_path),
-    )
-
-    return universe
-
-
 def get_template_by_page(
     page: Page,
     graph: rdflib.ConjunctiveGraph,
@@ -90,10 +75,6 @@ class OctaDocsPlugin(BasePlugin):
     def on_config(self, config: Config) -> Config:
         self.octiron = Octiron(
             root_directory=Path(config['docs_dir']),
-            namespaces={
-                'octa': OCTA,
-                'local': LOCAL,
-            }
         )
 
         if config['extra'] is None:
@@ -113,7 +94,7 @@ class OctaDocsPlugin(BasePlugin):
             self.octiron.update_from_file(
                 path=Path(mkdocs_file.abs_src_path),
                 local_iri=src_path_to_iri(mkdocs_file.src_path),
-                global_url=mkdocs_file.url,
+                global_url=f'/{mkdocs_file.url}',
             )
 
     def on_page_markdown(

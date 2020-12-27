@@ -69,6 +69,10 @@ class MarkdownLoader(Loader):
 
         # The page will be available on the Web under certain URL.
         if self.global_url is not None:
-            yield Triple(self.local_iri, OCTA.url, self.global_url)
+            yield Triple(
+                self.local_iri,
+                OCTA.url,
+                rdflib.Literal(self.global_url),
+            )
 
         yield from starmap(Triple, iter(graph))

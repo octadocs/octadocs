@@ -14,7 +14,7 @@ from deepmerge import always_merger
 from octiron.plugins.base import Loader
 from octiron.plugins.markdown import MarkdownLoader
 from octiron.plugins.turtle import TurtleLoader
-from octiron.types import Context, Triple, Quad
+from octiron.types import Context, Triple, Quad, DEFAULT_NAMESPACES
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,10 @@ class Octiron:
     def graph(self) -> rdflib.ConjunctiveGraph:
         conjunctive_graph = rdflib.ConjunctiveGraph()
 
-        for short_name, uri in self.namespaces.items():
+        namespaces = DEFAULT_NAMESPACES.copy()
+        namespaces.update(self.namespaces)
+
+        for short_name, uri in namespaces.items():
             conjunctive_graph.bind(short_name, uri)
 
         return conjunctive_graph
@@ -98,7 +101,7 @@ class Octiron:
         loader = CONTEXT_FORMATS[path.name]
 
         with path.open('r') as context_data_stream:
-            yield loader(context_data_stream)
+            return loader(context_data_stream)
 
     def get_context_per_directory(
         self,
@@ -118,7 +121,7 @@ class Octiron:
         self,
         path: Path,
         local_iri: rdflib.URIRef,
-        global_url: Optional[rdflib.URIRef] = None,
+        global_url: Optional[str] = None,
     ) -> None:
         """Update the graph from file determined by given path."""
         context = self.get_context_per_directory(path.parent)
