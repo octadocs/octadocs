@@ -9,7 +9,7 @@ style = "https://raw.githubusercontent.com/wemake-services/wemake-python-stylegu
 
 [tool.poetry]
 name = "octadocs"
-version = "0.0.4"
+version = "0.0.5"
 description = "MkDocs wiki made smart"
 license = "MIT"
 

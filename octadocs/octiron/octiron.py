@@ -1,8 +1,9 @@
 import json
 import logging
 import re
+import sys
 from dataclasses import dataclass, field
-from functools import cached_property, partial, reduce
+from functools import partial, reduce
 from pathlib import Path
 from types import MappingProxyType
 from typing import Dict, Iterable, Iterator, Optional, Type
@@ -14,6 +15,11 @@ from deepmerge import always_merger
 
 from octadocs.octiron.plugins import Loader, MarkdownLoader, TurtleLoader
 from octadocs.octiron.types import DEFAULT_NAMESPACES, Context, Quad, Triple
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property  # noqa
+else:
+    from backports.cached_property import cached_property  # noqa: WPS433,WPS440
 
 logger = logging.getLogger(__name__)
 
