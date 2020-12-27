@@ -50,6 +50,7 @@ def get_template_by_page(
     page: Page,
     graph: rdflib.ConjunctiveGraph,
 ) -> Optional[str]:
+    """Find the template to render the given Markdown file."""
     iri = rdflib.URIRef(f'{settings.LOCAL_IRI_SCHEME}{page.file.src_path}')
 
     bindings = graph.query(
@@ -71,20 +72,21 @@ class OctaDocsPlugin(BasePlugin):
     octiron: Octiron
 
     def on_config(self, config: Config) -> Config:
+        """Initialize Octiron and provide graph to macros through the config."""
         self.octiron = Octiron(
             root_directory=Path(config['docs_dir']),
         )
 
         if config['extra'] is None:
-            config['extra'] = {}
+            config['extra'] = {'graph': self.octiron.graph}
 
-        config['extra']['graph'] = self.octiron.graph
+        else:
+            config['extra']['graph'] = self.octiron.graph
 
         return config
 
     def on_files(self, files: Files, config: Config):
         """Extract metadata from files and compose the site graph."""
-
         for mkdocs_file in files:
             self.octiron.update_from_file(
                 path=Path(mkdocs_file.abs_src_path),
@@ -92,6 +94,7 @@ class OctaDocsPlugin(BasePlugin):
                 global_url=f'/{mkdocs_file.url}',
             )
 
+        # After all files are imported, run inference rules.
         self.octiron.apply_inference()
 
     def on_page_markdown(

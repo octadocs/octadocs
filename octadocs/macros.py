@@ -134,36 +134,51 @@ def label(
     return bindings[0][rdflib.Variable('label')].value
 
 
-def define_env(env: MacrosPlugin) -> MacrosPlugin:
+def define_env(env: MacrosPlugin) -> MacrosPlugin:  # noqa: WPS213
+    """Create mkdocs-macros Jinja environment."""
     env.filter(graph)
     env.filter(sparql)
     env.filter(turtle)
     env.filter(table)
 
-    env.macro(partial(
-        query,
-        instance=env.variables.graph,
-    ), name='query')
+    env.macro(
+        partial(
+            query,
+            instance=env.variables.graph,
+        ),
+        name='query',
+    )
 
-    env.macro(partial(
-        construct,
-        instance=env.variables.graph,
-    ), name='construct')
+    env.macro(
+        partial(
+            construct,
+            instance=env.variables.graph,
+        ),
+        name='construct',
+    )
 
-    env.macro(partial(
-        url,
-        graph=env.variables.graph,
-    ), name='url')
+    env.macro(
+        partial(
+            url,
+            graph=env.variables.graph,
+        ),
+        name='url',
+    )
 
-    env.filter(partial(
-        url,
-        graph=env.variables.graph,
-    ), name='url')
+    env.filter(
+        partial(
+            url,
+            graph=env.variables.graph,
+        ), name='url',
+    )
 
-    env.filter(partial(
-        label,
-        graph=env.variables.graph,
-    ), name='label')
+    env.filter(
+        partial(
+            label,
+            graph=env.variables.graph,
+        ),
+        name='label',
+    )
 
     env.macro(iri_to_url)
     env.macro(src_path_to_iri)

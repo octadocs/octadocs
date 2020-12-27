@@ -3,7 +3,7 @@ from typing import Iterator, Optional
 
 import rdflib
 
-from octadocs.octiron.types import Triple, Context
+from octadocs.octiron.types import Context, Triple
 
 
 class Loader:
@@ -20,7 +20,7 @@ class Loader:
 
     # The URL of the page (relative or absolute) under which the page will be
     # accessible for users.
-    global_url: Optional[rdflib.URIRef]
+    global_url: Optional[str]
 
     # JSON-LD context
     context: Context
@@ -29,7 +29,7 @@ class Loader:
         self,
         path: Path,
         local_iri: rdflib.URIRef,
-        global_url: Optional[rdflib.URIRef],
+        global_url: Optional[str],
         context: Context,
     ) -> None:
         """Initialize the data loader."""

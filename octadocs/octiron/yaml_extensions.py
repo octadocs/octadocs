@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
 from boltons.iterutils import remap
 
@@ -15,7 +15,7 @@ def convert_dollar_signs(
     """
     return remap(
         meta_data,
-        lambda path, key, value: (
+        lambda path, key, value: (  # noqa: WPS110
             key.replace('$', '@') if isinstance(key, str) else key,
             value,
         ),

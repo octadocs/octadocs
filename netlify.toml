@@ -1,9 +1,0 @@
-# https://github.com/netlify/build-image/issues/221
-
-[build]
-publish = "site/"
-command = """
-pip install -q poetry &&
-poetry install &&
-poetry run mkdocs build
-"""
