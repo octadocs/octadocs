@@ -50,5 +50,5 @@ class Quad(NamedTuple):
 
 # Should be Dict[str, 'Context'] but mypy crashes on a recursive type.
 Context = Optional[   # type: ignore
-    Union[str, int, float, Dict[str, Any]],
+    Union[str, int, float, Dict[str, Any]]
 ]
