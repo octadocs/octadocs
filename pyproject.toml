@@ -45,7 +45,7 @@ graphviz = "^0.15"
 boltons = "^20.2.1"
 owlrl = "^5.2.1"
 typing-extensions = "^3.7.4"
-"backports.cached-property" = { version = "^1.0.0", python = "<3.8" }
+"backports.cached_property" = { version = "^1.0.0", python = "<3.8" }
 requests = "^2.25.1"
 deepmerge = "^0.1.1"
 
@@ -69,3 +69,9 @@ flakehell = "^0.7.1"
 [tool.flakehell]
 # Will replace by my own ignorelist later
 base = "https://raw.githubusercontent.com/Recall-Masters/standards/main/pyproject.toml"
+
+[tool.flakehell.exceptions."tests/**.py"]
+wemake-python-styleguide = [
+  # Found protected attribute usage
+  "-WPS437"
+]

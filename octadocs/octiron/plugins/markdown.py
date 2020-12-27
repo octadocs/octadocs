@@ -8,7 +8,7 @@ from pyld import jsonld
 from rdflib import RDF
 
 from octadocs.octiron.plugins import Loader
-from octadocs.octiron.types import Triple, OCTA
+from octadocs.octiron.types import OCTA, Triple
 from octadocs.octiron.yaml_extensions import convert_dollar_signs
 
 
@@ -29,7 +29,7 @@ class MarkdownLoader(Loader):
         if meta_data.get('@context'):
             raise ValueError('A-A-A!!! @context is specified in front matter!')
 
-        if '@id' in meta_data:
+        if meta_data.get('@id') is not None:
             # The author specified an IRI the document tells us about. Let us
             # link this IRI to the local document IRI.
             meta_data['octa:subjectOf'] = self.local_iri

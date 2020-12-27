@@ -4,7 +4,8 @@ import re
 from dataclasses import dataclass, field
 from functools import partial, reduce, cached_property
 from pathlib import Path
-from typing import Iterable, Dict, Any, Optional, Type, Iterator
+from types import MappingProxyType
+from typing import Iterable, Dict, Optional, Type, Iterator
 
 import owlrl
 import rdflib
@@ -18,7 +19,7 @@ from octadocs.octiron.types import Context, Triple, Quad, DEFAULT_NAMESPACES
 
 logger = logging.getLogger(__name__)
 
-CONTEXT_FORMATS = {
+CONTEXT_FORMATS = MappingProxyType({
     'context.json': json.load,
 
     # FIXME we need $ conversion for YAML files.
@@ -26,9 +27,9 @@ CONTEXT_FORMATS = {
         yaml.load,
         Loader=Loader,
     ),
-}
+})
 
-DEFAULT_CONTEXT = {
+DEFAULT_CONTEXT = MappingProxyType({
     '@vocab': 'local:',
     '@base': 'local:',
 
@@ -47,7 +48,7 @@ DEFAULT_CONTEXT = {
     'octa:subjectOf': {
         '@type': '@id',
     }
-}
+})
 
 
 def triples_to_quads(
@@ -72,7 +73,7 @@ class Octiron:
     def graph(self) -> rdflib.ConjunctiveGraph:
         conjunctive_graph = rdflib.ConjunctiveGraph()
 
-        namespaces = DEFAULT_NAMESPACES.copy()
+        namespaces = dict(DEFAULT_NAMESPACES)
         namespaces.update(self.namespaces)
 
         for short_name, uri in namespaces.items():
@@ -96,12 +97,12 @@ class Octiron:
             if context_directory == self.root_directory:
                 return
 
-    def _get_context_file(self, path: Path) -> Dict[str, Any]:
+    def _get_context_file(self, path: Path) -> Context:
         """Read and return context file by path."""
         loader = CONTEXT_FORMATS[path.name]
 
         with path.open('r') as context_data_stream:
-            return loader(context_data_stream)
+            return loader(context_data_stream)  # type: ignore
 
     def get_context_per_directory(
         self,
@@ -114,7 +115,7 @@ class Octiron:
                 self._get_context_file,
                 reversed(list(self._find_context_files(directory))),
             ),
-            DEFAULT_CONTEXT,
+            dict(DEFAULT_CONTEXT),
         )
 
     def update_from_file(
@@ -185,11 +186,11 @@ class Octiron:
     def get_loader_class_for_path(self, path: Path) -> Optional[Type[Loader]]:
         """Based on file path, determine the loader to use."""
         # TODO dependency inversion
-        for loader in [
-            MarkdownLoader,
-            TurtleLoader,
-        ]:
+        loaders = [MarkdownLoader, TurtleLoader]
+
+        for loader in loaders:
             if re.search(loader.regex, str(path)) is not None:
                 return loader
 
         logger.warning('Cannot find appropriate loader for path: %s', path)
+        return None

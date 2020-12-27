@@ -5,8 +5,8 @@ from octadocs.octiron import Octiron
 
 
 def test_file_in_upper_directory():
-    with tempfile.TemporaryDirectory() as temp_directory:
-        temp_directory = Path(temp_directory)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_directory = Path(temp_dir)
 
         # Create a file that will not be accessible to the finder
         # because it is above the root_directory in structure
@@ -16,12 +16,12 @@ def test_file_in_upper_directory():
         docs_directory.mkdir()
 
         octiron = Octiron(root_directory=docs_directory)
-        assert list(octiron._find_context_files(docs_directory / 'posts')) == []
+        assert not list(octiron._find_context_files(docs_directory / 'posts'))
 
 
 def test_file_in_docs_directory():
-    with tempfile.TemporaryDirectory() as temp_directory:
-        temp_directory = Path(temp_directory)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_directory = Path(temp_dir)
 
         docs_directory = Path(temp_directory) / 'docs'
         docs_directory.mkdir()
@@ -29,13 +29,13 @@ def test_file_in_docs_directory():
 
         octiron = Octiron(root_directory=docs_directory)
         assert list(octiron._find_context_files(docs_directory / 'posts')) == [
-            temp_directory / 'docs/context.yaml'
+            temp_directory / 'docs/context.yaml',
         ]
 
 
 def test_file_in_sub_directory():
-    with tempfile.TemporaryDirectory() as temp_directory:
-        temp_directory = Path(temp_directory)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_directory = Path(temp_dir)
 
         docs_directory = Path(temp_directory) / 'docs'
         docs_directory.mkdir()
@@ -55,8 +55,8 @@ def test_file_in_sub_directory():
 
 
 def test_file_in_current_directory():
-    with tempfile.TemporaryDirectory() as temp_directory:
-        temp_directory = Path(temp_directory)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_directory = Path(temp_dir)
 
         docs_directory = Path(temp_directory) / 'docs'
         docs_directory.mkdir()

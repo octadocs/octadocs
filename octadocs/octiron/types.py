@@ -1,4 +1,5 @@
-from typing import Union, NamedTuple, Dict, Optional
+from types import MappingProxyType
+from typing import Any, Dict, NamedTuple, Optional, Union
 
 import rdflib
 
@@ -6,7 +7,8 @@ OCTA = rdflib.Namespace('https://ns.octadocs.io/')
 LOCAL = rdflib.Namespace('local:')
 
 
-DEFAULT_NAMESPACES = {
+# To prevent WPS401 Found mutable module constant
+DEFAULT_NAMESPACES = MappingProxyType({
     'octa': OCTA,
     'local': LOCAL,
     '': LOCAL,
@@ -22,7 +24,7 @@ DEFAULT_NAMESPACES = {
     'dcat': rdflib.DCAT,
     'dcterms': rdflib.DCTERMS,
     'foaf': rdflib.FOAF,
-}
+})
 
 
 class Triple(NamedTuple):
@@ -30,7 +32,7 @@ class Triple(NamedTuple):
 
     subject: rdflib.URIRef
     predicate: rdflib.URIRef
-    object: Union[rdflib.URIRef, rdflib.Literal]
+    object: Union[rdflib.URIRef, rdflib.Literal]  # noqa: WPS125
 
     def as_quad(self, graph: rdflib.URIRef) -> 'Quad':
         """Add graph to this triple and hence get a quad."""
@@ -42,8 +44,11 @@ class Quad(NamedTuple):
 
     subject: rdflib.URIRef
     predicate: rdflib.URIRef
-    object: Union[rdflib.URIRef, rdflib.Literal]
+    object: Union[rdflib.URIRef, rdflib.Literal]  # noqa: WPS125
     graph: rdflib.URIRef
 
 
-Context = Optional[Union[str, int, float, Dict[str, 'Context']]]
+# Should be Dict[str, 'Context'] but mypy crashes on a recursive type.
+Context = Optional[   # type: ignore
+    Union[str, int, float, Dict[str, Any]],
+]

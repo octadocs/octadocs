@@ -1,5 +1,6 @@
+import sys
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Union
+from typing import Union
 
 import rdflib
 from mkdocs.structure.nav import Navigation, Section
@@ -7,16 +8,11 @@ from mkdocs.structure.pages import Page
 
 from octadocs.conversions import get_page_title_by_iri, iri_by_page
 
-if TYPE_CHECKING:  # pragma: nocover
+if sys.version_info >= (3, 8):
     from functools import cached_property  # noqa
+else:
+    from backports.cached_property import cached_property  # noqa: WPS433,WPS440
 
-else:  # pragma: nocover
-    try:
-        from functools import cached_property  # noqa
-
-    except ImportError:
-        # For Python <3.8
-        from backports.cached_property import cached_property  # noqa
 
 NavigationItem = Union[Page, Section]
 

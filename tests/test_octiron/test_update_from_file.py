@@ -1,9 +1,11 @@
 from pathlib import Path
 
-from rdflib import URIRef, RDFS, DC, Literal, Graph, RDF
+from rdflib import DC, RDF, RDFS, Graph, Literal, URIRef
 
 from octadocs.octiron import Octiron
-from octadocs.octiron import OCTA
+from octadocs.octiron.types import OCTA
+
+LOCAL_IRI = URIRef('local:test.md')
 
 
 def test_turtle():
@@ -33,7 +35,7 @@ def test_markdown():
 
     octiron.update_from_file(
         path=data_dir / 'test.md',
-        local_iri=URIRef('local:test.md'),
+        local_iri=LOCAL_IRI,
     )
 
     assert set(octiron.graph.quads()) == {
@@ -41,19 +43,19 @@ def test_markdown():
             URIRef('local:test'),
             URIRef('local:title'),
             Literal('Hey, I am a test!'),
-            Graph(identifier=URIRef('local:test.md')),
+            Graph(identifier=LOCAL_IRI),
         ),
         (
             URIRef('local:test'),
             OCTA.subjectOf,
-            URIRef('local:test.md'),
-            Graph(identifier=URIRef('local:test.md')),
+            LOCAL_IRI,
+            Graph(identifier=LOCAL_IRI),
         ),
         (
-            URIRef('local:test.md'),
+            LOCAL_IRI,
             RDF.type,
             OCTA.Page,
-            Graph(identifier=URIRef('local:test.md')),
+            Graph(identifier=LOCAL_IRI),
         ),
     }
 
@@ -66,20 +68,20 @@ def test_markdown_without_id():
 
     octiron.update_from_file(
         path=data_dir / 'test_without_id.md',
-        local_iri=URIRef('local:test.md'),
+        local_iri=LOCAL_IRI,
     )
 
     assert set(octiron.graph.quads()) == {
         (
-            URIRef('local:test.md'),
+            LOCAL_IRI,
             URIRef('local:title'),
             Literal('Hey, I am a test!'),
-            Graph(identifier=URIRef('local:test.md')),
+            Graph(identifier=LOCAL_IRI),
         ),
         (
-            URIRef('local:test.md'),
+            LOCAL_IRI,
             RDF.type,
             OCTA.Page,
-            Graph(identifier=URIRef('local:test.md')),
+            Graph(identifier=LOCAL_IRI),
         ),
     }
