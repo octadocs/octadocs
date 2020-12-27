@@ -4,6 +4,7 @@ import rdflib
 
 
 OCTA = rdflib.Namespace('https://ns.octadocs.io/')
+LOCAL = rdflib.Namespace('local:')
 
 
 class Triple(NamedTuple):

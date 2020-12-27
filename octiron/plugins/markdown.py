@@ -67,4 +67,8 @@ class MarkdownLoader(Loader):
         # FIXME: maybe this should be in octiron.py and work globally.
         yield Triple(self.local_iri, RDF.type, OCTA.Page)
 
+        # The page will be available on the Web under certain URL.
+        if self.global_url is not None:
+            yield Triple(self.local_iri, OCTA.url, self.global_url)
+
         yield from starmap(Triple, iter(graph))

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Optional
 
 import rdflib
 
@@ -18,6 +18,10 @@ class Loader:
     # Local address of the file, which will be used as graph name
     local_iri: rdflib.URIRef
 
+    # The URL of the page (relative or absolute) under which the page will be
+    # accessible for users.
+    global_url: Optional[rdflib.URIRef]
+
     # JSON-LD context
     context: Context
 
@@ -25,12 +29,14 @@ class Loader:
         self,
         path: Path,
         local_iri: rdflib.URIRef,
+        global_url: Optional[rdflib.URIRef],
         context: Context,
     ) -> None:
         """Initialize the data loader."""
         self.path = path
         self.context = context
         self.local_iri = local_iri
+        self.global_url = global_url
 
     def stream(self) -> Iterator[Triple]:
         """Read the source data and return a stream of triples."""

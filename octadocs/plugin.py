@@ -19,6 +19,7 @@ from typing_extensions import TypedDict
 from octadocs.settings import LOCAL_IRI_SCHEME
 from octadocs.environment import query, src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
+from octiron import Octiron
 from octiron.yaml_extensions import convert_dollar_signs
 
 NavigationItem = Union[Page, Section]
@@ -64,66 +65,6 @@ def update_graph_from_n3_file(
     )
 
     return universe
-
-
-def update_graph_from_markdown_file(
-    mkdocs_file: File,
-    docs_dir: Path,
-    universe: rdflib.ConjunctiveGraph,
-    context: Dict[str, str],
-):
-    document = frontmatter.load(docs_dir / mkdocs_file.src_path)
-
-    meta_data = document.metadata
-
-    if not meta_data:
-        return None
-
-    meta_data = convert_dollar_signs(meta_data)
-
-    meta_data.update({'@context': context})
-
-    page_id = src_path_to_iri(mkdocs_file.src_path)
-
-    if meta_data.get('@id') is None:
-        meta_data['@id'] = page_id
-
-    if meta_data.get('octa:subjectOf') is None:
-        meta_data['octa:subjectOf'] = {
-            '@id': page_id,
-            'octa:url': f'/{mkdocs_file.url}',
-            '@type': 'octa:Page',
-        }
-
-    return universe
-
-
-def update_graph_from_file(
-    mkdocs_file: File,
-    docs_dir: Path,
-    universe: rdflib.ConjunctiveGraph,
-):
-    context = fetch_context(
-        docs_dir=docs_dir,
-        mkdocs_file=mkdocs_file,
-    )
-
-    if mkdocs_file.src_path.endswith('.md'):
-        return update_graph_from_markdown_file(
-            mkdocs_file=mkdocs_file,
-            docs_dir=docs_dir,
-            universe=universe,
-            context=context,
-        )
-
-    elif mkdocs_file.src_path.endswith('.n3'):
-        return update_graph_from_n3_file(
-            mkdocs_file=mkdocs_file,
-            docs_dir=docs_dir,
-            universe=universe,
-        )
-
-    return None
 
 
 def get_template_by_page(
@@ -190,23 +131,12 @@ def apply_inference_in_place(
 class OctaDocsPlugin(BasePlugin):
     """MkDocs Meta plugin."""
 
-    graph: rdflib.ConjunctiveGraph = None
+    octiron: Octiron
 
     def on_config(self, config: Config) -> Config:
-        self.graph = rdflib.ConjunctiveGraph(store=IOMemory())
-
-        self.graph.bind('octa', 'https://ns.octadocs.io/')
-        self.graph.bind('schema', 'https://schema.org/')
-        self.graph.bind('local', 'local')
-
-        if config.get('extra') is None:
-            config['extra'] = {'graph': self.graph}
-
-        else:
-            config['extra'].update(  # type: ignore
-                graph=self.graph,
-            )
-
+        self.octiron = Octiron(
+            root_directory=Path(config['docs_dir']),
+        )
         return config
 
     def on_files(self, files: Files, config: Config):
@@ -214,13 +144,14 @@ class OctaDocsPlugin(BasePlugin):
 
         docs_dir = Path(config['docs_dir'])
 
-        for f in files:
-            update_graph_from_file(
-                mkdocs_file=f,
-                docs_dir=docs_dir,
-                universe=self.graph,
-                context=context,
+        for mkdocs_file in files:
+            self.octiron.update_from_file(
+                path=Path(mkdocs_file.src_path),
+                local_iri=src_path_to_iri(mkdocs_file.src_path),
+                global_url=mkdocs_file.url,
             )
+
+        self.octiron.apply_inference()
 
         apply_inference_in_place(self.graph, docs_dir=docs_dir)
 

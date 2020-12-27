@@ -103,7 +103,12 @@ class Octiron:
             DEFAULT_CONTEXT,
         )
 
-    def update_from_file(self, path: Path, local_iri: rdflib.URIRef) -> None:
+    def update_from_file(
+        self,
+        path: Path,
+        local_iri: rdflib.URIRef,
+        global_url: Optional[rdflib.URIRef] = None,
+    ) -> None:
         """Update the graph from file determined by given path."""
         context = self.get_context_per_directory(path.parent)
         loader_class = self.get_loader_class_for_path(path)
@@ -111,6 +116,7 @@ class Octiron:
             path=path,
             context=context,
             local_iri=local_iri,
+            global_url=global_url,
         )
         triples = loader_instance.stream()
 
