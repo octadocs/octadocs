@@ -29,7 +29,10 @@ class MarkdownLoader(Loader):
 
         local_context = meta_data.pop('@context', None)
         if local_context is not None:
-            context = always_merger(self.context, local_context)
+            context = always_merger.merge(
+                base=self.context,
+                nxt=local_context,
+            )
 
         else:
             context = self.context

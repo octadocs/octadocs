@@ -85,3 +85,30 @@ def test_markdown_without_id():
             Graph(identifier=LOCAL_IRI),
         ),
     }
+
+
+def test_markdown_with_context():
+    """Update Octiron graph from a Markdown file with a $context."""
+    data_dir = Path(__file__).parent / 'data'
+
+    octiron = Octiron(root_directory=data_dir)
+
+    octiron.update_from_file(
+        path=data_dir / 'test_with_context.md',
+        local_iri=LOCAL_IRI,
+    )
+
+    assert set(octiron.graph.quads()) == {
+        (
+            LOCAL_IRI,
+            RDFS.label,
+            Literal('Hey, I am a test!'),
+            Graph(identifier=LOCAL_IRI),
+        ),
+        (
+            LOCAL_IRI,
+            RDF.type,
+            OCTA.Page,
+            Graph(identifier=LOCAL_IRI),
+        ),
+    }
