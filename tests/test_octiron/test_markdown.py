@@ -3,7 +3,7 @@ from pathlib import Path
 from rdflib import RDF, RDFS, Graph, Literal, URIRef
 
 from octadocs.octiron import Octiron
-from octadocs.octiron.types import OCTA
+from octadocs.octiron.types import OCTA, LOCAL
 
 LOCAL_IRI = URIRef('local:test.md')
 
@@ -111,6 +111,12 @@ def test_markdown_with_dollar_sign():
             LOCAL_IRI,
             RDFS.label,
             Literal('Hey, I am a test!'),
+            Graph(identifier=LOCAL_IRI),
+        ),
+        (
+            LOCAL_IRI,
+            RDFS.domain,
+            LOCAL.UnitTesting,
             Graph(identifier=LOCAL_IRI),
         ),
         (
