@@ -5,7 +5,7 @@ import rdflib
 from rdflib import URIRef, term
 from rdflib.plugins.sparql.processor import SPARQLResult
 
-from octadocs.settings import LOCAL_IRI_SCHEME
+from octadocs.octiron.types import LOCAL
 
 
 def query(
@@ -27,7 +27,7 @@ def query(
 
 def iri_to_url(iri: str) -> str:
     """Convert Zet IRI into clickable URL."""
-    iri = iri.replace(LOCAL_IRI_SCHEME, '')
+    iri = iri.replace(str(LOCAL), '')
 
     if iri.endswith('index.md'):
         return re.sub(
@@ -46,34 +46,20 @@ def iri_to_url(iri: str) -> str:
 
 def src_path_to_iri(src_path: str) -> URIRef:
     """Convert src_path of a file to a Zet IRI."""
-    return URIRef(f'{LOCAL_IRI_SCHEME}{src_path}')
-
-
-def _format_sparql_variable_value(rdf_value: term.Identifier) -> str:
-    """Format a RDF value as a primitive type value."""
-    if isinstance(rdf_value, rdflib.URIRef):
-        return str(rdf_value)
-
-    elif isinstance(rdf_value, rdflib.BNode):
-        return str(rdf_value)
-
-    elif isinstance(rdf_value, rdflib.Literal):
-        return rdf_value.value
-
-    raise ValueError(f'Cannot interpret value: {rdf_value}')
+    return URIRef(f'{LOCAL}{src_path}')
 
 
 def _format_query_bindings(
     bindings: List[Dict[rdflib.Variable, term.Identifier]],
-) -> List[Dict[str, str]]:
+) -> List[Dict[str, term.Identifier]]:
     """
     Format bindings before returning them.
 
-    FIXME: I am not sure this is really necessary.
+    Converts Variable to str for ease of addressing.
     """
     return [
         {
-            str(variable_name): _format_sparql_variable_value(rdf_value)
+            str(variable_name): rdf_value
             for variable_name, rdf_value
             in row.items()
         }

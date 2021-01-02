@@ -4,8 +4,10 @@ Test for GitHub issue: https://github.com/RDFLib/rdflib/issues/1216
 import pytest
 import rdflib
 
-DOCUMENT = """
-@base <local:> .
+from octadocs.octiron.types import LOCAL
+
+DOCUMENT = f"""
+@base <{LOCAL}> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 <class_to_class>
@@ -28,4 +30,4 @@ def test_no_slash_after_colon():
     )
 
     # Raises ValueError:
-    #   Base <local:> has no slash after colon - with relative 'class_to_class'.
+    #   Base <LOCAL> has no slash after colon - with relative 'class_to_class'.

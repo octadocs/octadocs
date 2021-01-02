@@ -14,7 +14,13 @@ import yaml
 
 from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import Loader, MarkdownLoader, TurtleLoader
-from octadocs.octiron.types import DEFAULT_NAMESPACES, Context, Quad, Triple
+from octadocs.octiron.types import (
+    DEFAULT_CONTEXT,
+    DEFAULT_NAMESPACES,
+    Context,
+    Quad,
+    Triple,
+)
 
 if sys.version_info >= (3, 8):
     from functools import cached_property  # noqa
@@ -31,27 +37,6 @@ CONTEXT_FORMATS = MappingProxyType({
         yaml.load,
         Loader=Loader,
     ),
-})
-
-DEFAULT_CONTEXT = MappingProxyType({
-    '@vocab': 'local:',
-    '@base': 'local:',
-
-    'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
-    'schema': 'https://schema.org/',
-    'octa': 'https://ns.octadocs.io/',
-
-    'label': 'rdfs:label',
-    'comment': 'rdfs:comment',
-    'rdfs:isDefinedBy': {
-        '@type': '@id',
-    },
-    'rdfs:subClassOf': {
-        '@type': '@id',
-    },
-    'octa:subjectOf': {
-        '@type': '@id',
-    },
 })
 
 

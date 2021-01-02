@@ -10,7 +10,6 @@ LOCAL = rdflib.Namespace('local:')
 # To prevent WPS401 Found mutable module constant
 DEFAULT_NAMESPACES = MappingProxyType({
     'octa': OCTA,
-    'local': LOCAL,
     '': LOCAL,
 
     'rdf': rdflib.RDF,
@@ -24,6 +23,33 @@ DEFAULT_NAMESPACES = MappingProxyType({
     'dcat': rdflib.DCAT,
     'dcterms': rdflib.DCTERMS,
     'foaf': rdflib.FOAF,
+})
+
+
+DEFAULT_CONTEXT = MappingProxyType({
+    '@vocab': LOCAL,
+    '@base': LOCAL,
+
+    'label': 'rdfs:label',
+    'comment': 'rdfs:comment',
+    'rdfs:isDefinedBy': {
+        '@type': '@id',
+    },
+    'rdfs:subClassOf': {
+        '@type': '@id',
+    },
+    'octa:subjectOf': {
+        '@type': '@id',
+    },
+
+    # The default namespaces list should be included in context
+    # We have to convert URLs to strings though - to make them serializable.
+    **{
+        namespace_name: str(namespace_url)
+        for namespace_name, namespace_url
+        in DEFAULT_NAMESPACES.items()
+        if namespace_name
+    },
 })
 
 
