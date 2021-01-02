@@ -5,6 +5,14 @@ from boltons.iterutils import remap
 MetaData = Dict[str, Any]   # type: ignore
 
 
+def _convert(term: Any) -> Any:  # type: ignore
+    """Convert $statement to @statement."""
+    if isinstance(term, str) and term.startswith('$'):
+        return '@' + term[1:]  # noqa: WPS336
+
+    return term
+
+
 def convert_dollar_signs(
     meta_data: MetaData,
 ) -> MetaData:
@@ -16,7 +24,7 @@ def convert_dollar_signs(
     return remap(
         meta_data,
         lambda path, key, value: (  # noqa: WPS110
-            key.replace('$', '@') if isinstance(key, str) else key,
-            value,
+            _convert(key),
+            _convert(value),
         ),
     )
