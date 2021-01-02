@@ -4,10 +4,10 @@ from typing import Iterator
 
 import frontmatter
 import rdflib
-from deepmerge import always_merger
 from pyld import jsonld
 from rdflib import RDF
 
+from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import Loader
 from octadocs.octiron.types import OCTA, Triple
 from octadocs.octiron.yaml_extensions import convert_dollar_signs
@@ -29,9 +29,9 @@ class MarkdownLoader(Loader):
 
         local_context = meta_data.pop('@context', None)
         if local_context is not None:
-            context = always_merger.merge(
-                base=self.context,
-                nxt=local_context,
+            context = merge(
+                first=self.context,
+                second=local_context,
             )
 
         else:
