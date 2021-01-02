@@ -3,7 +3,7 @@ from pathlib import Path
 from rdflib import RDF, RDFS, Graph, Literal, URIRef
 
 from octadocs.octiron import Octiron
-from octadocs.octiron.types import OCTA, LOCAL
+from octadocs.octiron.types import LOCAL, OCTA
 
 LOCAL_IRI = URIRef('local:test.md')
 

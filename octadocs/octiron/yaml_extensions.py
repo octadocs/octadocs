@@ -8,7 +8,7 @@ MetaData = Dict[str, Any]   # type: ignore
 def _convert(term: Any) -> Any:  # type: ignore
     """Convert $statement to @statement."""
     if isinstance(term, str) and term.startswith('$'):
-        return '@' + term[1:]
+        return '@' + term[1:]  # noqa: WPS336
 
     return term
 

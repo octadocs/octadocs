@@ -5,7 +5,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "octadocs"
-version = "0.0.9"
+version = "0.0.10"
 description = "MkDocs wiki made smart"
 license = "MIT"
 
