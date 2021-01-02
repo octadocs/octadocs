@@ -9,7 +9,7 @@ from rdflib import RDF
 
 from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import Loader
-from octadocs.octiron.types import OCTA, Triple, LOCAL
+from octadocs.octiron.types import LOCAL, OCTA, Triple
 from octadocs.octiron.yaml_extensions import convert_dollar_signs
 
 
