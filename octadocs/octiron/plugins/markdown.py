@@ -4,6 +4,7 @@ from typing import Iterator
 
 import frontmatter
 import rdflib
+from deepmerge import always_merger
 from pyld import jsonld
 from rdflib import RDF
 
@@ -26,8 +27,12 @@ class MarkdownLoader(Loader):
 
         meta_data = convert_dollar_signs(meta_data)
 
-        if meta_data.get('@context'):
-            raise ValueError('A-A-A!!! @context is specified in front matter!')
+        local_context = meta_data.pop('@context', None)
+        if local_context is not None:
+            context = always_merger(self.context, local_context)
+
+        else:
+            context = self.context
 
         if meta_data.get('@id') is not None:
             # The author specified an IRI the document tells us about. Let us
@@ -46,7 +51,7 @@ class MarkdownLoader(Loader):
             meta_data,
             options={
                 'base': 'local:',
-                'expandContext': self.context,
+                'expandContext': context,
             },
         )
 
