@@ -9,7 +9,7 @@ from rdflib import RDF
 
 from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import Loader
-from octadocs.octiron.types import OCTA, Triple
+from octadocs.octiron.types import OCTA, Triple, LOCAL
 from octadocs.octiron.yaml_extensions import convert_dollar_signs
 
 
@@ -53,7 +53,7 @@ class MarkdownLoader(Loader):
         meta_data = jsonld.expand(
             meta_data,
             options={
-                'base': 'local:',
+                'base': str(LOCAL),
                 'expandContext': context,
             },
         )

@@ -11,10 +11,10 @@ from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from typing_extensions import TypedDict
 
-from octadocs import settings
 from octadocs.environment import query, src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
+from octadocs.octiron.types import LOCAL
 
 NavigationItem = Union[Page, Section]
 
@@ -51,7 +51,7 @@ def get_template_by_page(
     graph: rdflib.ConjunctiveGraph,
 ) -> Optional[str]:
     """Find the template to render the given Markdown file."""
-    iri = rdflib.URIRef(f'{settings.LOCAL_IRI_SCHEME}{page.file.src_path}')
+    iri = rdflib.URIRef(f'{LOCAL}{page.file.src_path}')
 
     bindings = graph.query(
         'SELECT ?template_name WHERE { ?iri octa:template ?template_name }',
@@ -124,7 +124,7 @@ class OctaDocsPlugin(BasePlugin):
     ) -> TemplateContext:
         """Attach the views to certain pages."""
         page_iri = rdflib.URIRef(
-            f'{settings.LOCAL_IRI_SCHEME}{page.file.src_path}',
+            f'{LOCAL}{page.file.src_path}',
         )
 
         this_choices = list(map(

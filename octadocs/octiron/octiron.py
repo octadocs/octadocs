@@ -15,8 +15,11 @@ import yaml
 from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import Loader, MarkdownLoader, TurtleLoader
 from octadocs.octiron.types import (
-    DEFAULT_NAMESPACES, Context, Quad, Triple,
     DEFAULT_CONTEXT,
+    DEFAULT_NAMESPACES,
+    Context,
+    Quad,
+    Triple,
 )
 
 if sys.version_info >= (3, 8):

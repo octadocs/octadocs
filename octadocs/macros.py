@@ -14,6 +14,7 @@ from rdflib.tools.rdf2dot import rdf2dot
 
 from octadocs.conversions import iri_by_page
 from octadocs.environment import iri_to_url, query, src_path_to_iri
+from octadocs.octiron.types import LOCAL
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:
@@ -192,7 +193,7 @@ def define_env(env: MacrosPlugin) -> MacrosPlugin:  # noqa: WPS213
     env.variables['rdfs'] = rdflib.Namespace(
         'http://www.w3.org/2000/01/rdf-schema#',
     )
-    env.variables['local'] = rdflib.Namespace('local:')
+    env.variables['local'] = LOCAL
 
     env.variables['URIRef'] = rdflib.URIRef
 

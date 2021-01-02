@@ -5,7 +5,7 @@ import rdflib
 from rdflib import URIRef, term
 from rdflib.plugins.sparql.processor import SPARQLResult
 
-from octadocs.settings import LOCAL_IRI_SCHEME
+from octadocs.octiron.types import LOCAL
 
 
 def query(
@@ -27,7 +27,7 @@ def query(
 
 def iri_to_url(iri: str) -> str:
     """Convert Zet IRI into clickable URL."""
-    iri = iri.replace(LOCAL_IRI_SCHEME, '')
+    iri = iri.replace(str(LOCAL), '')
 
     if iri.endswith('index.md'):
         return re.sub(
@@ -46,7 +46,7 @@ def iri_to_url(iri: str) -> str:
 
 def src_path_to_iri(src_path: str) -> URIRef:
     """Convert src_path of a file to a Zet IRI."""
-    return URIRef(f'{LOCAL_IRI_SCHEME}{src_path}')
+    return URIRef(f'{LOCAL}{src_path}')
 
 
 def _format_query_bindings(
