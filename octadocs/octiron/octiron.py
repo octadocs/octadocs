@@ -11,8 +11,8 @@ from typing import Dict, Iterable, Iterator, Optional, Type
 import owlrl
 import rdflib
 import yaml
-from deepmerge import always_merger
 
+from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import Loader, MarkdownLoader, TurtleLoader
 from octadocs.octiron.types import DEFAULT_NAMESPACES, Context, Quad, Triple
 
@@ -92,7 +92,7 @@ class Octiron:
     ) -> Context:
         """Find context file per disk directory."""
         return reduce(
-            always_merger.merge,
+            merge,  # type: ignore
             map(
                 self._get_context_file,
                 reversed(list(self._find_context_files(directory))),

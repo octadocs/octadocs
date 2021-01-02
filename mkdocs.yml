@@ -16,7 +16,7 @@ plugins:
   - search
   - macros:
       modules:
-        - octadocs
+        - octadocs.macros
 
 theme:
   name: mkdocs

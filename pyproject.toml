@@ -3,13 +3,9 @@ requires = ["poetry>=1.0"]
 build-backend = "poetry.masonry.api"
 
 
-[tool.nitpick]
-style = "https://raw.githubusercontent.com/wemake-services/wemake-python-styleguide/master/styles/nitpick-style-wemake.toml"
-
-
 [tool.poetry]
 name = "octadocs"
-version = "0.0.8"
+version = "0.0.9"
 description = "MkDocs wiki made smart"
 license = "MIT"
 
@@ -29,7 +25,7 @@ classifiers = [
 ]
 
 [tool.poetry.plugins."mkdocs.plugins"]
-octadocs = "octadocs:OctaDocsPlugin"
+octadocs = "octadocs.plugin:OctaDocsPlugin"
 
 
 [tool.poetry.dependencies]

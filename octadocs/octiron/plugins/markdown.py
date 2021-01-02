@@ -7,6 +7,7 @@ import rdflib
 from pyld import jsonld
 from rdflib import RDF
 
+from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import Loader
 from octadocs.octiron.types import OCTA, Triple
 from octadocs.octiron.yaml_extensions import convert_dollar_signs
@@ -26,8 +27,15 @@ class MarkdownLoader(Loader):
 
         meta_data = convert_dollar_signs(meta_data)
 
-        if meta_data.get('@context'):
-            raise ValueError('A-A-A!!! @context is specified in front matter!')
+        local_context = meta_data.pop('@context', None)
+        if local_context is not None:
+            context = merge(
+                first=self.context,
+                second=local_context,
+            )
+
+        else:
+            context = self.context
 
         if meta_data.get('@id') is not None:
             # The author specified an IRI the document tells us about. Let us
@@ -46,7 +54,7 @@ class MarkdownLoader(Loader):
             meta_data,
             options={
                 'base': 'local:',
-                'expandContext': self.context,
+                'expandContext': context,
             },
         )
 
