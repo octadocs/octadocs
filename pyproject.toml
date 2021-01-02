@@ -29,7 +29,7 @@ classifiers = [
 ]
 
 [tool.poetry.plugins."mkdocs.plugins"]
-octadocs = "octadocs:OctaDocsPlugin"
+octadocs = "octadocs.plugin:OctaDocsPlugin"
 
 
 [tool.poetry.dependencies]
