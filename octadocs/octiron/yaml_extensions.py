@@ -9,6 +9,14 @@ from pyld import jsonld
 from octadocs.octiron.context import merge
 from octadocs.octiron.types import LOCAL, Context, Triple
 
+try:  # noqa
+    from yaml import CSafeDumper as SafeDumper  # noqa
+    from yaml import CSafeLoader as SafeLoader  # noqa
+except ImportError:
+    from yaml import SafeDumper  # type: ignore   # noqa
+    from yaml import SafeLoader  # type: ignore   # noqa
+
+
 MetaData = Dict[str, Any]   # type: ignore
 
 
