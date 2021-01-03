@@ -1,16 +1,12 @@
-import json
-from itertools import starmap
 from typing import Iterator
 
 import frontmatter
 import rdflib
-from pyld import jsonld
 from rdflib import RDF
 
-from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import Loader
-from octadocs.octiron.types import LOCAL, OCTA, Triple
-from octadocs.octiron.yaml_extensions import convert_dollar_signs
+from octadocs.octiron.types import OCTA, Triple
+from octadocs.octiron.yaml_extensions import as_triple_stream
 
 
 class MarkdownLoader(Loader):
@@ -22,53 +18,10 @@ class MarkdownLoader(Loader):
         """Return stream of triples."""
         meta_data = frontmatter.load(self.path).metadata
 
-        if not meta_data:
-            return
-
-        meta_data = convert_dollar_signs(meta_data)
-
-        local_context = meta_data.pop('@context', None)
-        if local_context is not None:
-            context = merge(
-                first=self.context,
-                second=local_context,
-            )
-
-        else:
-            context = self.context
-
-        if meta_data.get('@id') is not None:
-            # The author specified an IRI the document tells us about. Let us
-            # link this IRI to the local document IRI.
-            meta_data['octa:subjectOf'] = self.local_iri
-
-        else:
-            # The document author did not tell us about what their document is.
-            # In this case, we assume that the local_iri of the document file
-            # is the subject of the document description.
-            meta_data['@id'] = self.local_iri
-
-        # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
-        # If we don't expand with an explicit @base, import will fail silently.
-        meta_data = jsonld.expand(
-            meta_data,
-            options={
-                'base': str(LOCAL),
-                'expandContext': context,
-            },
-        )
-
-        # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/98
-        # If we don't flatten, @included sections will not be imported.
-        meta_data = jsonld.flatten(meta_data)
-
-        serialized_meta_data = json.dumps(meta_data, indent=4)
-
-        graph = rdflib.Graph()
-
-        graph.parse(
-            data=serialized_meta_data,
-            format='json-ld',
+        yield from as_triple_stream(
+            raw_data=meta_data,
+            context=self.context,
+            local_iri=self.local_iri,
         )
 
         # The IRI of the local page is a page.
@@ -82,5 +35,3 @@ class MarkdownLoader(Loader):
                 OCTA.url,
                 rdflib.Literal(self.global_url),
             )
-
-        yield from starmap(Triple, iter(graph))

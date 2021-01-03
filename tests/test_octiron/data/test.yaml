@@ -1,0 +1,10 @@
+$context:
+  subject: rdf:subject
+  predicate: rdf:predicate
+  object: rdf:object
+
+given: spo
+infer:
+  - subject: s
+  - predicate: p
+  - object: o
