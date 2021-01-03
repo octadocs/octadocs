@@ -15,6 +15,9 @@ class YAMLLoader(Loader):
 
     def stream(self) -> Iterator[Triple]:
         """Return stream of triples."""
+        if self.path.stem == 'context':
+            return
+
         with open(self.path, 'r') as yaml_file:
             raw_data = yaml.load(yaml_file, Loader=SafeLoader)
 

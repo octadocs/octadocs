@@ -68,3 +68,17 @@ def test_yaml_list():
         LOCAL.prefix,
         Literal('rdf'),
     ) in octiron.graph
+
+
+def test_yaml_read_context():
+    """Do not interpret context.yaml as data file."""
+    data_dir = Path(__file__).parent / 'data'
+
+    octiron = Octiron(root_directory=data_dir)
+
+    octiron.update_from_file(
+        path=data_dir / 'test_yaml/context.yaml',
+        local_iri=LOCAL_IRI,
+    )
+
+    assert not list(octiron.graph)

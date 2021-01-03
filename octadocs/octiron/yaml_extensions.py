@@ -1,6 +1,6 @@
 import json
 from itertools import starmap
-from typing import Any, Dict, Iterator, List, Union, TypeVar
+from typing import Any, Dict, Iterator, List, TypeVar, Union
 
 import rdflib
 from boltons.iterutils import remap
@@ -17,7 +17,7 @@ except ImportError:
     from yaml import SafeLoader  # type: ignore   # noqa
 
 
-MetaData = Union[List[Dict[str, Any]], Dict[str, Any]]   # type: ignore
+MetaData = Union[List[Dict[str, Any]], Dict[str, Any]]   # type: ignore  # noqa
 
 Data = TypeVar('Data')
 
