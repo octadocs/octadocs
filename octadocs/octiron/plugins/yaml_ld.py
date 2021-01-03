@@ -5,7 +5,7 @@ from rdflib import RDF
 
 from octadocs.octiron.plugins import Loader
 from octadocs.octiron.types import OCTA, Triple
-from octadocs.octiron.yaml_extensions import as_triple_stream, SafeLoader
+from octadocs.octiron.yaml_extensions import SafeLoader, as_triple_stream
 
 
 class YAMLLoader(Loader):

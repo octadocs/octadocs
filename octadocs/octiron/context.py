@@ -13,5 +13,3 @@ def merge(first: Context, second: Context) -> Context:
         base=first,
         nxt=second,
     )
-
-

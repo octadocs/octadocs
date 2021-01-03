@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from rdflib import RDF, BNode, Literal, URIRef, RDFS
+from rdflib import RDF, RDFS, BNode, Literal, URIRef
 
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL, OCTA
@@ -48,5 +48,5 @@ def test_yaml_with_context():
         Literal(
             'For any triple, its subject and object are Resources, and '
             'predicate is a Property.',
-        )
+        ),
     ) in octiron.graph

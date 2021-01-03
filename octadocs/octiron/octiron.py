@@ -1,16 +1,14 @@
-import json
 import logging
 import re
 import sys
 from dataclasses import dataclass, field
-from functools import partial, reduce
+from functools import reduce
 from pathlib import Path
 from types import MappingProxyType
 from typing import Dict, Iterable, Iterator, Optional, Type
 
 import owlrl
 import rdflib
-import yaml
 
 from octadocs.octiron.context import merge
 from octadocs.octiron.context_loaders import (
