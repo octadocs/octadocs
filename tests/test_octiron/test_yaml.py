@@ -50,3 +50,21 @@ def test_yaml_with_context():
             'predicate is a Property.',
         ),
     ) in octiron.graph
+
+
+def test_yaml_list():
+    """Update Octiron graph from a YAML file."""
+    data_dir = Path(__file__).parent / 'data'
+
+    octiron = Octiron(root_directory=data_dir)
+
+    octiron.update_from_file(
+        path=data_dir / 'test_yaml/list.yaml',
+        local_iri=LOCAL_IRI,
+    )
+
+    assert (
+       RDF.uri,
+       LOCAL.prefix,
+       Literal('rdf'),
+    ) in octiron.graph
