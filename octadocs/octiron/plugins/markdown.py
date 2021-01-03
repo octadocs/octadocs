@@ -1,19 +1,12 @@
-import json
-from itertools import starmap
 from typing import Iterator
 
 import frontmatter
 import rdflib
-from pyld import jsonld
 from rdflib import RDF
 
-from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import Loader
-from octadocs.octiron.types import LOCAL, OCTA, Triple
-from octadocs.octiron.yaml_extensions import (
-    convert_dollar_signs,
-    as_triple_stream,
-)
+from octadocs.octiron.types import OCTA, Triple
+from octadocs.octiron.yaml_extensions import as_triple_stream
 
 
 class MarkdownLoader(Loader):

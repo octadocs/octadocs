@@ -5,16 +5,14 @@ from rdflib import RDF
 
 from octadocs.octiron.plugins import Loader
 from octadocs.octiron.types import OCTA, Triple
-from octadocs.octiron.yaml_extensions import (
-    as_triple_stream,
-)
+from octadocs.octiron.yaml_extensions import as_triple_stream
 
-try:
-    from yaml import CSafeDumper as SafeDumper
-    from yaml import CSafeLoader as SafeLoader
+try:  # noqa
+    from yaml import CSafeDumper as SafeDumper  # noqa
+    from yaml import CSafeLoader as SafeLoader  # noqa
 except ImportError:
-    from yaml import SafeDumper
-    from yaml import SafeLoader
+    from yaml import SafeDumper  # type: ignore   # noqa
+    from yaml import SafeLoader  # type: ignore   # noqa
 
 
 class YAMLLoader(Loader):
@@ -25,7 +23,7 @@ class YAMLLoader(Loader):
     def stream(self) -> Iterator[Triple]:
         """Return stream of triples."""
         with open(self.path, 'r') as yaml_file:
-            raw_data = yaml.load(yaml_file)
+            raw_data = yaml.load(yaml_file, Loader=SafeLoader)
 
         yield from as_triple_stream(
             raw_data=raw_data,

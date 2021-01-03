@@ -7,7 +7,7 @@ from boltons.iterutils import remap
 from pyld import jsonld
 
 from octadocs.octiron.context import merge
-from octadocs.octiron.types import Triple, Context, LOCAL
+from octadocs.octiron.types import LOCAL, Context, Triple
 
 MetaData = Dict[str, Any]   # type: ignore
 

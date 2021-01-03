@@ -1,12 +1,11 @@
 from pathlib import Path
 
-from rdflib import DC, RDFS, Graph, Literal, URIRef, BNode, RDF
+from rdflib import RDF, BNode, Literal, URIRef
 
 from octadocs.octiron import Octiron
-from octadocs.octiron.plugins import TurtleLoader
-from octadocs.octiron.types import Triple, OCTA, LOCAL
+from octadocs.octiron.types import LOCAL, OCTA
 
-LOCAL_IRI = URIRef('local:test.md')
+LOCAL_IRI = URIRef('local:test.yaml')
 
 
 def test_yaml():
@@ -17,16 +16,16 @@ def test_yaml():
 
     octiron.update_from_file(
         path=data_dir / 'test.yaml',
-        local_iri=URIRef('local:test.yaml'),
+        local_iri=LOCAL_IRI,
     )
 
     assert set(octiron.graph) == {
         (BNode('b0'), RDF.subject, Literal('s')),
         (BNode('b1'), RDF.predicate, Literal('p')),
         (BNode('b2'), RDF.object, Literal('o')),
-        (URIRef('local:test.yaml'), RDF.type, OCTA.Page),
-        (URIRef('local:test.yaml'), LOCAL.given, Literal('spo')),
-        (URIRef('local:test.yaml'), LOCAL.infer, BNode('b0')),
-        (URIRef('local:test.yaml'), LOCAL.infer, BNode('b1')),
-        (URIRef('local:test.yaml'), LOCAL.infer, BNode('b2')),
+        (LOCAL_IRI, RDF.type, OCTA.Page),
+        (LOCAL_IRI, LOCAL.given, Literal('spo')),
+        (LOCAL_IRI, LOCAL.infer, BNode('b0')),
+        (LOCAL_IRI, LOCAL.infer, BNode('b1')),
+        (LOCAL_IRI, LOCAL.infer, BNode('b2')),
     }

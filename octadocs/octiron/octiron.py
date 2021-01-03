@@ -14,7 +14,9 @@ import yaml
 
 from octadocs.octiron.context import merge
 from octadocs.octiron.plugins import (
-    Loader, MarkdownLoader, TurtleLoader,
+    Loader,
+    MarkdownLoader,
+    TurtleLoader,
     YAMLLoader,
 )
 from octadocs.octiron.types import (
