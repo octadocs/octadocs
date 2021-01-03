@@ -1,6 +1,6 @@
 import json
 from itertools import starmap
-from typing import Any, Dict, Iterator
+from typing import Any, Dict, Iterator, List, TypeVar, Union
 
 import rdflib
 from boltons.iterutils import remap
@@ -9,7 +9,17 @@ from pyld import jsonld
 from octadocs.octiron.context import merge
 from octadocs.octiron.types import LOCAL, Context, Triple
 
-MetaData = Dict[str, Any]   # type: ignore
+try:  # noqa
+    from yaml import CSafeDumper as SafeDumper  # noqa
+    from yaml import CSafeLoader as SafeLoader  # noqa
+except ImportError:
+    from yaml import SafeDumper  # type: ignore   # noqa
+    from yaml import SafeLoader  # type: ignore   # noqa
+
+
+MetaData = Union[List[Dict[str, Any]], Dict[str, Any]]   # type: ignore  # noqa
+
+Data = TypeVar('Data')
 
 
 def _convert(term: Any) -> Any:  # type: ignore
@@ -21,8 +31,8 @@ def _convert(term: Any) -> Any:  # type: ignore
 
 
 def convert_dollar_signs(
-    meta_data: MetaData,
-) -> MetaData:
+    meta_data: Data,
+) -> Data:
     """
     Convert $ character to @ in keys.
 
@@ -43,6 +53,30 @@ def as_triple_stream(
     local_iri: str,
 ) -> Iterator[Triple]:
     """Convert YAML dict to a stream of triples."""
+    if isinstance(raw_data, list):
+        yield from _list_as_triple_stream(
+            context=context,
+            local_iri=local_iri,
+            raw_data=raw_data,
+        )
+
+    elif isinstance(raw_data, dict):
+        yield from _dict_as_triple_stream(
+            context=context,
+            local_iri=local_iri,
+            raw_data=raw_data,
+        )
+
+    else:
+        raise ValueError(f'Format of data not recognized: {raw_data}')
+
+
+def _dict_as_triple_stream(  # type: ignore
+    raw_data: Dict[str, Any],
+    context: Context,
+    local_iri: str,
+) -> Iterator[Triple]:
+    """Convert dict into a triple stream."""
     meta_data = convert_dollar_signs(raw_data)
 
     local_context = meta_data.pop('@context', None)
@@ -76,14 +110,25 @@ def as_triple_stream(
     # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/98
     # If we don't flatten, @included sections will not be imported.
     meta_data = jsonld.flatten(meta_data)
-
     serialized_meta_data = json.dumps(meta_data, indent=4)
 
     graph = rdflib.Graph()
-
     graph.parse(
         data=serialized_meta_data,
         format='json-ld',
     )
-
     yield from starmap(Triple, iter(graph))
+
+
+def _list_as_triple_stream(  # type: ignore
+    raw_data: List[Dict[str, Any]],
+    context: Context,
+    local_iri: str,
+) -> Iterator[Triple]:
+    """Convert a list into a triple stream."""
+    for sub_document in raw_data:
+        yield from as_triple_stream(
+            raw_data=sub_document,
+            context=context,
+            local_iri=local_iri,
+        )

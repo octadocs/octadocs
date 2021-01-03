@@ -1,0 +1,6 @@
+- $id: "rdfs:"
+  prefix: "rdfs"
+- $id: "rdf:"
+  prefix: "rdf"
+- $id: "rdf:Property"
+  rdfs:isDefinedBy: "rdf:"

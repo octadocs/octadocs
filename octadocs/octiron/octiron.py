@@ -1,18 +1,20 @@
-import json
 import logging
 import re
 import sys
 from dataclasses import dataclass, field
-from functools import partial, reduce
+from functools import reduce
 from pathlib import Path
 from types import MappingProxyType
 from typing import Dict, Iterable, Iterator, Optional, Type
 
 import owlrl
 import rdflib
-import yaml
 
 from octadocs.octiron.context import merge
+from octadocs.octiron.context_loaders import (
+    context_from_json,
+    context_from_yaml,
+)
 from octadocs.octiron.plugins import (
     Loader,
     MarkdownLoader,
@@ -35,13 +37,8 @@ else:
 logger = logging.getLogger(__name__)
 
 CONTEXT_FORMATS = MappingProxyType({
-    'context.json': json.load,
-
-    # FIXME we need $ conversion for YAML files.
-    'context.yaml': partial(
-        yaml.load,
-        Loader=Loader,
-    ),
+    'context.json': context_from_json,
+    'context.yaml': context_from_yaml,
 })
 
 
@@ -186,7 +183,5 @@ class Octiron:
 
     def _get_context_file(self, path: Path) -> Context:
         """Read and return context file by path."""
-        loader = CONTEXT_FORMATS[path.name]
-
-        with path.open('r') as context_data_stream:
-            return loader(context_data_stream)  # type: ignore
+        context_loader = CONTEXT_FORMATS[path.name]
+        return context_loader(path)

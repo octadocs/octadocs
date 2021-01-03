@@ -1,0 +1,12 @@
+label: For any triple, its subject and object are Resources, and predicate is a Property.
+given: spo
+infer:
+  - subject: p
+    predicate: rdf:type
+    object: rdf:Property
+  - subject: s
+    predicate: rdf:type
+    object: rdfs:Resource
+  - subject: o
+    predicate: rdf:type
+    object: rdfs:Resource

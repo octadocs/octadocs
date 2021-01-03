@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from rdflib import RDF, BNode, Literal, URIRef
+from rdflib import RDF, RDFS, BNode, Literal, URIRef
 
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL, OCTA
@@ -29,3 +29,56 @@ def test_yaml():
         (LOCAL_IRI, LOCAL.infer, BNode('b1')),
         (LOCAL_IRI, LOCAL.infer, BNode('b2')),
     }
+
+
+def test_yaml_with_context():
+    """Update Octiron graph from a YAML file."""
+    data_dir = Path(__file__).parent / 'data'
+
+    octiron = Octiron(root_directory=data_dir)
+
+    octiron.update_from_file(
+        path=data_dir / 'test_yaml/spo.yaml',
+        local_iri=LOCAL_IRI,
+    )
+
+    assert (
+        LOCAL_IRI,
+        RDFS.label,
+        Literal(
+            'For any triple, its subject and object are Resources, and '
+            'predicate is a Property.',
+        ),
+    ) in octiron.graph
+
+
+def test_yaml_list():
+    """Update Octiron graph from a YAML file."""
+    data_dir = Path(__file__).parent / 'data'
+
+    octiron = Octiron(root_directory=data_dir)
+
+    octiron.update_from_file(
+        path=data_dir / 'test_yaml/list.yaml',
+        local_iri=LOCAL_IRI,
+    )
+
+    assert (
+        RDF.uri,
+        LOCAL.prefix,
+        Literal('rdf'),
+    ) in octiron.graph
+
+
+def test_yaml_read_context():
+    """Do not interpret context.yaml as data file."""
+    data_dir = Path(__file__).parent / 'data'
+
+    octiron = Octiron(root_directory=data_dir)
+
+    octiron.update_from_file(
+        path=data_dir / 'test_yaml/context.yaml',
+        local_iri=LOCAL_IRI,
+    )
+
+    assert not list(octiron.graph)

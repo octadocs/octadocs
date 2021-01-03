@@ -1,0 +1,24 @@
+# Map RDF keywords to something more concise
+subject:
+  $id: rdf:subject
+  $type: $id
+predicate:
+  $id: rdf:predicate
+  $type: $id
+object:
+  $id: rdf:object
+  $type: $id
+
+# Make sure RDFS properties are read correctly
+rdfs:domain:
+  $type: $id
+rdfs:range:
+  $type: $id
+
+# And our own properties too
+given:
+  $type: $id
+infer:
+  $type: $id
+
+label: rdfs:label
