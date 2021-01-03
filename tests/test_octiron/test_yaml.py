@@ -64,7 +64,7 @@ def test_yaml_list():
     )
 
     assert (
-       RDF.uri,
-       LOCAL.prefix,
-       Literal('rdf'),
+        RDF.uri,
+        LOCAL.prefix,
+        Literal('rdf'),
     ) in octiron.graph

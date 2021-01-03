@@ -1,6 +1,6 @@
 import json
 from itertools import starmap
-from typing import Any, Dict, Iterator, List, Union
+from typing import Any, Dict, Iterator, List, Union, TypeVar
 
 import rdflib
 from boltons.iterutils import remap
@@ -19,6 +19,8 @@ except ImportError:
 
 MetaData = Union[List[Dict[str, Any]], Dict[str, Any]]   # type: ignore
 
+Data = TypeVar('Data')
+
 
 def _convert(term: Any) -> Any:  # type: ignore
     """Convert $statement to @statement."""
@@ -29,8 +31,8 @@ def _convert(term: Any) -> Any:  # type: ignore
 
 
 def convert_dollar_signs(
-    meta_data: MetaData,
-) -> MetaData:
+    meta_data: Data,
+) -> Data:
     """
     Convert $ character to @ in keys.
 
@@ -52,58 +54,81 @@ def as_triple_stream(
 ) -> Iterator[Triple]:
     """Convert YAML dict to a stream of triples."""
     if isinstance(raw_data, list):
-        for sub_document in raw_data:
-            yield from as_triple_stream(
-                raw_data=sub_document,
-                context=context,
-                local_iri=local_iri,
-            )
+        yield from _list_as_triple_stream(
+            context=context,
+            local_iri=local_iri,
+            raw_data=raw_data,
+        )
 
     elif isinstance(raw_data, dict):
-        meta_data = convert_dollar_signs(raw_data)
-
-        local_context = meta_data.pop('@context', None)
-        if local_context is not None:
-            context = merge(
-                first=context,
-                second=local_context,
-            )
-
-        if meta_data.get('@id') is not None:
-            # The author specified an IRI the document tells us about. Let us
-            # link this IRI to the local document IRI.
-            meta_data['octa:subjectOf'] = local_iri
-
-        else:
-            # The document author did not tell us about what their document is.
-            # In this case, we assume that the local_iri of the document file
-            # is the subject of the document description.
-            meta_data['@id'] = local_iri
-
-        # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
-        # If we don't expand with an explicit @base, import will fail silently.
-        meta_data = jsonld.expand(
-            meta_data,
-            options={
-                'base': str(LOCAL),
-                'expandContext': context,
-            },
+        yield from _dict_as_triple_stream(
+            context=context,
+            local_iri=local_iri,
+            raw_data=raw_data,
         )
-
-        # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/98
-        # If we don't flatten, @included sections will not be imported.
-        meta_data = jsonld.flatten(meta_data)
-
-        serialized_meta_data = json.dumps(meta_data, indent=4)
-
-        graph = rdflib.Graph()
-
-        graph.parse(
-            data=serialized_meta_data,
-            format='json-ld',
-        )
-
-        yield from starmap(Triple, iter(graph))
 
     else:
         raise ValueError(f'Format of data not recognized: {raw_data}')
+
+
+def _dict_as_triple_stream(  # type: ignore
+    raw_data: Dict[str, Any],
+    context: Context,
+    local_iri: str,
+) -> Iterator[Triple]:
+    """Convert dict into a triple stream."""
+    meta_data = convert_dollar_signs(raw_data)
+
+    local_context = meta_data.pop('@context', None)
+    if local_context is not None:
+        context = merge(
+            first=context,
+            second=local_context,
+        )
+
+    if meta_data.get('@id') is not None:
+        # The author specified an IRI the document tells us about. Let us
+        # link this IRI to the local document IRI.
+        meta_data['octa:subjectOf'] = local_iri
+
+    else:
+        # The document author did not tell us about what their document is.
+        # In this case, we assume that the local_iri of the document file
+        # is the subject of the document description.
+        meta_data['@id'] = local_iri
+
+    # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
+    # If we don't expand with an explicit @base, import will fail silently.
+    meta_data = jsonld.expand(
+        meta_data,
+        options={
+            'base': str(LOCAL),
+            'expandContext': context,
+        },
+    )
+
+    # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/98
+    # If we don't flatten, @included sections will not be imported.
+    meta_data = jsonld.flatten(meta_data)
+    serialized_meta_data = json.dumps(meta_data, indent=4)
+
+    graph = rdflib.Graph()
+    graph.parse(
+        data=serialized_meta_data,
+        format='json-ld',
+    )
+    yield from starmap(Triple, iter(graph))
+
+
+def _list_as_triple_stream(  # type: ignore
+    raw_data: List[Dict[str, Any]],
+    context: Context,
+    local_iri: str,
+) -> Iterator[Triple]:
+    """Convert a list into a triple stream."""
+    for sub_document in raw_data:
+        yield from as_triple_stream(
+            raw_data=sub_document,
+            context=context,
+            local_iri=local_iri,
+        )
