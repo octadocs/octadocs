@@ -13,7 +13,10 @@ import rdflib
 import yaml
 
 from octadocs.octiron.context import merge
-from octadocs.octiron.plugins import Loader, MarkdownLoader, TurtleLoader
+from octadocs.octiron.plugins import (
+    Loader, MarkdownLoader, TurtleLoader,
+    YAMLLoader,
+)
 from octadocs.octiron.types import (
     DEFAULT_CONTEXT,
     DEFAULT_NAMESPACES,
@@ -154,7 +157,7 @@ class Octiron:
     def get_loader_class_for_path(self, path: Path) -> Optional[Type[Loader]]:
         """Based on file path, determine the loader to use."""
         # TODO dependency inversion
-        loaders = [MarkdownLoader, TurtleLoader]
+        loaders = [MarkdownLoader, TurtleLoader, YAMLLoader]
 
         for loader in loaders:
             if re.search(loader.regex, str(path)) is not None:
