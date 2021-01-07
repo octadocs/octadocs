@@ -1,4 +1,5 @@
 import json
+from functools import partial
 from itertools import starmap
 from typing import Any, Dict, Iterator, List, TypeVar, Union
 
@@ -71,6 +72,26 @@ def as_triple_stream(
         raise ValueError(f'Format of data not recognized: {raw_data}')
 
 
+def reformat_blank_nodes(prefix: str, triple: Triple) -> Triple:
+    """
+    Prepend prefix to every blank node.
+
+    JSON-LD flattening creates sequential identifiers in the form of _:bN
+    for every blank node. See https://www.w3.org/TR/json-ld11/
+
+    This means that subgraphs of the Octiron ConjunctiveGraph have clashing
+    blank node identifiers.
+
+    To avoid that, we prepend a prefix to every blank node identifier.
+    """
+    return Triple(*(
+        rdflib.BNode(value=prefix + str(singleton)) if (
+            isinstance(singleton, rdflib.BNode)
+        ) else singleton
+        for singleton in triple
+    ))
+
+
 def _dict_as_triple_stream(  # type: ignore
     raw_data: Dict[str, Any],
     context: Context,
@@ -117,7 +138,16 @@ def _dict_as_triple_stream(  # type: ignore
         data=serialized_meta_data,
         format='json-ld',
     )
-    yield from starmap(Triple, iter(graph))
+    yield from map(
+        partial(
+            reformat_blank_nodes,
+            f'{local_iri}/',
+        ),
+        starmap(
+            Triple,
+            iter(graph),
+        ),
+    )
 
 
 def _list_as_triple_stream(  # type: ignore
