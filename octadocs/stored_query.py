@@ -1,16 +1,10 @@
 import dataclasses
 from pathlib import Path
-from typing import Any, Dict, Protocol, Union
+from typing import Any, Protocol
 
 from documented import DocumentedError
-from rdflib import Graph
-from rdflib.term import Node
 
-QueryResult = Union[
-    Dict[str, Node],   # SELECT
-    Graph,             # CONSTRUCT
-    bool,              # ASK
-]
+from octadocs.query import QueryResult
 
 
 class QueryExecutor(Protocol):

@@ -2,7 +2,7 @@ import logging
 import operator
 from functools import partial
 from pathlib import Path
-from typing import Callable, Dict, Optional, Union
+from typing import Callable, Optional, Union
 
 import rdflib
 from livereload import Server
@@ -12,10 +12,11 @@ from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from typing_extensions import TypedDict
 
-from octadocs.environment import query, src_path_to_iri
+from octadocs.environment import src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL
+from octadocs.query import Query, query
 from octadocs.stored_query import StoredQuery
 
 NavigationItem = Union[Page, Section]
@@ -43,7 +44,7 @@ class TemplateContext(TypedDict):
     graph: rdflib.ConjunctiveGraph
     iri: rdflib.URIRef
     this: rdflib.URIRef
-    query: Callable[[str], Dict[str, rdflib.term.Identifier]]
+    query: Query
     q: StoredQuery   # noqa: WPS111
 
     # FIXME this is hardcode and should be removed
