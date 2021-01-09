@@ -1,6 +1,6 @@
 import dataclasses
 from pathlib import Path
-from typing import Callable, Union, Dict
+from typing import Any, Dict, Protocol, Union
 
 from documented import DocumentedError
 from rdflib import Graph
@@ -9,11 +9,24 @@ from rdflib.term import Node
 QueryResult = Union[
     Dict[str, Node],   # SELECT
     Graph,             # CONSTRUCT
-    bool               # ASK
+    bool,              # ASK
 ]
 
 
-QueryExecutor = Callable  # For now
+class QueryExecutor(Protocol):
+    """
+    Query executor.
+
+    Allows to abstract away the details of SPARQL query execution from the
+    StoredQuery interface.
+    """
+
+    def __call__(  # type: ignore
+        self,
+        query_text: str,
+        **kwargs: Any,
+    ) -> QueryResult:
+        """Run given query with args against an RDF store."""
 
 
 @dataclasses.dataclass
@@ -49,11 +62,11 @@ class StoredQuery:
 
     def _read_query_text(self) -> str:
         """Fetch query text from disk."""
-        query_path = self.path.with_name(self.path.name + '.sparql')
+        query_path = self.path.with_name(f'{self.path.name}.sparql')
 
         try:
             return query_path.read_text()
         except FileNotFoundError as err:
             raise QueryNotFound(path=query_path) from err
 
-    __getitem__ = __getattr__ = _append
+    __getitem__ = __getattr__ = _append  # noqa: WPS429

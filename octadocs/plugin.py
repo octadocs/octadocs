@@ -7,7 +7,7 @@ from typing import Callable, Dict, Optional, Union
 import rdflib
 from livereload import Server
 from mkdocs.plugins import BasePlugin
-from mkdocs.structure.files import Files, File
+from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from typing_extensions import TypedDict
@@ -27,13 +27,14 @@ class ConfigExtra(TypedDict):
     """Extra portion of the config which we put our graph into."""
 
     graph: rdflib.ConjunctiveGraph
+    q: StoredQuery  # noqa: WPS111
 
 
 class Config(TypedDict):
     """MkDocs configuration."""
 
     docs_dir: str
-    extra: Optional[ConfigExtra]
+    extra: ConfigExtra
 
 
 class TemplateContext(TypedDict):
@@ -43,6 +44,7 @@ class TemplateContext(TypedDict):
     iri: rdflib.URIRef
     this: rdflib.URIRef
     query: Callable[[str], Dict[str, rdflib.term.Identifier]]
+    q: StoredQuery   # noqa: WPS111
 
     # FIXME this is hardcode and should be removed
     rdfs: rdflib.Namespace
@@ -85,11 +87,11 @@ class OctaDocsPlugin(BasePlugin):
             executor=partial(
                 query,
                 instance=self.octiron.graph,
-            )
+            ),
         )
 
         if config['extra'] is None:
-            config['extra'] = {}
+            config['extra'] = {}  # type: ignore
 
         config['extra'].update({
             'graph': self.octiron.graph,
@@ -183,7 +185,12 @@ class OctaDocsPlugin(BasePlugin):
             navigation=nav,
         ).generate()
 
-    def on_serve(self, server: Server, config: Config, builder: Callable) -> Server:
+    def on_serve(
+        self,
+        server: Server,
+        config: Config,
+        builder: Callable,  # type: ignore
+    ) -> Server:
         """Watch the stored queries directory if it exists."""
         stored_queries = Path(config['docs_dir']).parent / 'queries'
 
