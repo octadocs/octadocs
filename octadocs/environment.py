@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import rdflib
 from rdflib import URIRef, term
@@ -49,19 +49,31 @@ def src_path_to_iri(src_path: str) -> URIRef:
     return URIRef(f'{LOCAL}{src_path}')
 
 
+SelectRow = Dict[str, term.Identifier]
+
+
+class SelectResult(List[SelectRow]):
+    """SPARQL SELECT query result."""
+
+    @property
+    def first(self) -> Optional[SelectRow]:
+        """Return first element of the list."""
+        return self[0] if self else None
+
+
 def _format_query_bindings(
     bindings: List[Dict[rdflib.Variable, term.Identifier]],
-) -> List[Dict[str, term.Identifier]]:
+) -> SelectResult:
     """
     Format bindings before returning them.
 
     Converts Variable to str for ease of addressing.
     """
-    return [
+    return SelectResult(
         {
             str(variable_name): rdf_value
             for variable_name, rdf_value
             in row.items()
         }
         for row in bindings
-    ]
+    )

@@ -46,6 +46,7 @@ deepmerge = "^0.1.1"
 
 # I did not find a way to install this conditionally without failure on Netlify.
 "backports.cached-property" = "^1.0.0"
+documented = "^0.1.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.790"
