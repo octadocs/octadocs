@@ -143,6 +143,8 @@ def define_env(env: MacrosPlugin) -> MacrosPlugin:  # noqa: WPS213
     env.filter(turtle)
     env.filter(table)
 
+    octiron = env.variables.octiron
+
     env.macro(
         partial(
             query,
@@ -190,11 +192,8 @@ def define_env(env: MacrosPlugin) -> MacrosPlugin:  # noqa: WPS213
     env.filter(iri_by_page)
     env.macro(iri_by_page)
 
-    # FIXME this is hardcode, needs to be defined dynamically
-    env.variables['rdfs'] = rdflib.Namespace(
-        'http://www.w3.org/2000/01/rdf-schema#',
-    )
-    env.variables['local'] = LOCAL
+    # Update context with namespaces
+    env.variables.update(octiron.namespaces)
 
     env.variables['URIRef'] = rdflib.URIRef
 
