@@ -28,7 +28,7 @@ class ConfigExtra(TypedDict):
     """Extra portion of the config which we put our graph into."""
 
     graph: rdflib.ConjunctiveGraph
-    q: StoredQuery  # noqa: WPS111
+    queries: StoredQuery
 
 
 class Config(TypedDict):
@@ -45,7 +45,7 @@ class TemplateContext(TypedDict):
     iri: rdflib.URIRef
     this: rdflib.URIRef
     query: Query
-    q: StoredQuery   # noqa: WPS111
+    queries: StoredQuery
 
     # FIXME this is hardcode and should be removed
     rdfs: rdflib.Namespace
@@ -96,7 +96,7 @@ class OctaDocsPlugin(BasePlugin):
 
         config['extra'].update({
             'graph': self.octiron.graph,
-            'q': self.stored_query,
+            'queries': self.stored_query,
         })
 
         return config
@@ -165,7 +165,7 @@ class OctaDocsPlugin(BasePlugin):
             query,
             instance=self.octiron.graph,
         )
-        context['q'] = self.stored_query
+        context['queries'] = self.stored_query
 
         # FIXME this is hardcode, needs to be defined dynamically
         context['rdfs'] = rdflib.Namespace(

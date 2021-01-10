@@ -1,8 +1,9 @@
-from typing import Dict, List, Optional, Protocol, Union
+from typing import Dict, List, Optional, Union
 
 import rdflib
 from rdflib import Graph, term
 from rdflib.plugins.sparql.processor import SPARQLResult
+from typing_extensions import Protocol
 
 SelectRow = Dict[str, term.Node]
 

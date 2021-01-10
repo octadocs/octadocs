@@ -2,7 +2,7 @@
 
 OctaDocs is a plugin for [MkDocs](https://www.mkdocs.org/) to make it smarter.
 
-{{ q.test().first }}
+{{ queries.test().first }}
 
 ### To think about:
 

@@ -1,8 +1,9 @@
 import dataclasses
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 from documented import DocumentedError
+from typing_extensions import Protocol
 
 from octadocs.query import QueryResult
 
