@@ -2,19 +2,22 @@ import logging
 import operator
 from functools import partial
 from pathlib import Path
-from typing import Callable, Dict, Optional, Union
+from typing import Callable, Optional, Union
 
 import rdflib
+from livereload import Server
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from typing_extensions import TypedDict
 
-from octadocs.environment import query, src_path_to_iri
+from octadocs.environment import src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL
+from octadocs.query import Query, query
+from octadocs.stored_query import StoredQuery
 
 NavigationItem = Union[Page, Section]
 
@@ -25,13 +28,14 @@ class ConfigExtra(TypedDict):
     """Extra portion of the config which we put our graph into."""
 
     graph: rdflib.ConjunctiveGraph
+    q: StoredQuery  # noqa: WPS111
 
 
 class Config(TypedDict):
     """MkDocs configuration."""
 
     docs_dir: str
-    extra: Optional[ConfigExtra]
+    extra: ConfigExtra
 
 
 class TemplateContext(TypedDict):
@@ -40,7 +44,8 @@ class TemplateContext(TypedDict):
     graph: rdflib.ConjunctiveGraph
     iri: rdflib.URIRef
     this: rdflib.URIRef
-    query: Callable[[str], Dict[str, rdflib.term.Identifier]]
+    query: Query
+    q: StoredQuery   # noqa: WPS111
 
     # FIXME this is hardcode and should be removed
     rdfs: rdflib.Namespace
@@ -70,6 +75,7 @@ class OctaDocsPlugin(BasePlugin):
     """MkDocs Meta plugin."""
 
     octiron: Octiron
+    stored_query: StoredQuery
 
     def on_config(self, config: Config) -> Config:
         """Initialize Octiron and provide graph to macros through the config."""
@@ -77,11 +83,21 @@ class OctaDocsPlugin(BasePlugin):
             root_directory=Path(config['docs_dir']),
         )
 
-        if config['extra'] is None:
-            config['extra'] = {'graph': self.octiron.graph}
+        self.stored_query = StoredQuery(
+            path=Path(config['docs_dir']).parent / 'queries',
+            executor=partial(
+                query,
+                instance=self.octiron.graph,
+            ),
+        )
 
-        else:
-            config['extra']['graph'] = self.octiron.graph
+        if config['extra'] is None:
+            config['extra'] = {}  # type: ignore
+
+        config['extra'].update({
+            'graph': self.octiron.graph,
+            'q': self.stored_query,
+        })
 
         return config
 
@@ -149,6 +165,8 @@ class OctaDocsPlugin(BasePlugin):
             query,
             instance=self.octiron.graph,
         )
+        context['q'] = self.stored_query
+
         # FIXME this is hardcode, needs to be defined dynamically
         context['rdfs'] = rdflib.Namespace(
             'http://www.w3.org/2000/01/rdf-schema#',
@@ -167,3 +185,17 @@ class OctaDocsPlugin(BasePlugin):
             graph=self.octiron.graph,
             navigation=nav,
         ).generate()
+
+    def on_serve(
+        self,
+        server: Server,
+        config: Config,
+        builder: Callable,  # type: ignore
+    ) -> Server:
+        """Watch the stored queries directory if it exists."""
+        stored_queries = Path(config['docs_dir']).parent / 'queries'
+
+        if stored_queries.is_dir():
+            server.watch(str(stored_queries))
+
+        return server

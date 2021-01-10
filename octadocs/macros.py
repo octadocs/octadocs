@@ -13,8 +13,9 @@ from rdflib.plugins.sparql.processor import SPARQLResult
 from rdflib.tools.rdf2dot import rdf2dot
 
 from octadocs.conversions import iri_by_page
-from octadocs.environment import iri_to_url, query, src_path_to_iri
+from octadocs.environment import iri_to_url, src_path_to_iri
 from octadocs.octiron.types import LOCAL
+from octadocs.query import query
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:

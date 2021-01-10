@@ -2,8 +2,9 @@
 
 OctaDocs is a plugin for [MkDocs](https://www.mkdocs.org/) to make it smarter.
 
-### To think about:
+{{ q.test().first }}
 
+### To think about:
 
 ```jinja2
 {% raw %}

@@ -2,9 +2,10 @@ from typing import Optional
 
 import rdflib
 from mkdocs.structure.pages import Page
-
-from octadocs.environment import query, src_path_to_iri
 from rdflib import URIRef
+
+from octadocs.environment import src_path_to_iri
+from octadocs.query import SelectResult, query
 
 
 def iri_by_page(page: Page) -> URIRef:
@@ -16,7 +17,7 @@ def get_page_title_by_iri(
     iri: str,
     graph: rdflib.ConjunctiveGraph,
 ) -> Optional[str]:
-    results = query(
+    rows: SelectResult = query(  # type: ignore
         query_text='''
             SELECT ?title WHERE {
                 ?page octa:title ?title .
@@ -27,7 +28,7 @@ def get_page_title_by_iri(
         page=iri,
     )
 
-    if results:
-        return results[0]['title']
+    if rows:
+        return rows[0]['title']
 
     return None
