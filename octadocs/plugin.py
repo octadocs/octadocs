@@ -28,6 +28,7 @@ class ConfigExtra(TypedDict):
     """Extra portion of the config which we put our graph into."""
 
     graph: rdflib.ConjunctiveGraph
+    octiron: Octiron
     queries: StoredQuery
 
 
@@ -96,6 +97,7 @@ class OctaDocsPlugin(BasePlugin):
 
         config['extra'].update({
             'graph': self.octiron.graph,
+            'octiron': self.octiron,
             'queries': self.stored_query,
         })
 
@@ -161,16 +163,15 @@ class OctaDocsPlugin(BasePlugin):
         context['graph'] = self.octiron.graph
         context['iri'] = page_iri
 
+        # noinspection PyTypedDict
         context['query'] = partial(
             query,
             instance=self.octiron.graph,
         )
         context['queries'] = self.stored_query
 
-        # FIXME this is hardcode, needs to be defined dynamically
-        context['rdfs'] = rdflib.Namespace(
-            'http://www.w3.org/2000/01/rdf-schema#',
-        )
+        # Provide all the support namespaces into template context
+        context.update(self.octiron.namespaces)
 
         return context
 

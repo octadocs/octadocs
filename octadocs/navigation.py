@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Union
 
 import rdflib
-from mkdocs.structure.nav import Navigation, Section
+from mkdocs.structure.nav import Link, Navigation, Section
 from mkdocs.structure.pages import Page
 
 from octadocs.conversions import get_page_title_by_iri, iri_by_page
@@ -14,7 +14,7 @@ else:
     from backports.cached_property import cached_property  # noqa: WPS433,WPS440
 
 
-NavigationItem = Union[Page, Section]
+NavigationItem = Union[Page, Section, Link]
 
 
 @dataclass(repr=False)
@@ -55,8 +55,10 @@ class OctadocsNavigationProcessor:
         elif isinstance(item, Section):
             return self._process_nav_section(item)
 
-        else:
-            raise Exception(f'What the heck is {item}?')
+        elif isinstance(item, Link):
+            return item
+
+        raise Exception(f'What the heck is {item}?')
 
     def _process_nav_page(self, page: Page) -> Page:
         """Add title to a page."""

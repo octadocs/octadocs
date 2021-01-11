@@ -1,3 +1,4 @@
+from logging import config as logging_config
 from types import MappingProxyType
 from typing import Any, Dict, NamedTuple, Optional, Union
 
@@ -78,3 +79,28 @@ class Quad(NamedTuple):
 Context = Optional[   # type: ignore
     Union[str, int, float, Dict[str, Any]]
 ]
+
+
+logging_config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'formatter': 'standard',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+})

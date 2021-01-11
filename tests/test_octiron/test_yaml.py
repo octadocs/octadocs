@@ -70,6 +70,28 @@ def test_yaml_list():
     ) in octiron.graph
 
 
+def test_yaml_date():
+    """
+    Update Octiron graph from a YAML file with a date in it.
+
+    Created for https://github.com/digitalbazaar/pyld/issues/146
+    """
+    data_dir = Path(__file__).parent / 'data'
+
+    octiron = Octiron(root_directory=data_dir)
+
+    octiron.update_from_file(
+        path=data_dir / 'test_yaml/publication_date.yaml',
+        local_iri=LOCAL_IRI,
+    )
+
+    assert (
+        LOCAL.foo,
+        LOCAL.publicationDate,
+        Literal('2020-11-16'),
+    ) in octiron.graph
+
+
 def test_yaml_read_context():
     """Do not interpret context.yaml as data file."""
     data_dir = Path(__file__).parent / 'data'

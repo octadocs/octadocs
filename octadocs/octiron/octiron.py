@@ -58,18 +58,27 @@ class Octiron:
     """Convert a lump of goo and data into a semantic graph."""
 
     root_directory: Path
-    namespaces: Dict[str, rdflib.URIRef] = field(default_factory=dict)
+    custom_namespaces: Dict[str, rdflib.Namespace] = field(default_factory=dict)
+
+    @cached_property
+    def namespaces(self):
+        """
+        Join the provided custom namespaces with the defaults.
+
+        Returns all namespaces registered with this Octiron instance.
+        """
+        namespaces = dict(DEFAULT_NAMESPACES)
+        namespaces.update(self.custom_namespaces)
+
+        return namespaces
 
     @cached_property
     def graph(self) -> rdflib.ConjunctiveGraph:
         """Generate and instantiate the RDFLib graph instance."""
         conjunctive_graph = rdflib.ConjunctiveGraph()
 
-        namespaces = dict(DEFAULT_NAMESPACES)
-        namespaces.update(self.namespaces)
-
-        for short_name, uri in namespaces.items():
-            conjunctive_graph.bind(short_name, uri)
+        for short_name, namespace in self.namespaces.items():
+            conjunctive_graph.bind(short_name, namespace)
 
         return conjunctive_graph
 
@@ -94,6 +103,7 @@ class Octiron:
         global_url: Optional[str] = None,
     ) -> None:
         """Update the graph from file determined by given path."""
+        logger.info('Reading: %s', path)
         context = self.get_context_per_directory(path.parent)
         loader_class = self.get_loader_class_for_path(path)
 
