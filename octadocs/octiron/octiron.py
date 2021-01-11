@@ -103,6 +103,7 @@ class Octiron:
         global_url: Optional[str] = None,
     ) -> None:
         """Update the graph from file determined by given path."""
+        logger.info('Reading: %s', path)
         context = self.get_context_per_directory(path.parent)
         loader_class = self.get_loader_class_for_path(path)
 

@@ -1,10 +1,14 @@
+import datetime
 import json
+from dataclasses import dataclass
 from functools import partial
 from itertools import starmap
+from pprint import pformat
 from typing import Any, Dict, Iterator, List, TypeVar, Union
 
 import rdflib
 from boltons.iterutils import remap
+from documented import DocumentedError
 from pyld import jsonld
 
 from octadocs.octiron.context import merge
@@ -23,10 +27,33 @@ MetaData = Union[List[Dict[str, Any]], Dict[str, Any]]   # type: ignore  # noqa
 Data = TypeVar('Data')
 
 
+@dataclass
+class ExpandError(DocumentedError):
+    """
+    JSON-LD expand operation failed. Please review the source data below.
+
+    {self.formatted_data}
+    """
+
+    meta_data: MetaData
+
+    @property
+    def formatted_data(self) -> str:
+        """Format meta_data for printing."""
+        return pformat(self.meta_data, indent=4)
+
+
 def _convert(term: Any) -> Any:  # type: ignore
     """Convert $statement to @statement."""
     if isinstance(term, str) and term.startswith('$'):
         return '@' + term[1:]  # noqa: WPS336
+
+    # pyld cannot expand() a document which contains data which cannot be
+    # trivially serialized to JSON.
+    # FIXME we may want to replace this with an xsd:date declaration, but let's
+    #   revisit that later.
+    if isinstance(term, (datetime.date, datetime.datetime)):
+        return str(term)
 
     return term
 
@@ -120,13 +147,18 @@ def _dict_as_triple_stream(  # type: ignore
 
     # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
     # If we don't expand with an explicit @base, import will fail silently.
-    meta_data = jsonld.expand(
-        meta_data,
-        options={
-            'base': str(LOCAL),
-            'expandContext': context,
-        },
-    )
+    try:
+        meta_data = jsonld.expand(
+            meta_data,
+            options={
+                'base': str(LOCAL),
+                'expandContext': context,
+            },
+        )
+    except TypeError as err:
+        raise ExpandError(
+            meta_data=meta_data,
+        ) from err
 
     # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/98
     # If we don't flatten, @included sections will not be imported.

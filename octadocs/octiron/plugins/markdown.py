@@ -17,7 +17,6 @@ class MarkdownLoader(Loader):
     def stream(self) -> Iterator[Triple]:
         """Return stream of triples."""
         meta_data = frontmatter.load(self.path).metadata
-
         yield from as_triple_stream(
             raw_data=meta_data,
             context=self.context,
