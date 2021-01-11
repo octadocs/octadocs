@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Union
 
 import rdflib
-from mkdocs.structure.nav import Navigation, Section
+from mkdocs.structure.nav import Navigation, Section, Link
 from mkdocs.structure.pages import Page
 
 from octadocs.conversions import get_page_title_by_iri, iri_by_page
@@ -54,6 +54,9 @@ class OctadocsNavigationProcessor:
 
         elif isinstance(item, Section):
             return self._process_nav_section(item)
+
+        elif isinstance(item, Link):
+            return item
 
         else:
             raise Exception(f'What the heck is {item}?')
