@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, List
 
 import frontmatter
 import rdflib
@@ -29,7 +29,7 @@ class InvalidFrontmatter(DocumentedError):
     {self.error}
 
     {self.explanation}
-    """
+    """   # noqa
 
     path: Path
     raw_frontmatter: str
@@ -38,7 +38,7 @@ class InvalidFrontmatter(DocumentedError):
     @property
     def explanation(self) -> str:
         """Explain the error to the user."""
-        if 'found character \'\\t\' that' in str(self.error):
+        if 'found character \'\\t\' that' in str(self.error):   # noqa: WPS342
             return 'Suggestion:\n  Use spaces, not tabs, for indentation.'
 
         if self.error.problem == 'mapping values are not allowed here':
@@ -54,6 +54,32 @@ class InvalidFrontmatter(DocumentedError):
         return ''
 
 
+def process_yaml_scanner_error(
+    err: ScannerError,
+    path: Path,
+) -> InvalidFrontmatter:
+    """Process YAML error and explain it to the user."""
+    # Read the head of the file to print it in the error message
+    raw_frontmatter: List[str] = []
+    with path.open() as raw_file:
+        for line in raw_file:
+            if len(raw_frontmatter) > 10:
+                raw_frontmatter.append('...')
+                break
+
+            if line.startswith('---') and raw_frontmatter:
+                raw_frontmatter.append(line.strip('\n'))
+                break
+
+            raw_frontmatter.append(line.strip('\n'))
+
+    return InvalidFrontmatter(
+        path=path,
+        raw_frontmatter='\n'.join(raw_frontmatter),
+        error=err,
+    )
+
+
 class MarkdownLoader(Loader):
     """Load semantic data from Markdown front matter."""
 
@@ -64,24 +90,9 @@ class MarkdownLoader(Loader):
         try:
             meta_data = frontmatter.load(self.path).metadata
         except ScannerError as err:
-            # Read the head of the file to print it in the error message
-            raw_frontmatter = []
-            with self.path.open() as raw_file:
-                for line in raw_file:
-                    if len(raw_frontmatter) > 10:
-                        raw_frontmatter.append('...')
-                        break
-
-                    if line.startswith('---') and raw_frontmatter:
-                        raw_frontmatter.append(line.strip('\n'))
-                        break
-
-                    raw_frontmatter.append(line.strip('\n'))
-
-            raise InvalidFrontmatter(
+            raise process_yaml_scanner_error(
+                err=err,
                 path=self.path,
-                raw_frontmatter='\n'.join(raw_frontmatter),
-                error=err,
             ) from err
 
         yield from as_triple_stream(
