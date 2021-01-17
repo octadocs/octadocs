@@ -47,6 +47,7 @@ class TemplateContext(TypedDict):
     this: rdflib.URIRef
     query: Query
     queries: StoredQuery
+    local: rdflib.Namespace
 
     # FIXME this is hardcode and should be removed
     rdfs: rdflib.Namespace
@@ -169,6 +170,7 @@ class OctaDocsPlugin(BasePlugin):
             instance=self.octiron.graph,
         )
         context['queries'] = self.stored_query
+        context['local'] = LOCAL
 
         # Provide all the support namespaces into template context
         context.update(self.octiron.namespaces)
