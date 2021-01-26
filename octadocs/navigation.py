@@ -17,6 +17,14 @@ else:
 NavigationItem = Union[Page, Section, Link]
 
 
+def is_index_md(navigation_item: NavigationItem) -> bool:
+    """Determine if certain navigation item is an index.md page."""
+    return (
+        isinstance(navigation_item, Page) and
+        navigation_item.file.src_path.endswith('index.md')
+    )
+
+
 @dataclass(repr=False)
 class OctadocsNavigationProcessor:
     """Rewrite navigation based on the knowledge graph."""
@@ -87,7 +95,7 @@ class OctadocsNavigationProcessor:
             return index_page
 
         index_page_candidates = list(filter(
-            lambda page: page.file.src_path.endswith('index.md'),
+            is_index_md,
             section.children,
         ))
 
