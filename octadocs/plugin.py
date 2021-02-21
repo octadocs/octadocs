@@ -1,23 +1,22 @@
 import logging
 import operator
-from functools import partial, lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from typing import Callable, Optional, Union
 
 import rdflib
 from livereload import Server
 from mkdocs.plugins import BasePlugin
-from mkdocs.structure.files import Files, File
+from mkdocs.structure.files import File, Files
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
-from typing_extensions import TypedDict
-
 from octadocs.environment import src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL
 from octadocs.query import Query, query
 from octadocs.stored_query import StoredQuery
+from typing_extensions import TypedDict
 
 NavigationItem = Union[Page, Section]
 

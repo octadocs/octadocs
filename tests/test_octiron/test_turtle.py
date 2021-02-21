@@ -1,10 +1,9 @@
 from pathlib import Path
 
-from rdflib import DC, RDFS, Graph, Literal, URIRef
-
 from octadocs.octiron import Octiron
 from octadocs.octiron.plugins import TurtleLoader
 from octadocs.octiron.types import Triple
+from rdflib import DC, RDFS, Graph, Literal, URIRef
 
 LOCAL_IRI = URIRef('local:test.md')
 

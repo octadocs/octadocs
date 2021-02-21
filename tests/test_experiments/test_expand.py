@@ -10,7 +10,6 @@ import json
 
 from pyld import jsonld
 
-
 JSONLD_DOCUMENT = {
     '@context': {
         'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',

@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Iterator, Optional
 
 import rdflib
-
 from octadocs.octiron.types import Context, Triple
 
 

@@ -14,8 +14,7 @@ This is supplementary material for this StackOverflow question:
 import json
 import operator
 
-from rdflib import ConjunctiveGraph, Variable, URIRef
-
+from rdflib import ConjunctiveGraph, URIRef, Variable
 
 NAMESPACES = {
     'schema': 'https://schema.org/',

@@ -1,9 +1,8 @@
 from pathlib import Path
 
-from rdflib import RDF, RDFS, BNode, Literal, URIRef
-
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL, OCTA
+from rdflib import RDF, RDFS, BNode, Literal, URIRef
 
 LOCAL_IRI = URIRef('local:test.yaml')
 

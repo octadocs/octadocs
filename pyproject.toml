@@ -29,7 +29,7 @@ octadocs = "octadocs.plugin:OctaDocsPlugin"
 
 
 [tool.poetry.dependencies]
-python = ">=3.6,<4.0"
+python = ">=3.6,<3.10"
 mkdocs = "^1.1.2"
 rdflib = "^5.0.0"
 python-frontmatter = "^0.5.0"
@@ -63,7 +63,7 @@ pytest-randomly = "^3.4"
 
 m2r = "^0.2"
 tomlkit = "^0.7"
-flakehell = "^0.7.1"
+python-jeeves = "^0.0.1"
 
 [tool.flakehell]
 # Will replace by my own ignorelist later

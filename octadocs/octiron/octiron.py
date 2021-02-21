@@ -10,7 +10,6 @@ from typing import Dict, Iterable, Iterator, Optional, Type
 
 import owlrl
 import rdflib
-
 from octadocs.octiron.context import merge
 from octadocs.octiron.context_loaders import (
     context_from_json,

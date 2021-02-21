@@ -15,8 +15,7 @@ import json
 import operator
 
 from pyld import jsonld
-from rdflib import ConjunctiveGraph, Variable, URIRef
-
+from rdflib import ConjunctiveGraph, URIRef, Variable
 
 NAMESPACES = {
     'schema': 'https://schema.org/',

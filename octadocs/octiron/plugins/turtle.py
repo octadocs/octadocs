@@ -2,7 +2,6 @@ from itertools import starmap
 from typing import Iterator
 
 import rdflib
-
 from octadocs.octiron.plugins import Loader
 from octadocs.octiron.types import Triple
 

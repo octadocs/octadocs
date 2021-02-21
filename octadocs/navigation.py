@@ -5,7 +5,6 @@ from typing import Union
 import rdflib
 from mkdocs.structure.nav import Link, Navigation, Section
 from mkdocs.structure.pages import Page
-
 from octadocs.conversions import get_page_title_by_iri, iri_by_page
 
 if sys.version_info >= (3, 8):

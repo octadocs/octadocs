@@ -8,14 +8,13 @@ from unittest.mock import patch
 import pydotplus
 import rdflib
 from macros.plugin import MacrosPlugin
-from rdflib import Variable
-from rdflib.plugins.sparql.processor import SPARQLResult
-from rdflib.tools.rdf2dot import rdf2dot
-
 from octadocs.conversions import iri_by_page
 from octadocs.environment import iri_to_url, src_path_to_iri
 from octadocs.octiron.types import LOCAL
 from octadocs.query import query
+from rdflib import Variable
+from rdflib.plugins.sparql.processor import SPARQLResult
+from rdflib.tools.rdf2dot import rdf2dot
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:

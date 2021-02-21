@@ -5,12 +5,11 @@ from typing import Iterator, List
 import frontmatter
 import rdflib
 from documented import DocumentedError
-from rdflib import RDF
-from yaml.scanner import ScannerError
-
 from octadocs.octiron.plugins import Loader
 from octadocs.octiron.types import OCTA, Triple
 from octadocs.octiron.yaml_extensions import as_triple_stream
+from rdflib import RDF
+from yaml.scanner import ScannerError
 
 
 @dataclass
