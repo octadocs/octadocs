@@ -18,5 +18,3 @@ OctaDocs is a plugin for [MkDocs](https://www.mkdocs.org/) to make it smarter.
 ) }}
 {% endraw %}
 ```
-
-boo

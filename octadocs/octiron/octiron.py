@@ -129,10 +129,10 @@ class Octiron:
 
         return CacheStatus.UP_TO_DATE
 
-    def wipe_named_graph(self, local_iri: rdflib.URIRef) -> None:
+    def clear_named_graph(self, local_iri: rdflib.URIRef) -> None:
         """Remove all triples in the specified named graph."""
         self.graph.update(
-            'DELETE WHERE { GRAPH ?graph { ?s ?p ?o } }',
+            'CLEAR GRAPH <?graph>',
             initBindings={
                 'graph': local_iri,
             },
@@ -159,11 +159,11 @@ class Octiron:
         )
 
         if cache_status == CacheStatus.UP_TO_DATE:
-            logger.info('Skipping %s as cached and up to date.', relative_path)
+            logger.info('Skipping %s (cached and up to date)', relative_path)
             return
 
         elif cache_status == CacheStatus.EXPIRED:
-            self.wipe_named_graph(local_iri)
+            self.clear_named_graph(local_iri)
 
         context = self.get_context_per_directory(path.parent)
         loader_class = self.get_loader_class_for_path(path)
@@ -197,10 +197,16 @@ class Octiron:
             file_last_modification_time
         )
 
+    def clear_default_graph(self) -> None:
+        """Remove all triples from the default graph."""
+        self.graph.update('CLEAR DEFAULT')
+
     def apply_inference(self) -> None:
         """Do whatever is needed after the graph was updated from a file."""
         # FIXME this should be customizable via dependency inversion. Right now
         #   this is hardcoded to run inference rules formulated as SPARQL files.
+        self.clear_default_graph()
+
         logger.info('Inference: OWL RL')
         owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(self.graph)
 
