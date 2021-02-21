@@ -36,4 +36,3 @@ Without large scale modifications of the code, we will speed up development expe
 This can be resolved by removing everything from the global graph, but that needs to be carefully investigated.
 
 boo
-foo

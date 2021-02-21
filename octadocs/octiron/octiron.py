@@ -145,7 +145,11 @@ class Octiron:
         global_url: Optional[str] = None,
     ) -> None:
         """Update the graph from file determined by given path."""
-        logger.info('Reading: %s', path)
+        # Create a shorter (printable) version of the path for logging messages.
+        try:
+            relative_path = path.relative_to(self.root_directory)
+        except ValueError:
+            relative_path = path
 
         file_last_modification_time = path.stat().st_mtime
 
@@ -155,24 +159,26 @@ class Octiron:
         )
 
         if cache_status == CacheStatus.UP_TO_DATE:
-            logger.info('%s is up to date, skipping.', path)
+            logger.info('Skipping %s as cached and up to date.', relative_path)
             return
 
         elif cache_status == CacheStatus.EXPIRED:
-            logger.info(
-                '%s is EXPIRED, removing the old data and reading new version.',
-                path,
-            )
             self.wipe_named_graph(local_iri)
-
-        else:
-            logger.info('%s is not cached yet, importing it.', path)
 
         context = self.get_context_per_directory(path.parent)
         loader_class = self.get_loader_class_for_path(path)
 
         if loader_class is None:
             return
+
+        logger.info(
+            'Importing %s via %s (%s)',
+            relative_path,
+            loader_class.__name__,
+            'not cached before' if (
+                cache_status == CacheStatus.NOT_CACHED
+            ) else 'cached but expired'
+        )
 
         loader_instance = loader_class(
             path=path,
@@ -241,7 +247,6 @@ class Octiron:
             if re.search(loader.regex, str(path)) is not None:
                 return loader
 
-        logger.warning('Cannot find appropriate loader for path: %s', path)
         return None
 
     def _find_context_files(self, directory: Path) -> Iterable[Path]:

@@ -7,7 +7,7 @@ from typing import Callable, Optional, Union
 import rdflib
 from livereload import Server
 from mkdocs.plugins import BasePlugin
-from mkdocs.structure.files import Files
+from mkdocs.structure.files import Files, File
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from typing_extensions import TypedDict
