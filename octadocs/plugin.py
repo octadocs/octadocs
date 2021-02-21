@@ -1,6 +1,6 @@
 import logging
 import operator
-from functools import partial
+from functools import partial, lru_cache
 from pathlib import Path
 from typing import Callable, Optional, Union
 
@@ -73,6 +73,12 @@ def get_template_by_page(
     return None
 
 
+@lru_cache(None)
+def cached_octiron(docs_dir: Path) -> Octiron:
+    """Retrieve cached Octiron instance or create it if absent."""
+    return Octiron(root_directory=docs_dir)
+
+
 class OctaDocsPlugin(BasePlugin):
     """MkDocs Meta plugin."""
 
@@ -81,12 +87,15 @@ class OctaDocsPlugin(BasePlugin):
 
     def on_config(self, config: Config) -> Config:
         """Initialize Octiron and provide graph to macros through the config."""
-        self.octiron = Octiron(
-            root_directory=Path(config['docs_dir']),
+        docs_dir = Path(config['docs_dir'])
+
+        self.octiron = cached_octiron(
+            docs_dir=docs_dir,
         )
+        print(id(self.octiron))
 
         self.stored_query = StoredQuery(
-            path=Path(config['docs_dir']).parent / 'queries',
+            path=docs_dir.parent / 'queries',
             executor=partial(
                 query,
                 instance=self.octiron.graph,

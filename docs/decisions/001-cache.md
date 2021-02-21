@@ -26,3 +26,14 @@ Unfortunately, OWL RL and SPARQL inference rules will have to be rerun anyway, a
 ## Consequences
 
 Without large scale modifications of the code, we will speed up development experience a little bit.
+
+### Adverse effect
+
+- If there was a triple `t1` which was used by inference to create another triple `t2`,
+- and if the user removed `t1` from the graph,
+- `t2` will still remain in the graph which may confuse the user.
+
+This can be resolved by removing everything from the global graph, but that needs to be carefully investigated.
+
+boo
+foo

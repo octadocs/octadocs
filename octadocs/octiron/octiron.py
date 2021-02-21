@@ -2,6 +2,7 @@ import logging
 import re
 import sys
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from functools import reduce
 from pathlib import Path
 from types import MappingProxyType
@@ -53,12 +54,26 @@ def triples_to_quads(
     )
 
 
+class CacheStatus(Enum):
+    """Cache condition of a file."""
+
+    NOT_CACHED = auto()
+    UP_TO_DATE = auto()
+    EXPIRED = auto()
+
+
 @dataclass
 class Octiron:
     """Convert a lump of goo and data into a semantic graph."""
 
     root_directory: Path
     custom_namespaces: Dict[str, rdflib.Namespace] = field(default_factory=dict)
+    last_modified_timestamp_per_file: Dict[rdflib.URIRef, float] = field(
+        default_factory=dict,
+        metadata={
+            '__doc__': 'Time when every file was last imported into the graph.',
+        }
+    )
 
     @cached_property
     def namespaces(self):
@@ -96,6 +111,33 @@ class Octiron:
             dict(DEFAULT_CONTEXT),
         )
 
+    def create_file_cache_status(
+        self,
+        local_iri: rdflib.URIRef,
+        last_modification_timestamp_on_disk: float,
+    ) -> CacheStatus:
+        """Determine caching status of a file."""
+        cached_modification_time = self.last_modified_timestamp_per_file.get(
+            local_iri,
+        )
+
+        if cached_modification_time is None:
+            return CacheStatus.NOT_CACHED
+
+        elif cached_modification_time < last_modification_timestamp_on_disk:
+            return CacheStatus.EXPIRED
+
+        return CacheStatus.UP_TO_DATE
+
+    def wipe_named_graph(self, local_iri: rdflib.URIRef) -> None:
+        """Remove all triples in the specified named graph."""
+        self.graph.update(
+            'DELETE WHERE { GRAPH ?graph { ?s ?p ?o } }',
+            initBindings={
+                'graph': local_iri,
+            },
+        )
+
     def update_from_file(
         self,
         path: Path,
@@ -104,6 +146,28 @@ class Octiron:
     ) -> None:
         """Update the graph from file determined by given path."""
         logger.info('Reading: %s', path)
+
+        file_last_modification_time = path.stat().st_mtime
+
+        cache_status = self.create_file_cache_status(
+            local_iri=local_iri,
+            last_modification_timestamp_on_disk=file_last_modification_time,
+        )
+
+        if cache_status == CacheStatus.UP_TO_DATE:
+            logger.info('%s is up to date, skipping.', path)
+            return
+
+        elif cache_status == CacheStatus.EXPIRED:
+            logger.info(
+                '%s is EXPIRED, removing the old data and reading new version.',
+                path,
+            )
+            self.wipe_named_graph(local_iri)
+
+        else:
+            logger.info('%s is not cached yet, importing it.', path)
+
         context = self.get_context_per_directory(path.parent)
         loader_class = self.get_loader_class_for_path(path)
 
@@ -121,6 +185,11 @@ class Octiron:
         quads = triples_to_quads(triples=triples, graph=local_iri)
 
         self.graph.addN(quads)
+
+        # Store the file last modification time
+        self.last_modified_timestamp_per_file[local_iri] = (
+            file_last_modification_time
+        )
 
     def apply_inference(self) -> None:
         """Do whatever is needed after the graph was updated from a file."""
