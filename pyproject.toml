@@ -51,7 +51,7 @@ documented = "^0.1.1"
 [tool.poetry.dev-dependencies]
 mypy = "^0.790"
 
-wemake-python-styleguide = "^0.14"
+wemake-python-styleguide = "^0.15.1"
 flake8-pytest-style = "^1.3"
 nitpick = "^0.23"
 
@@ -63,7 +63,7 @@ pytest-randomly = "^3.4"
 
 m2r = "^0.2"
 tomlkit = "^0.7"
-python-jeeves = "^0.0.1"
+mister-jeeves = "^0.0.2"
 
 [tool.flakehell]
 # Will replace by my own ignorelist later
