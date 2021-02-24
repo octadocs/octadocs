@@ -10,7 +10,7 @@ import json
 
 from pyld import jsonld
 
-JSONLD_DOCUMENT = {
+JSONLD_DOCUMENT = {  # noqa: WPS407
     '@context': {
         'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
         'label': 'rdfs:label',

@@ -17,7 +17,7 @@ import pytest
 from pyld import jsonld
 from rdflib import ConjunctiveGraph, URIRef, Variable
 
-NAMESPACES = {
+NAMESPACES = {   # noqa: WPS407
     'schema': 'https://schema.org/',
     'blog': 'https://blog.me/',
     'ex': 'https://example.org/',
@@ -28,7 +28,7 @@ NAMESPACES = {
 PUBLIC_ID = URIRef('https://myblog.net/rdf/')
 
 
-JSONLD_DOCUMENT = {
+JSONLD_DOCUMENT = {  # noqa: WPS407
     '@context': NAMESPACES,
 
     # This document describes an article in my blog. This article has a few
@@ -64,7 +64,6 @@ def test_import_jsonld_into_named_graph(flatten_before_import: bool):
         jsonld_document = jsonld.flatten(jsonld_document)
 
     serialized_document = json.dumps(jsonld_document, indent=4)
-    print(serialized_document)
 
     graph.parse(
         data=serialized_document,

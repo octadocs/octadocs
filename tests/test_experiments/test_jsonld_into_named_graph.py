@@ -16,7 +16,7 @@ import operator
 
 from rdflib import ConjunctiveGraph, URIRef, Variable
 
-NAMESPACES = {
+NAMESPACES = {  # noqa: WPS407
     'schema': 'https://schema.org/',
     'blog': 'https://blog.me/',
     'ex': 'https://example.org/',
@@ -27,7 +27,7 @@ NAMESPACES = {
 PUBLIC_ID = URIRef('https://myblog.net/rdf/')
 
 
-JSONLD_DOCUMENT = {
+JSONLD_DOCUMENT = {  # noqa: WPS407
     '@context': NAMESPACES,
 
     # This document describes an article in my blog. This article has a few
@@ -56,7 +56,6 @@ def test_import_jsonld_into_named_graph():
     graph = ConjunctiveGraph()
 
     serialized_document = json.dumps(JSONLD_DOCUMENT, indent=4)
-    print(serialized_document)
 
     graph.parse(
         data=serialized_document,

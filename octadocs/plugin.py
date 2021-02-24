@@ -7,7 +7,7 @@ from typing import Callable, Optional, Union
 import rdflib
 from livereload import Server
 from mkdocs.plugins import BasePlugin
-from mkdocs.structure.files import File, Files
+from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from octadocs.environment import src_path_to_iri
@@ -91,7 +91,6 @@ class OctaDocsPlugin(BasePlugin):
         self.octiron = cached_octiron(
             docs_dir=docs_dir,
         )
-        print(id(self.octiron))
 
         self.stored_query = StoredQuery(
             path=docs_dir.parent / 'queries',

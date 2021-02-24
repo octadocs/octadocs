@@ -62,7 +62,7 @@ class CacheStatus(Enum):
 
 
 @dataclass
-class Octiron:
+class Octiron:   # noqa: WPS214
     """Convert a lump of goo and data into a semantic graph."""
 
     root_directory: Path
@@ -71,7 +71,7 @@ class Octiron:
         default_factory=dict,
         metadata={
             '__doc__': 'Time when every file was last imported into the graph.',
-        }
+        },
     )
 
     @cached_property
@@ -137,7 +137,7 @@ class Octiron:
             },
         )
 
-    def update_from_file(
+    def update_from_file(  # noqa: WPS210
         self,
         path: Path,
         local_iri: rdflib.URIRef,
@@ -176,7 +176,7 @@ class Octiron:
             loader_class.__name__,
             'not cached before' if (
                 cache_status == CacheStatus.NOT_CACHED
-            ) else 'cached but expired'
+            ) else 'cached but expired',
         )
 
         loader_instance = loader_class(
@@ -200,7 +200,7 @@ class Octiron:
         """Remove all triples from the default graph."""
         self.graph.update('CLEAR DEFAULT')
 
-    def apply_inference(self) -> None:
+    def apply_inference(self) -> None:  # noqa: WPS213
         """Do whatever is needed after the graph was updated from a file."""
         # FIXME this should be customizable via dependency inversion. Right now
         #   this is hardcoded to run inference rules formulated as SPARQL files.
