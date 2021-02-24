@@ -500,7 +500,7 @@ marker = "python_version < \"3.8\""
 name = "importlib-metadata"
 optional = false
 python-versions = ">=3.6"
-version = "3.4.0"
+version = "3.6.0"
 
 [package.dependencies]
 zipp = ">=0.5"
@@ -673,7 +673,7 @@ description = "An unofficial extension to Marshmallow to allow for polymorphic f
 name = "marshmallow-polyfield"
 optional = false
 python-versions = ">=3.5"
-version = "5.9"
+version = "5.10"
 
 [package.dependencies]
 marshmallow = ">=3.0.0b10"
@@ -735,7 +735,7 @@ description = "Unleash the power of MkDocs with macros and variables"
 name = "mkdocs-macros-plugin"
 optional = false
 python-versions = ">=3.5"
-version = "0.4.20"
+version = "0.5.0"
 
 [package.dependencies]
 jinja2 = "*"
@@ -760,7 +760,7 @@ description = "A Material Design theme for MkDocs"
 name = "mkdocs-material"
 optional = false
 python-versions = "*"
-version = "6.2.8"
+version = "7.0.0"
 
 [package.dependencies]
 Pygments = ">=2.4"
@@ -1448,7 +1448,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "c2607f39e17246fc1a50ed20cf6def310c406f05d8df5b64b6ebc85ecaf4da7d"
+content-hash = "954758972e0f3ffd5b02d279f72d72bb2fee7d168b519a82d4a51ed088552768"
 python-versions = ">=3.6,<3.10"
 
 [metadata.files]
@@ -1674,8 +1674,8 @@ idna = [
     {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
 ]
 importlib-metadata = [
-    {file = "importlib_metadata-3.4.0-py3-none-any.whl", hash = "sha256:ace61d5fc652dc280e7b6b4ff732a9c2d40db2c0f92bc6cb74e07b73d53a1771"},
-    {file = "importlib_metadata-3.4.0.tar.gz", hash = "sha256:fa5daa4477a7414ae34e95942e4dd07f62adf589143c875c133c1e53c4eff38d"},
+    {file = "importlib_metadata-3.6.0-py3-none-any.whl", hash = "sha256:144acbe6ec34f170c4a362f52c2d03e82db7d012668ba57ff8f1e668905889b0"},
+    {file = "importlib_metadata-3.6.0.tar.gz", hash = "sha256:080d666daa2faedcc2e96c0c87d3cdb76325261c51650016784834733faa7897"},
 ]
 isodate = [
     {file = "isodate-0.6.0-py2.py3-none-any.whl", hash = "sha256:aa4d33c06640f5352aca96e4b81afd8ab3b47337cc12089822d6f322ac772c81"},
@@ -1809,7 +1809,8 @@ marshmallow = [
     {file = "marshmallow-3.10.0.tar.gz", hash = "sha256:4ab2fdb7f36eb61c3665da67a7ce281c8900db08d72ba6bf0e695828253581f7"},
 ]
 marshmallow-polyfield = [
-    {file = "marshmallow-polyfield-5.9.tar.gz", hash = "sha256:448f4b1ac5cbd671c0fb8a5452e99da7c0e8be924dd2cda2a21ee59457a4748f"},
+    {file = "marshmallow-polyfield-5.10.tar.gz", hash = "sha256:75d0e31b725650e91428f975a66ed30f703cc6f9fcfe45b8436ee6d676921691"},
+    {file = "marshmallow_polyfield-5.10-py3-none-any.whl", hash = "sha256:a0a91730c6d21bfac1563990c7ba1413928e7499af669619d4fb38d1fb25c4e9"},
 ]
 mccabe = [
     {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},
@@ -1828,16 +1829,16 @@ mkdocs = [
     {file = "mkdocs-1.1.2.tar.gz", hash = "sha256:f0b61e5402b99d7789efa032c7a74c90a20220a9c81749da06dbfbcbd52ffb39"},
 ]
 mkdocs-macros-plugin = [
-    {file = "mkdocs-macros-plugin-0.4.20.tar.gz", hash = "sha256:82b90e376c30c567b242ec6dffc0db2ba1d0d51d468dfa5c41d3fa6344a56c50"},
-    {file = "mkdocs_macros_plugin-0.4.20-py3-none-any.whl", hash = "sha256:9259b4eabfb846df86568fb1c30f129fd775f1060f53e62fef12dea5766ff5b8"},
+    {file = "mkdocs-macros-plugin-0.5.0.tar.gz", hash = "sha256:70f9cb691b06d9765cca38c621c7d2a85442866a9f4dfd665c0f030fd930f837"},
+    {file = "mkdocs_macros_plugin-0.5.0-py3-none-any.whl", hash = "sha256:62d294443599f011a66dcf2141bb89adee7889116725ddac8ad1a3a8330f0897"},
 ]
 mkdocs-macros-test = [
     {file = "mkdocs-macros-test-0.1.0.tar.gz", hash = "sha256:c5aba3cd060f28a9804d14ff0eda38287c83373529a91dbee922038aead422f0"},
     {file = "mkdocs_macros_test-0.1.0-py3-none-any.whl", hash = "sha256:d775f23600ee006331b4c6fe57e34c5b794b7faf17d91d34bcfaf4b0a59430f3"},
 ]
 mkdocs-material = [
-    {file = "mkdocs-material-6.2.8.tar.gz", hash = "sha256:ce2f4a71e5db49540d71fd32f9afba7645765f7eca391e560d1d27f947eb344c"},
-    {file = "mkdocs_material-6.2.8-py2.py3-none-any.whl", hash = "sha256:c9b63d709d29778aa3dafc7178b6a8c655b00937be2594aab016d1423696c792"},
+    {file = "mkdocs-material-7.0.0.tar.gz", hash = "sha256:1016e4f2207c23683c7074d826eb549a5aabd95811aaa09bd2cfea1c1ea831f4"},
+    {file = "mkdocs_material-7.0.0-py2.py3-none-any.whl", hash = "sha256:0af576868e25cc0e3f67c2c1175cc0a8bde10d8e3a105ae3f10455411ad0cac6"},
 ]
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.1.tar.gz", hash = "sha256:6947fb7f5e4291e3c61405bad3539d81e0b3cd62ae0d66ced018128af509c68f"},
