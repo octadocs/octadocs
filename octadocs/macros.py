@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pydotplus
 import rdflib
-from macros.plugin import MacrosPlugin
+from mkdocs_macros.plugin import MacrosPlugin
 from octadocs.conversions import iri_by_page
 from octadocs.environment import iri_to_url, src_path_to_iri
 from octadocs.query import query
