@@ -198,7 +198,20 @@ class Octiron:   # noqa: WPS214
 
     def clear_default_graph(self) -> None:
         """Remove all triples from the default graph."""
-        self.graph.update('CLEAR DEFAULT')
+        # Cannot use CLEAR DEFAULT due to:
+        #     https://github.com/RDFLib/rdflib/issues/1275
+        self.graph.update(
+            '''
+            DELETE { ?s ?p ?o } WHERE {
+                ?s ?p ?o .
+                FILTER NOT EXISTS {
+                    GRAPH ?g {
+                        ?s ?p ?o .
+                    }
+                }
+            }
+            '''
+        )
 
     def apply_inference(self) -> None:  # noqa: WPS213
         """Do whatever is needed after the graph was updated from a file."""

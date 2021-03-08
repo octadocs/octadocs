@@ -164,6 +164,9 @@ def _dict_as_triple_stream(  # type: ignore
     meta_data = jsonld.flatten(meta_data)
     serialized_meta_data = json.dumps(meta_data, indent=4)
 
+    if False and 'class' in str(local_iri) and 'index' in str(local_iri):
+        raise Exception(serialized_meta_data)
+
     graph = rdflib.Graph()
     graph.parse(
         data=serialized_meta_data,
