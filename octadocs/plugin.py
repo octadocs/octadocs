@@ -8,10 +8,9 @@ import rdflib
 from livereload import Server
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files
-from mkdocs.structure.nav import Navigation, Section
+from mkdocs.structure.nav import Section
 from mkdocs.structure.pages import Page
 from octadocs.environment import src_path_to_iri
-from octadocs.navigation import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL
 from octadocs.query import Query, query
@@ -183,18 +182,6 @@ class OctaDocsPlugin(BasePlugin):
         context.update(self.octiron.namespaces)
 
         return context
-
-    def on_nav(
-        self,
-        nav: Navigation,
-        config: Config,
-        files: Files,
-    ) -> Navigation:
-        """Update the site's navigation from the knowledge graph."""
-        return OctadocsNavigationProcessor(
-            graph=self.octiron.graph,
-            navigation=nav,
-        ).generate()
 
     def on_serve(
         self,
