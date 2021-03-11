@@ -142,12 +142,9 @@ class Octiron:   # noqa: WPS214
 
     def clear_named_graph(self, local_iri: rdflib.URIRef) -> None:
         """Remove all triples in the specified named graph."""
-        self.graph.update(
-            'CLEAR GRAPH <?graph>',
-            initBindings={
-                'graph': local_iri,
-            },
-        )
+        # Ugly formatting is used because of:
+        #   https://github.com/RDFLib/rdflib/issues/1277
+        self.graph.update(f'CLEAR GRAPH <{local_iri}>')
 
     def update_from_file(  # noqa: WPS210
         self,
