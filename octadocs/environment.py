@@ -1,8 +1,7 @@
 import re
 
-from rdflib import URIRef
-
 from octadocs.octiron.types import LOCAL
+from rdflib import URIRef
 
 
 def iri_to_url(iri: str) -> str:

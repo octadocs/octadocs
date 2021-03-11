@@ -22,3 +22,6 @@ theme:
   name: mkdocs
   logo:
     image: logo.png
+
+extra:
+  foo: bazinga

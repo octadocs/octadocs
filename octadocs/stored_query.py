@@ -3,9 +3,8 @@ from pathlib import Path
 from typing import Any
 
 from documented import DocumentedError
-from typing_extensions import Protocol
-
 from octadocs.query import QueryResult
+from typing_extensions import Protocol
 
 
 class QueryExecutor(Protocol):

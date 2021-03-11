@@ -1,6 +1,6 @@
 import json
 
-from rdflib import Graph, URIRef, Literal
+from rdflib import Graph, Literal, URIRef
 
 
 def test_parse_compacted_uri():

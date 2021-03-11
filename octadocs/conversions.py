@@ -2,13 +2,11 @@ from typing import Optional
 
 import rdflib
 from mkdocs.structure.pages import Page
-from rdflib import URIRef
-
 from octadocs.environment import src_path_to_iri
 from octadocs.query import SelectResult, query
 
 
-def iri_by_page(page: Page) -> URIRef:
+def iri_by_page(page: Page) -> rdflib.URIRef:
     """Convert src_path of a file to a Zet IRI."""
     return src_path_to_iri(page.file.src_path)
 

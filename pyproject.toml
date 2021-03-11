@@ -5,7 +5,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "octadocs"
-version = "0.0.21"
+version = "0.0.26"
 description = "MkDocs wiki made smart"
 license = "MIT"
 
@@ -29,7 +29,7 @@ octadocs = "octadocs.plugin:OctaDocsPlugin"
 
 
 [tool.poetry.dependencies]
-python = ">=3.6,<4.0"
+python = ">=3.6,<3.10"
 mkdocs = "^1.1.2"
 rdflib = "^5.0.0"
 python-frontmatter = "^0.5.0"
@@ -51,7 +51,7 @@ documented = "^0.1.1"
 [tool.poetry.dev-dependencies]
 mypy = "^0.790"
 
-wemake-python-styleguide = "^0.14"
+wemake-python-styleguide = "^0.15.1"
 flake8-pytest-style = "^1.3"
 nitpick = "^0.23"
 
@@ -63,7 +63,7 @@ pytest-randomly = "^3.4"
 
 m2r = "^0.2"
 tomlkit = "^0.7"
-flakehell = "^0.7.1"
+mister-jeeves = "^0.0.2"
 
 [tool.flakehell]
 # Will replace by my own ignorelist later

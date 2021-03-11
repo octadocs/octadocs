@@ -9,10 +9,9 @@ from typing import Any, Dict, Iterator, List, TypeVar, Union
 import rdflib
 from boltons.iterutils import remap
 from documented import DocumentedError
-from pyld import jsonld
-
 from octadocs.octiron.context import merge
 from octadocs.octiron.types import LOCAL, Context, Triple
+from pyld import jsonld
 
 try:  # noqa
     from yaml import CSafeDumper as SafeDumper  # noqa

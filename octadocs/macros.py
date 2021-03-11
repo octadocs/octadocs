@@ -7,15 +7,12 @@ from unittest.mock import patch
 
 import pydotplus
 import rdflib
-from macros.plugin import MacrosPlugin
-from rdflib import Variable
-from rdflib.plugins.sparql.processor import SPARQLResult
-from rdflib.tools.rdf2dot import rdf2dot
-
+from mkdocs_macros.plugin import MacrosPlugin
 from octadocs.conversions import iri_by_page
 from octadocs.environment import iri_to_url, src_path_to_iri
-from octadocs.octiron.types import LOCAL
 from octadocs.query import query
+from rdflib.plugins.sparql.processor import SPARQLResult
+from rdflib.tools.rdf2dot import rdf2dot
 
 
 def graph(instance: rdflib.ConjunctiveGraph) -> str:
@@ -61,7 +58,7 @@ def sparql(
     return instance.query(query, initBindings=bindings)
 
 
-def _render_as_row(row: Dict[Variable, Any]) -> str:  # type: ignore
+def _render_as_row(row: Dict[rdflib.Variable, Any]) -> str:  # type: ignore
     """Render row of a Markdown table."""
     formatted_row = ' | '.join(row.values())
     return f'| {formatted_row} |'

@@ -1,6 +1,6 @@
 import logging
 import operator
-from functools import partial
+from functools import lru_cache, partial
 from pathlib import Path
 from typing import Callable, Optional, Union
 
@@ -8,16 +8,14 @@ import rdflib
 from livereload import Server
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files
-from mkdocs.structure.nav import Navigation, Section
+from mkdocs.structure.nav import Section
 from mkdocs.structure.pages import Page
-from typing_extensions import TypedDict
-
 from octadocs.environment import src_path_to_iri
-from octadocs.navigation import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL
 from octadocs.query import Query, query
 from octadocs.stored_query import StoredQuery
+from typing_extensions import TypedDict
 
 NavigationItem = Union[Page, Section]
 
@@ -73,6 +71,12 @@ def get_template_by_page(
     return None
 
 
+@lru_cache(None)
+def cached_octiron(docs_dir: Path) -> Octiron:
+    """Retrieve cached Octiron instance or create it if absent."""
+    return Octiron(root_directory=docs_dir)
+
+
 class OctaDocsPlugin(BasePlugin):
     """MkDocs Meta plugin."""
 
@@ -81,12 +85,14 @@ class OctaDocsPlugin(BasePlugin):
 
     def on_config(self, config: Config) -> Config:
         """Initialize Octiron and provide graph to macros through the config."""
-        self.octiron = Octiron(
-            root_directory=Path(config['docs_dir']),
+        docs_dir = Path(config['docs_dir'])
+
+        self.octiron = cached_octiron(
+            docs_dir=docs_dir,
         )
 
         self.stored_query = StoredQuery(
-            path=Path(config['docs_dir']).parent / 'queries',
+            path=docs_dir.parent / 'queries',
             executor=partial(
                 query,
                 instance=self.octiron.graph,
@@ -176,18 +182,6 @@ class OctaDocsPlugin(BasePlugin):
         context.update(self.octiron.namespaces)
 
         return context
-
-    def on_nav(
-        self,
-        nav: Navigation,
-        config: Config,
-        files: Files,
-    ) -> Navigation:
-        """Update the site's navigation from the knowledge graph."""
-        return OctadocsNavigationProcessor(
-            graph=self.octiron.graph,
-            navigation=nav,
-        ).generate()
 
     def on_serve(
         self,

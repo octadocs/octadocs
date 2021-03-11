@@ -5,12 +5,10 @@ from typing import Iterator, List
 import frontmatter
 import rdflib
 from documented import DocumentedError
-from rdflib import RDF
-from yaml.scanner import ScannerError
-
 from octadocs.octiron.plugins import Loader
 from octadocs.octiron.types import OCTA, Triple
 from octadocs.octiron.yaml_extensions import as_triple_stream
+from yaml.scanner import ScannerError
 
 
 @dataclass
@@ -103,7 +101,7 @@ class MarkdownLoader(Loader):
 
         # The IRI of the local page is a page.
         # FIXME: maybe this should be in octiron.py and work globally.
-        yield Triple(self.local_iri, RDF.type, OCTA.Page)
+        yield Triple(self.local_iri, rdflib.RDF.type, OCTA.Page)
 
         # The page will be available on the Web under certain URL.
         if self.global_url is not None:

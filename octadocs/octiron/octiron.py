@@ -2,6 +2,7 @@ import logging
 import re
 import sys
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from functools import reduce
 from pathlib import Path
 from types import MappingProxyType
@@ -9,7 +10,6 @@ from typing import Dict, Iterable, Iterator, Optional, Type
 
 import owlrl
 import rdflib
-
 from octadocs.octiron.context import merge
 from octadocs.octiron.context_loaders import (
     context_from_json,
@@ -42,6 +42,18 @@ CONTEXT_FORMATS = MappingProxyType({
 })
 
 
+CLEAR_DEFAULT_QUERY = '''
+DELETE { ?s ?p ?o } WHERE {
+    ?s ?p ?o .
+    FILTER NOT EXISTS {
+        GRAPH ?g {
+            ?s ?p ?o .
+        }
+    }
+}
+'''
+
+
 def triples_to_quads(
     triples: Iterator[Triple],
     graph: rdflib.URIRef,
@@ -53,12 +65,26 @@ def triples_to_quads(
     )
 
 
+class CacheStatus(Enum):
+    """Cache condition of a file."""
+
+    NOT_CACHED = auto()
+    UP_TO_DATE = auto()
+    EXPIRED = auto()
+
+
 @dataclass
-class Octiron:
+class Octiron:   # noqa: WPS214
     """Convert a lump of goo and data into a semantic graph."""
 
     root_directory: Path
     custom_namespaces: Dict[str, rdflib.Namespace] = field(default_factory=dict)
+    last_modified_timestamp_per_file: Dict[rdflib.URIRef, float] = field(
+        default_factory=dict,
+        metadata={
+            '__doc__': 'Time when every file was last imported into the graph.',
+        },
+    )
 
     @cached_property
     def namespaces(self):
@@ -96,19 +122,74 @@ class Octiron:
             dict(DEFAULT_CONTEXT),
         )
 
-    def update_from_file(
+    def create_file_cache_status(
+        self,
+        local_iri: rdflib.URIRef,
+        last_modification_timestamp_on_disk: float,
+    ) -> CacheStatus:
+        """Determine caching status of a file."""
+        cached_modification_time = self.last_modified_timestamp_per_file.get(
+            local_iri,
+        )
+
+        if cached_modification_time is None:
+            return CacheStatus.NOT_CACHED
+
+        elif cached_modification_time < last_modification_timestamp_on_disk:
+            return CacheStatus.EXPIRED
+
+        return CacheStatus.UP_TO_DATE
+
+    def clear_named_graph(self, local_iri: rdflib.URIRef) -> None:
+        """Remove all triples in the specified named graph."""
+        self.graph.update(
+            'CLEAR GRAPH <?graph>',
+            initBindings={
+                'graph': local_iri,
+            },
+        )
+
+    def update_from_file(  # noqa: WPS210
         self,
         path: Path,
         local_iri: rdflib.URIRef,
         global_url: Optional[str] = None,
     ) -> None:
         """Update the graph from file determined by given path."""
-        logger.info('Reading: %s', path)
+        # Create a shorter (printable) version of the path for logging messages.
+        try:
+            relative_path = path.relative_to(self.root_directory)
+        except ValueError:
+            relative_path = path
+
+        file_last_modification_time = path.stat().st_mtime
+
+        cache_status = self.create_file_cache_status(
+            local_iri=local_iri,
+            last_modification_timestamp_on_disk=file_last_modification_time,
+        )
+
+        if cache_status == CacheStatus.UP_TO_DATE:
+            logger.info('Skipping %s (cached and up to date)', relative_path)
+            return
+
+        elif cache_status == CacheStatus.EXPIRED:
+            self.clear_named_graph(local_iri)
+
         context = self.get_context_per_directory(path.parent)
         loader_class = self.get_loader_class_for_path(path)
 
         if loader_class is None:
             return
+
+        logger.info(
+            'Importing %s via %s (%s)',
+            relative_path,
+            loader_class.__name__,
+            'not cached before' if (
+                cache_status == CacheStatus.NOT_CACHED
+            ) else 'cached but expired',
+        )
 
         loader_instance = loader_class(
             path=path,
@@ -122,10 +203,23 @@ class Octiron:
 
         self.graph.addN(quads)
 
-    def apply_inference(self) -> None:
+        # Store the file last modification time
+        self.last_modified_timestamp_per_file[local_iri] = (
+            file_last_modification_time
+        )
+
+    def clear_default_graph(self) -> None:
+        """Remove all triples from the default graph."""
+        # Cannot use CLEAR DEFAULT due to:
+        #     https://github.com/RDFLib/rdflib/issues/1275
+        self.graph.update(CLEAR_DEFAULT_QUERY)
+
+    def apply_inference(self) -> None:  # noqa: WPS213
         """Do whatever is needed after the graph was updated from a file."""
         # FIXME this should be customizable via dependency inversion. Right now
         #   this is hardcoded to run inference rules formulated as SPARQL files.
+        self.clear_default_graph()
+
         logger.info('Inference: OWL RL')
         owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(self.graph)
 
@@ -172,7 +266,6 @@ class Octiron:
             if re.search(loader.regex, str(path)) is not None:
                 return loader
 
-        logger.warning('Cannot find appropriate loader for path: %s', path)
         return None
 
     def _find_context_files(self, directory: Path) -> Iterable[Path]:

@@ -1,11 +1,10 @@
 from typing import Iterator
 
 import yaml
-from rdflib import RDF
-
 from octadocs.octiron.plugins import Loader
 from octadocs.octiron.types import OCTA, Triple
 from octadocs.octiron.yaml_extensions import SafeLoader, as_triple_stream
+from rdflib import RDF
 
 
 class YAMLLoader(Loader):

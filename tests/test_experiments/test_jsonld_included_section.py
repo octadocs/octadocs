@@ -15,10 +15,9 @@ import json
 import operator
 
 from pyld import jsonld
-from rdflib import ConjunctiveGraph, Variable, URIRef
+from rdflib import ConjunctiveGraph, URIRef, Variable
 
-
-NAMESPACES = {
+NAMESPACES = {   # noqa: WPS407
     'schema': 'https://schema.org/',
     'blog': 'https://blog.me/',
     'ex': 'https://example.org/',
@@ -29,7 +28,7 @@ NAMESPACES = {
 PUBLIC_ID = URIRef('https://myblog.net/rdf/')
 
 
-JSONLD_DOCUMENT = {
+JSONLD_DOCUMENT = {  # noqa: WPS407
     '@context': NAMESPACES,
 
     # This document describes an article in my blog. This article has a few
