@@ -1,4 +1,4 @@
-# mkdocs meta
+# octadocs
 
 [![Build Status](https://travis-ci.com/anatoly-scherbakov/octadocs.svg?branch=master)](https://travis-ci.com/anatoly-scherbakov/octadocs)
 [![Coverage](https://coveralls.io/repos/github/anatoly-scherbakov/octadocs/badge.svg?branch=master)](https://coveralls.io/github/anatoly-scherbakov/octadocs?branch=master)
