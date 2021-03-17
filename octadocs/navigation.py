@@ -13,6 +13,9 @@ from mkdocs.structure.nav import (  # noqa: WPS450
 from mkdocs.structure.pages import Page
 from octadocs.conversions import iri_by_page
 from octadocs.query import SelectResult, query
+# We have to use this library instead of functools.singledispatchmethod
+# because that guy is only available on Python >= 3.8.
+from singledispatchmethod import singledispatchmethod
 
 if sys.version_info >= (3, 8):
     from functools import cached_property  # noqa
@@ -134,7 +137,7 @@ class OctadocsNavigationProcessor:
 
         return navigation
 
-    @functools.singledispatchmethod
+    @singledispatchmethod
     def rearrange_navigation(
         self,
         navigation_item: NavigationItem,
@@ -142,7 +145,7 @@ class OctadocsNavigationProcessor:
         """Change the order of navigation menu elements."""
         raise NotImplementedError()
 
-    @rearrange_navigation.register(Page)
+    @rearrange_navigation.register
     def _rearrange_page(self, page: Page) -> Page:
         iri = iri_by_page(page)
         position = self.position_by_page.get(
@@ -167,7 +170,7 @@ class OctadocsNavigationProcessor:
             key=sort_key,
         )
 
-    @rearrange_navigation.register(Section)
+    @rearrange_navigation.register
     def _rearrange_section(self, section: Section) -> Section:
         section.children = self._rearrange_list_of_navigation_items(
             section.children,
@@ -182,7 +185,7 @@ class OctadocsNavigationProcessor:
 
         return section
 
-    @rearrange_navigation.register(Navigation)
+    @rearrange_navigation.register
     def _rearrange_navigation(self, navigation: Navigation):
         navigation.items = self._rearrange_list_of_navigation_items(
             navigation.items,
