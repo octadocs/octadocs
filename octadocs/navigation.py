@@ -1,29 +1,27 @@
 import functools
 import sys
 from dataclasses import dataclass
-from typing import Union, NamedTuple, Dict, List, Optional, Iterable
+from typing import Dict, Iterable, List, NamedTuple, Optional, Union, cast
 
 import rdflib
-from mkdocs.structure.files import File
-from mkdocs.structure.nav import (
-    Link, Navigation, Section,
+from mkdocs.structure.nav import (  # noqa: WPS450
+    Link,
+    Navigation,
+    Section,
     _add_previous_and_next_links,
 )
 from mkdocs.structure.pages import Page
-
 from octadocs.conversions import iri_by_page
-from octadocs.query import query
+from octadocs.query import SelectResult, query
 
 if sys.version_info >= (3, 8):
     from functools import cached_property  # noqa
 else:
-    pass
+    pass  # noqa: WPS420
 
 
 NavigationItem = Union[Page, Section, Link, Navigation]
 
-INDEX_MD_DEFAULT_POSITION = -200
-DEFAULT_SECTION_POSITION = -100
 PAGE_DEFAULT_POSITION = 0
 
 
@@ -33,35 +31,6 @@ def is_index_md(navigation_item: NavigationItem) -> bool:
         isinstance(navigation_item, Page) and
         navigation_item.file.src_path.endswith('index.md')
     )
-
-
-@functools.singledispatch
-def assign_position_and_reorder(
-    navigation_item: NavigationItem,
-    graph: rdflib.ConjunctiveGraph,
-) -> NavigationItem:
-    """Get position for a navigation item from the graph."""
-    raise NotImplementedError(f'Cannot get position for: {navigation_item}')
-
-
-@assign_position_and_reorder.register(Page)
-def _get_position_page(page: Page, graph: rdflib.ConjunctiveGraph) -> Page:
-    """Fetch octa:position for a given Page."""
-    rows = query(
-        query_text='''
-            SELECT ?position WHERE {
-                ?iri octa:position ?position .
-            }
-        ''',
-        instance=graph,
-        iri=iri_by_page(page),
-    )
-
-    position = rows[0]['position'] if rows else 0
-
-    page.position = position
-
-    return page
 
 
 class SortKey(NamedTuple):
@@ -89,6 +58,7 @@ def sort_key(navigation_item: NavigationItem) -> SortKey:
 
 
 def find_index_page_in_section(section: Section) -> Optional[Page]:
+    """Find index.md page in the section, if any."""
     index_pages = list(filter(
         is_index_md,
         section.children,
@@ -150,29 +120,27 @@ class OctadocsNavigationProcessor:
 
         return {
             row['page']: row['position'].value
-            for row in rows
+            for row in cast(SelectResult, rows)
         }
 
-    def assign_positions_to_pages(self) -> None:
-        """Go through every page and assign position there."""
-        page: Page
-        for page in self.navigation.pages:
-            iri = iri_by_page(page)
+    def generate(self) -> Navigation:
+        """Generate the navigation structure."""
+        # Rearrange navigation itself
+        navigation = self.rearrange_navigation(self.navigation)
 
-            default_position = INDEX_MD_DEFAULT_POSITION if (
-                is_index_md(page)
-            ) else PAGE_DEFAULT_POSITION
+        # Generate flat pages list
+        pages = list(create_pages_list_by_navigation(navigation))
+        navigation.pages = pages
+        _add_previous_and_next_links(navigation.pages)
 
-            page.position = self.position_by_page.get(
-                iri,
-                default_position,
-            )
+        return navigation
 
     @functools.singledispatchmethod
     def rearrange_navigation(
         self,
         navigation_item: NavigationItem,
     ) -> NavigationItem:
+        """Change the order of navigation menu elements."""
         raise NotImplementedError()
 
     @rearrange_navigation.register(Page)
@@ -195,10 +163,10 @@ class OctadocsNavigationProcessor:
             navigation_items,
         ))
 
-        return list(sorted(
+        return sorted(
             navigation_items,
             key=sort_key,
-        ))
+        )
 
     @rearrange_navigation.register(Section)
     def _rearrange_section(self, section: Section) -> Section:
@@ -222,75 +190,3 @@ class OctadocsNavigationProcessor:
         )
 
         return navigation
-
-    def generate(self) -> Navigation:
-        """Generate the navigation structure."""
-        # Rearrange navigation itself
-        navigation = self.rearrange_navigation(self.navigation)
-
-        # Generate flat pages list
-        pages = list(create_pages_list_by_navigation(navigation))
-        navigation.pages = pages
-        _add_previous_and_next_links(navigation.pages)
-
-        return navigation
-
-
-@functools.singledispatch
-def reorder_navigation(navigation_item):
-    """Reorder navigation items based on their positions."""
-    raise NotImplementedError(f'Cannot reorder {navigation_item}.')
-
-
-@reorder_navigation.register(Page)
-def _reorder_page(page: Page) -> Page:
-    """Nothing to reorder here, page is a page."""
-    return page
-
-
-def navigation_sort_key(navigation_item: NavigationItem) -> SortKey:
-    return SortKey(
-        getattr(navigation_item, 'position', PAGE_DEFAULT_POSITION),
-        navigation_item.title,
-    )
-
-
-@reorder_navigation.register(Section)
-def _reorder_section(section: Section) -> Section:
-    """Reorder items inside a section based on their priorities."""
-    section.children = list(map(
-        reorder_navigation,
-        section.children,
-    ))
-
-    section.children.sort(
-        key=navigation_sort_key,
-    )
-
-    return section
-
-
-def construct_navigation_pages_by_items(
-    navigation_items: List[NavigationItem],
-) -> List[Page]:
-    """Construct flat pages list iterating by navigation three."""
-    pages = []
-    raise Exception('AAA!!!')
-
-
-@reorder_navigation.register(Navigation)
-def _reorder_navigation(navigation: Navigation) -> Navigation:
-    """Reorder items in the root navigation."""
-    navigation.items = list(map(
-        reorder_navigation,
-        navigation.items,
-    ))
-
-    navigation.items.sort(
-        key=navigation_sort_key,
-    )
-
-    navigation_pages = construct_navigation_pages_by_items()
-    _add_previous_and_next_links(navigation.pages)
-
-    return navigation

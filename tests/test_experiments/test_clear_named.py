@@ -17,7 +17,6 @@ def test_clear_named():
     assert list(graph)
 
     # Fails:
-    #     raise ParseException(instring, loc, self.errmsg, self)
     #     E   pyparsing.ParseException: Expected end of text, found 'C'
     #         (at char 0), (line:1, col:1)
     graph.update('CLEAR GRAPH ?g', initBindings={

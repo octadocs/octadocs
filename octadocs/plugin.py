@@ -8,7 +8,7 @@ import rdflib
 from livereload import Server
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files
-from mkdocs.structure.nav import Section, Navigation
+from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 from octadocs.environment import src_path_to_iri
 from octadocs.navigation import OctadocsNavigationProcessor
