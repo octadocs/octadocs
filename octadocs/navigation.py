@@ -17,8 +17,7 @@ from octadocs.query import SelectResult, query
 if sys.version_info >= (3, 8):
     from functools import cached_property  # noqa
 else:
-    pass  # noqa: WPS420
-
+    from backports.cached_property import cached_property  # noqa: WPS433,WPS440
 
 NavigationItem = Union[Page, Section, Link, Navigation]
 
