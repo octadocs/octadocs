@@ -1,7 +1,7 @@
 import functools
 import sys
 from dataclasses import dataclass
-from typing import Union, NamedTuple, Dict, List, Optional
+from typing import Union, NamedTuple, Dict, List, Optional, Iterable
 
 import rdflib
 from mkdocs.structure.files import File
@@ -98,6 +98,31 @@ def find_index_page_in_section(section: Section) -> Optional[Page]:
         return index_pages[0]
 
     return None
+
+
+@functools.singledispatch
+def create_pages_list_by_navigation(
+    navigation_item: NavigationItem,
+) -> Iterable[Page]:
+    """Filter pages."""
+    raise NotImplementedError()
+
+
+@create_pages_list_by_navigation.register(Page)
+def _create_pages_list_by_page(page: Page) -> Iterable[Page]:
+    yield page
+
+
+@create_pages_list_by_navigation.register(Section)
+def _create_pages_list_by_section(section: Section) -> Iterable[Page]:
+    for navigation_item in section.children:
+        yield from create_pages_list_by_navigation(navigation_item)
+
+
+@create_pages_list_by_navigation.register(Navigation)
+def _create_pages_list_by_navigation(navigation: Navigation) -> Iterable[Page]:
+    for navigation_item in navigation.items:
+        yield from create_pages_list_by_navigation(navigation_item)
 
 
 @dataclass(repr=False)
@@ -200,7 +225,15 @@ class OctadocsNavigationProcessor:
 
     def generate(self) -> Navigation:
         """Generate the navigation structure."""
-        return self.rearrange_navigation(self.navigation)
+        # Rearrange navigation itself
+        navigation = self.rearrange_navigation(self.navigation)
+
+        # Generate flat pages list
+        pages = list(create_pages_list_by_navigation(navigation))
+        navigation.pages = pages
+        _add_previous_and_next_links(navigation.pages)
+
+        return navigation
 
 
 @functools.singledispatch
