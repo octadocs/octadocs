@@ -1,9 +1,10 @@
 import functools
 import sys
 from dataclasses import dataclass
-from typing import Union, NamedTuple, Dict, List
+from typing import Union, NamedTuple, Dict, List, Optional
 
 import rdflib
+from mkdocs.structure.files import File
 from mkdocs.structure.nav import (
     Link, Navigation, Section,
     _add_previous_and_next_links,
@@ -19,10 +20,10 @@ else:
     pass
 
 
-NavigationItem = Union[Page, Section, Link]
+NavigationItem = Union[Page, Section, Link, Navigation]
 
-DEFAULT_SECTION_POSITION = -200
-INDEX_MD_DEFAULT_POSITION = -100
+INDEX_MD_DEFAULT_POSITION = -200
+DEFAULT_SECTION_POSITION = -100
 PAGE_DEFAULT_POSITION = 0
 
 
@@ -66,44 +67,37 @@ def _get_position_page(page: Page, graph: rdflib.ConjunctiveGraph) -> Page:
 class SortKey(NamedTuple):
     """Sort key."""
 
+    is_index: bool
     position: int
     title: str
 
 
 def sort_key(navigation_item: NavigationItem) -> SortKey:
     """Determine sort key for a navigation item."""
+    title = navigation_item.title
+    if title is None:
+        try:
+            title = navigation_item.file.name
+        except AttributeError:
+            title = ''
+
     return SortKey(
+        is_index=not is_index_md(navigation_item),
         position=navigation_item.position,
-        title=navigation_item.title,
+        title=title,
     )
 
 
-@assign_position_and_reorder.register(Section)
-@assign_position_and_reorder.register(Navigation)
-def _get_position_section(
-    section: Section,
-    graph: rdflib.ConjunctiveGraph,
-) -> Section:
-    """Fetch octa:position for a section."""
-    section.children = [
-        assign_position_and_reorder(child, graph)
-        for child in section.children
-    ]
-
-    section.children.sort(
-        key=sort_key,
-    )
-
+def find_index_page_in_section(section: Section) -> Optional[Page]:
     index_pages = list(filter(
         is_index_md,
         section.children,
     ))
 
-    position = index_pages[0].position if index_pages else 0
+    if index_pages:
+        return index_pages[0]
 
-    section.position = position
-
-    return section
+    return None
 
 
 @dataclass(repr=False)
@@ -149,30 +143,64 @@ class OctadocsNavigationProcessor:
                 default_position,
             )
 
-    def generate(self) -> Navigation:
-        """Generate the navigation structure."""
-        self.assign_positions_to_pages()
-        return reorder_navigation(self.navigation)
+    @functools.singledispatchmethod
+    def rearrange_navigation(
+        self,
+        navigation_item: NavigationItem,
+    ) -> NavigationItem:
+        raise NotImplementedError()
 
-    def _process_nav_item(self, item: NavigationItem) -> NavigationItem:
-        if isinstance(item, Page):
-            return self._process_nav_page(item)
+    @rearrange_navigation.register(Page)
+    def _rearrange_page(self, page: Page) -> Page:
+        iri = iri_by_page(page)
+        position = self.position_by_page.get(
+            iri,
+            PAGE_DEFAULT_POSITION,
+        )
 
-        elif isinstance(item, Section):
-            return self._process_nav_section(item)
-
-        elif isinstance(item, Link):
-            return item
-
-        return item
-
-    def _process_nav_page(self, page: Page) -> Page:
-        """Process a page."""
+        page.position = position
         return page
 
-    def _process_nav_section(self, section: Section) -> NavigationItem:
-        """Process section."""
-        # return assign_position_and_reorder()
+    def _rearrange_list_of_navigation_items(
+        self,
+        navigation_items: List[NavigationItem],
+    ) -> List[NavigationItem]:
+        navigation_items = list(map(
+            self.rearrange_navigation,
+            navigation_items,
+        ))
+
+        return list(sorted(
+            navigation_items,
+            key=sort_key,
+        ))
+
+    @rearrange_navigation.register(Section)
+    def _rearrange_section(self, section: Section) -> Section:
+        section.children = self._rearrange_list_of_navigation_items(
+            section.children,
+        )
+
+        index_page = find_index_page_in_section(section)
+        if index_page is None:
+            section.position = PAGE_DEFAULT_POSITION
+
+        else:
+            section.position = index_page.position
+
+        return section
+
+    @rearrange_navigation.register(Navigation)
+    def _rearrange_navigation(self, navigation: Navigation):
+        navigation.items = self._rearrange_list_of_navigation_items(
+            navigation.items,
+        )
+
+        return navigation
+
+    def generate(self) -> Navigation:
+        """Generate the navigation structure."""
+        return self.rearrange_navigation(self.navigation)
 
 
 @functools.singledispatch
@@ -189,7 +217,7 @@ def _reorder_page(page: Page) -> Page:
 
 def navigation_sort_key(navigation_item: NavigationItem) -> SortKey:
     return SortKey(
-        getattr(navigation_item, 'position', DEFAULT_SECTION_POSITION),
+        getattr(navigation_item, 'position', PAGE_DEFAULT_POSITION),
         navigation_item.title,
     )
 

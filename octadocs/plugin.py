@@ -36,6 +36,7 @@ class Config(TypedDict):
 
     docs_dir: str
     extra: ConfigExtra
+    nav: dict   # type: ignore
 
 
 class TemplateContext(TypedDict):
@@ -205,7 +206,10 @@ class OctaDocsPlugin(BasePlugin):
         files: Files,
     ) -> Navigation:
         """Update the site's navigation from the knowledge graph."""
-        return OctadocsNavigationProcessor(
-            graph=self.octiron.graph,
-            navigation=nav,
-        ).generate()
+        if not config.get('nav'):
+            nav = OctadocsNavigationProcessor(
+                graph=self.octiron.graph,
+                navigation=nav,
+            ).generate()
+
+        return nav
