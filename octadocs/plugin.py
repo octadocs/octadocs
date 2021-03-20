@@ -11,6 +11,7 @@ from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Navigation
 from mkdocs.structure.pages import Page
 from octadocs.environment import src_path_to_iri
+from octadocs.navigation.nav_to_graph import NavigationToGraphReader
 from octadocs.navigation.processor import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL
@@ -209,5 +210,9 @@ class OctaDocsPlugin(BasePlugin):
                 graph=self.octiron.graph,
                 navigation=nav,
             ).generate()
+
+        NavigationToGraphReader(
+            graph=self.octiron.graph,
+        ).update_graph(nav)
 
         return nav
