@@ -1,9 +1,8 @@
 import functools
 from typing import Iterable
 
-from mkdocs.structure.nav import Section, Navigation
+from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
-
 from octadocs.navigation.types import NavigationItem
 
 

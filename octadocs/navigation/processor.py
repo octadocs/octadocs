@@ -1,22 +1,24 @@
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Optional, Dict, cast, List
+from typing import Dict, List, Optional, cast
 
 import rdflib
-from mkdocs.structure.nav import (
-    Section, Navigation,
+# noinspection PyProtectedMember
+from mkdocs.structure.nav import (  # noqa: WPS450
+    Navigation,
+    Section,
     _add_previous_and_next_links,
 )
 from mkdocs.structure.pages import Page
-from singledispatchmethod import singledispatchmethod
-
 from octadocs.conversions import iri_by_page
 from octadocs.navigation.nav_as_pages import create_pages_list_by_navigation
 from octadocs.navigation.types import (
-    NavigationItem, SortKey,
     PAGE_DEFAULT_POSITION,
+    NavigationItem,
+    SortKey,
 )
-from octadocs.query import query, SelectResult
+from octadocs.query import SelectResult, query
+from singledispatchmethod import singledispatchmethod
 
 
 def is_index_md(navigation_item: NavigationItem) -> bool:
