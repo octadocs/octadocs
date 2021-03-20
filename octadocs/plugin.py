@@ -2,23 +2,22 @@ import logging
 import operator
 from functools import lru_cache, partial
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Callable, Optional
 
 import rdflib
 from livereload import Server
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files
-from mkdocs.structure.nav import Navigation, Section
+from mkdocs.structure.nav import Navigation
 from mkdocs.structure.pages import Page
 from octadocs.environment import src_path_to_iri
-from octadocs.navigation import OctadocsNavigationProcessor
+from octadocs.navigation.nav_to_graph import NavigationToGraphReader
+from octadocs.navigation.processor import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL
 from octadocs.query import Query, query
 from octadocs.stored_query import StoredQuery
 from typing_extensions import TypedDict
-
-NavigationItem = Union[Page, Section]
 
 logger = logging.getLogger(__name__)
 
@@ -211,5 +210,9 @@ class OctaDocsPlugin(BasePlugin):
                 graph=self.octiron.graph,
                 navigation=nav,
             ).generate()
+
+        NavigationToGraphReader(
+            graph=self.octiron.graph,
+        ).update_graph(nav)
 
         return nav

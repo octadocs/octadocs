@@ -1,30 +1,24 @@
-import functools
-import sys
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, NamedTuple, Optional, Union, cast
+from functools import cached_property
+from typing import Dict, List, Optional, cast
 
 import rdflib
+# noinspection PyProtectedMember
 from mkdocs.structure.nav import (  # noqa: WPS450
-    Link,
     Navigation,
     Section,
     _add_previous_and_next_links,
 )
 from mkdocs.structure.pages import Page
 from octadocs.conversions import iri_by_page
+from octadocs.navigation.nav_as_pages import create_pages_list_by_navigation
+from octadocs.navigation.types import (
+    PAGE_DEFAULT_POSITION,
+    NavigationItem,
+    SortKey,
+)
 from octadocs.query import SelectResult, query
-# We have to use this library instead of functools.singledispatchmethod
-# because that guy is only available on Python >= 3.8.
 from singledispatchmethod import singledispatchmethod
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property  # noqa
-else:
-    from backports.cached_property import cached_property  # noqa: WPS433,WPS440
-
-NavigationItem = Union[Page, Section, Link, Navigation]
-
-PAGE_DEFAULT_POSITION = 0
 
 
 def is_index_md(navigation_item: NavigationItem) -> bool:
@@ -33,14 +27,6 @@ def is_index_md(navigation_item: NavigationItem) -> bool:
         isinstance(navigation_item, Page) and
         navigation_item.file.src_path.endswith('index.md')
     )
-
-
-class SortKey(NamedTuple):
-    """Sort key."""
-
-    is_index: bool
-    position: int
-    title: str
 
 
 def sort_key(navigation_item: NavigationItem) -> SortKey:
@@ -70,31 +56,6 @@ def find_index_page_in_section(section: Section) -> Optional[Page]:
         return index_pages[0]
 
     return None
-
-
-@functools.singledispatch
-def create_pages_list_by_navigation(
-    navigation_item: NavigationItem,
-) -> Iterable[Page]:
-    """Filter pages."""
-    raise NotImplementedError()
-
-
-@create_pages_list_by_navigation.register(Page)
-def _create_pages_list_by_page(page: Page) -> Iterable[Page]:
-    yield page
-
-
-@create_pages_list_by_navigation.register(Section)
-def _create_pages_list_by_section(section: Section) -> Iterable[Page]:
-    for navigation_item in section.children:
-        yield from create_pages_list_by_navigation(navigation_item)
-
-
-@create_pages_list_by_navigation.register(Navigation)
-def _create_pages_list_by_navigation(navigation: Navigation) -> Iterable[Page]:
-    for navigation_item in navigation.items:
-        yield from create_pages_list_by_navigation(navigation_item)
 
 
 @dataclass(repr=False)
