@@ -2,13 +2,12 @@ from dataclasses import dataclass
 
 from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
-from rdflib import ConjunctiveGraph, URIRef
-from singledispatchmethod import singledispatchmethod
-
 from octadocs.conversions import iri_by_page
 from octadocs.navigation.processor import find_index_page_in_section
 from octadocs.navigation.types import NavigationItem
 from octadocs.octiron.types import LOCAL, OCTA
+from rdflib import ConjunctiveGraph, URIRef
+from singledispatchmethod import singledispatchmethod
 
 
 @dataclass

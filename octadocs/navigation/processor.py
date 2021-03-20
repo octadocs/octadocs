@@ -1,5 +1,5 @@
+import sys
 from dataclasses import dataclass
-from functools import cached_property
 from typing import Dict, List, Optional, cast
 
 import rdflib
@@ -19,6 +19,11 @@ from octadocs.navigation.types import (
 )
 from octadocs.query import SelectResult, query
 from singledispatchmethod import singledispatchmethod
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property  # noqa
+else:
+    from backports.cached_property import cached_property  # noqa: WPS433,WPS440
 
 
 def is_index_md(navigation_item: NavigationItem) -> bool:
