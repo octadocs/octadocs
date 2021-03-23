@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from mkdocs.structure.nav import Navigation, Section
@@ -8,6 +9,8 @@ from octadocs.navigation.types import NavigationItem
 from octadocs.octiron.types import LOCAL, OCTA
 from rdflib import ConjunctiveGraph, URIRef
 from singledispatchmethod import singledispatchmethod
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -65,6 +68,16 @@ class NavigationToGraphReader:
     ) -> None:
         """Read information about a Section into the graph."""
         index_page = find_index_page_in_section(section)
+        if index_page is None:
+            logger.warning(
+                'The section {section} does not have an index.md file in it. '
+                'Cannot read its structure into Octadocs graph.',
+                extra={
+                    'section': section,
+                },
+            )
+            return
+
         iri = iri_by_page(index_page)
 
         self.update_graph(
