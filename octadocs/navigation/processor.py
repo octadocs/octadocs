@@ -63,6 +63,14 @@ def find_index_page_in_section(section: Section) -> Optional[Page]:
     return None
 
 
+@dataclass
+class PageFromGraph:
+    """Information about a Page retrieved from Octiron graph."""
+
+    title: Optional[str] = None
+    position: int = PAGE_DEFAULT_POSITION
+
+
 @dataclass(repr=False)
 class OctadocsNavigationProcessor:
     """Rewrite navigation based on the knowledge graph."""
@@ -71,13 +79,19 @@ class OctadocsNavigationProcessor:
     navigation: Navigation
 
     @cached_property
-    def position_by_page(self) -> Dict[rdflib.URIRef, int]:
+    def pages_from_graph(self) -> Dict[rdflib.URIRef, PageFromGraph]:
         """Fetch the position by page from graph."""
         query_text = '''
-            SELECT ?page ?position WHERE {
-                ?page
-                    a octa:Page ;
-                    octa:position ?position .
+            SELECT ?page ?position ?title WHERE {
+                ?page a octa:Page .
+
+                OPTIONAL {
+                    ?page octa:position ?position .
+                }
+
+                OPTIONAL {
+                    ?page octa:title ?title .
+                }
             }
         '''
 
@@ -87,7 +101,18 @@ class OctadocsNavigationProcessor:
         )
 
         return {
-            row['page']: row['position'].value
+            row['page']: PageFromGraph(
+                title=getattr(
+                    row.get('title'),
+                    'value',
+                    None,
+                ),
+                position=getattr(
+                    row.get('position'),
+                    'value',
+                    PAGE_DEFAULT_POSITION,
+                ),
+            )
             for row in cast(SelectResult, rows)
         }
 
@@ -114,12 +139,15 @@ class OctadocsNavigationProcessor:
     @rearrange_navigation.register
     def _rearrange_page(self, page: Page) -> Page:
         iri = iri_by_page(page)
-        position = self.position_by_page.get(
-            iri,
-            PAGE_DEFAULT_POSITION,
-        )
+        page_from_graph = self.pages_from_graph.get(iri)
 
-        page.position = position
+        if page_from_graph:
+            page.title = page_from_graph.title
+            page.position = page_from_graph.position
+
+        else:
+            page.position = PAGE_DEFAULT_POSITION
+
         return page
 
     def _rearrange_list_of_navigation_items(
@@ -148,6 +176,9 @@ class OctadocsNavigationProcessor:
 
         else:
             section.position = index_page.position
+
+            if index_page.title:
+                section.title = index_page.title
 
         return section
 
