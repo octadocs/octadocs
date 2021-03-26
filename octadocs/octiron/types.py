@@ -43,6 +43,9 @@ DEFAULT_CONTEXT = MappingProxyType({
         '@type': '@id',
     },
 
+    'title': 'octa:title',
+    'position': 'octa:position',
+
     # The default namespaces list should be included in context
     # We have to convert URLs to strings though - to make them serializable.
     **{
