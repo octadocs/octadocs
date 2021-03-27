@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div role="main">
+        {% if page.meta.title %}
+            <h1>{{ page.meta.title }}</h1>
+        {% endif %}
+        {% include "content.html" %}
+    </div>
+{% endblock %}

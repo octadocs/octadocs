@@ -84,13 +84,14 @@ class OctadocsNavigationProcessor:
         query_text = '''
             SELECT ?page ?position ?title WHERE {
                 ?page a octa:Page .
+                ?thing octa:subjectOf ?page .
 
                 OPTIONAL {
-                    ?page octa:position ?position .
+                    ?thing octa:position ?position .
                 }
 
                 OPTIONAL {
-                    ?page octa:title ?title .
+                    ?thing octa:title ?title .
                 }
             }
         '''

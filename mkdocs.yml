@@ -20,6 +20,7 @@ plugins:
 
 theme:
   name: lux
+  custom_dir: templates
   logo:
     image: logo.png
 
