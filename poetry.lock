@@ -730,6 +730,17 @@ extras = ["languages"]
 version = "0.5.8"
 
 [[package]]
+category = "dev"
+description = "Bootswatch themes for MkDocs"
+name = "mkdocs-bootswatch"
+optional = false
+python-versions = ">=3.5"
+version = "1.1"
+
+[package.dependencies]
+mkdocs = ">=1.1"
+
+[[package]]
 category = "main"
 description = "Unleash the power of MkDocs with macros and variables"
 name = "mkdocs-macros-plugin"
@@ -1451,7 +1462,7 @@ docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "pytest-enabler", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "08715ba010df4137f8cbf262f37b7060f1d46e910e80e3b8904e4559512f5642"
+content-hash = "636e3f1a58e5ae288bbfc119e1e2cc940724c5370564d2a04261987c086fb4c4"
 python-versions = ">=3.6,<3.10"
 
 [metadata.files]
@@ -1833,6 +1844,10 @@ mistune = [
 mkdocs = [
     {file = "mkdocs-1.1.2-py3-none-any.whl", hash = "sha256:096f52ff52c02c7e90332d2e53da862fde5c062086e1b5356a6e392d5d60f5e9"},
     {file = "mkdocs-1.1.2.tar.gz", hash = "sha256:f0b61e5402b99d7789efa032c7a74c90a20220a9c81749da06dbfbcbd52ffb39"},
+]
+mkdocs-bootswatch = [
+    {file = "mkdocs-bootswatch-1.1.tar.gz", hash = "sha256:cc999ba15a3ce2a46eab35fcaabea9907f5c74bc49e79d9c866b51d4b0fa7f33"},
+    {file = "mkdocs_bootswatch-1.1-py2.py3-none-any.whl", hash = "sha256:9cc2c8431a26026eba096c55abe7dd054de7881312ca8fc948c4a6a0da25840c"},
 ]
 mkdocs-macros-plugin = [
     {file = "mkdocs-macros-plugin-0.5.5.tar.gz", hash = "sha256:e0302836397c787505a7b1666cb41b9f4b34d894f816f040e4d738839e76cc73"},
