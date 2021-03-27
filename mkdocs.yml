@@ -19,7 +19,8 @@ plugins:
         - octadocs.macros
 
 theme:
-  name: mkdocs
+  name: lux
+  custom_dir: templates
   logo:
     image: logo.png
 

@@ -5,7 +5,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "octadocs"
-version = "0.0.34"
+version = "0.0.35"
 description = "MkDocs wiki made smart"
 license = "MIT"
 
@@ -65,6 +65,7 @@ pytest-randomly = "^3.4"
 m2r = "^0.2"
 tomlkit = "^0.7"
 mister-jeeves = "^0.0.2"
+mkdocs-bootswatch = "^1.1"
 
 [tool.flakehell]
 # Will replace by my own ignorelist later

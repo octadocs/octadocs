@@ -133,16 +133,15 @@ def _dict_as_triple_stream(  # type: ignore
             second=local_context,
         )
 
-    if meta_data.get('@id') is not None:
-        # The author specified an IRI the document tells us about. Let us
-        # link this IRI to the local document IRI.
-        meta_data['octa:subjectOf'] = local_iri
-
-    else:
+    if meta_data.get('@id') is None:
         # The document author did not tell us about what their document is.
         # In this case, we assume that the local_iri of the document file
         # is the subject of the document description.
         meta_data['@id'] = local_iri
+
+    # The author specified an IRI the document tells us about. Let us
+    # link this IRI to the local document IRI.
+    meta_data['octa:subjectOf'] = local_iri
 
     # Reason: https://github.com/RDFLib/rdflib-jsonld/issues/97
     # If we don't expand with an explicit @base, import will fail silently.

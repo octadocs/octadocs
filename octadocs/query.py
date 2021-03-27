@@ -50,6 +50,13 @@ def query(
     if sparql_result.askAnswer is not None:
         return sparql_result.askAnswer
 
+    if sparql_result.graph is not None:
+        graph: rdflib.Graph = sparql_result.graph
+        for prefix, namespace in instance.namespaces():
+            graph.bind(prefix, namespace)
+
+        return graph
+
     return _format_query_bindings(sparql_result.bindings)
 
 
