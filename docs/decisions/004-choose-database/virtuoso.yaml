@@ -1,0 +1,5 @@
+$id: https://github.com/openlink/virtuoso-opensource
+license: GPL
+sparql-support:
+  version: 1.1
+ui-support: native

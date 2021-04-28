@@ -1,0 +1,14 @@
+ui-support:
+  $type: $id
+
+python-client:
+  $type: $id
+
+reasoning-support:
+  $type: $id
+
+sparqlwrapper:
+  $id: https://rdflib.dev/sparqlwrapper/
+
+command-line-client:
+  $type: $id
