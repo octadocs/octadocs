@@ -1,0 +1,16 @@
+- $id: KGStore
+  $type: rdfs:Class
+
+- $id: SPARQLSupport
+  $type: rdfs:Class
+
+- $id: sparql-support
+  rdfs:domain: KGStore
+  rdfs:range: SPARQLSupport
+
+- $id: version
+  rdfs:domain: SPARQLSupport
+  rdfs:range: xsd:string
+
+- $id: native
+  label: Native
