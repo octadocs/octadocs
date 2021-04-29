@@ -15,10 +15,65 @@ At this point, I consider the transient in-memory storage of RDF graph (the one 
 - There is no interactive UI to debug the graph;
 - The graph is rebuilt from scratch every time we build (or serve) the site.
 
-I believe we need to choose a database we are going to persist our data in.
+I believe we need to choose a method we are going to persist our data with.
 
-## Decision
+## Candidates
 
+### TerminusDB
 
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>Features</th>
+      <th>Shortcomings</th>
+    <tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Relevant</th>
+      <td>
+        <ul>
+          <li>Very nice admin UI</li>
+          <li>WOQL is JSON-LD based</li>
+          <li>Python query DSL</li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li>Lack for SPARQL support</li>
+          <li>Have to run a separate server process</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <th>Irrelevant</th>
+      <td>
+        <ul>
+          <li>Git-like versioning</li>
+          <li></li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li>?</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## Notes
+
+The most important problem in the list above is performance. OWL RL performance is extremely slow and makes the editing experience quite bad even on a modest size documentation database, which I experienced on [https://vocabulari.es](vocabulari.es). 
+
+This does not yet justify completely rejecting SPARQL as a query standard, or abandoning the principle when you do not need to run an extra DB server to use Octadocs. You just run `mkdocs serve` and everything works, out of the box. 
 
 ## Consequences
+
+I will:
+
+- Enable SQlite storage for RDFLib as the default method;
+- Look into methods to optimize the speed;
+- Optimize context generation and store modification times in the graph rather then in a special dictionary in RAM;
+- Perhaps look into supporting Oxigraph and other SPARQL-enabled stores.
