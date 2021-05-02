@@ -39,18 +39,6 @@ CONTEXT_FORMATS = MappingProxyType({
 })
 
 
-CLEAR_DEFAULT_QUERY = '''
-DELETE { ?s ?p ?o } WHERE {
-    ?s ?p ?o .
-    FILTER NOT EXISTS {
-        GRAPH ?g {
-            ?s ?p ?o .
-        }
-    }
-}
-'''
-
-
 class CacheStatus(Enum):
     """Cache condition of a file."""
 
@@ -231,44 +219,13 @@ class Octiron:   # noqa: WPS214
 
         self.graph.addN(quads)
 
-    def clear_default_graph(self) -> None:
-        """Remove all triples from the default graph."""
-        # Cannot use CLEAR DEFAULT due to:
-        #     https://github.com/RDFLib/rdflib/issues/1275
-        self.graph.update(CLEAR_DEFAULT_QUERY)
-
     def apply_inference(self) -> None:  # noqa: WPS213
         """Do whatever is needed after the graph was updated from a file."""
-        logger.info('Inference: OWL RL')
+        logger.info('Inference: OWL RL started...')
         owlrl.DeductiveClosure(OWLRLExtensionNamedGraph).expand(self.graph)
+        logger.info('Inference: OWL RL complete.')
 
-        # Fill in octa:about relationships.
-        logger.info(
-            'Inference: '
-            '?thing octa:subjectOf ?page ⇒ ?page octa:about ?thing .',
-        )
-        self.graph.update('''
-            INSERT {
-                ?page octa:about ?thing .
-            } WHERE {
-                ?thing octa:subjectOf ?page .
-            }
-        ''')
-
-        logger.info(
-            'Inference: ?thing rdfs:label ?label & '
-            '?thing octa:page ?page ⇒ ?page octa:title ?label',
-        )
-        self.graph.update('''
-            INSERT {
-                ?page octa:title ?title .
-            } WHERE {
-                ?subject
-                    rdfs:label ?title ;
-                    octa:subjectOf ?page .
-            }
-        ''')
-
+        # Custom inference queries
         inference_dir = self.root_directory.parent / 'inference'
         if inference_dir.is_dir():
             for sparql_file in inference_dir.iterdir():
