@@ -1,5 +1,6 @@
 import logging
 import operator
+import time
 from functools import lru_cache, partial
 from pathlib import Path
 from typing import Callable, Optional
@@ -122,6 +123,11 @@ class OctaDocsPlugin(BasePlugin):
 
         # After all files are imported, run inference rules.
         self.octiron.apply_inference()
+
+        # Save the graph somewhere
+        path = f'/tmp/flake8.codes/dump-{time.time()}.n3'
+        logger.error(f'Dumping: {path}')
+        self.octiron.graph.serialize(destination=path, format='n3')
 
     def on_page_markdown(
         self,

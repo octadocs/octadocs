@@ -215,6 +215,7 @@ class Octiron:   # noqa: WPS214
         """Do whatever is needed after the graph was updated from a file."""
         # FIXME this should be customizable via dependency inversion. Right now
         #   this is hardcoded to run inference rules formulated as SPARQL files.
+        logger.info('Clearing the unnamed inference graph')
         self.clear_default_graph()
 
         logger.info('Inference: OWL RL')
