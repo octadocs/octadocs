@@ -1364,6 +1364,21 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 brotli = ["brotlipy (>=0.6.0)"]
 
 [[package]]
+name = "urlpath"
+version = "1.1.7"
+description = "Object-oriented URL from `urllib.parse` and `pathlib`"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+requests = "*"
+
+[package.extras]
+json = ["jmespath"]
+test = ["webob", "jmespath"]
+
+[[package]]
 name = "wcwidth"
 version = "0.2.5"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -1416,7 +1431,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.10"
-content-hash = "636e3f1a58e5ae288bbfc119e1e2cc940724c5370564d2a04261987c086fb4c4"
+content-hash = "3664344652a262ddab7a3459363b10e9a4fabf26860a1b198fc47a59f6234eab"
 
 [metadata.files]
 astor = [
@@ -2189,6 +2204,9 @@ typing-extensions = [
 urllib3 = [
     {file = "urllib3-1.26.4-py2.py3-none-any.whl", hash = "sha256:2f4da4594db7e1e110a944bb1b551fdf4e6c136ad42e4234131391e21eb5b0df"},
     {file = "urllib3-1.26.4.tar.gz", hash = "sha256:e7b021f7241115872f92f43c6508082facffbd1c048e3c6e2bb9c2a157e28937"},
+]
+urlpath = [
+    {file = "urlpath-1.1.7.tar.gz", hash = "sha256:a280a6cb1e107d9597cc1f320cf93b6b3cb7d15876434a922cdbc0314a87221f"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},

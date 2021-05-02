@@ -1,6 +1,5 @@
 import logging
 import operator
-import time
 from functools import lru_cache, partial
 from pathlib import Path
 from typing import Callable, Optional
@@ -12,7 +11,6 @@ from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Navigation
 from mkdocs.structure.pages import Page
 from octadocs.environment import src_path_to_iri
-from octadocs.navigation.nav_to_graph import NavigationToGraphReader
 from octadocs.navigation.processor import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
 from octadocs.octiron.types import LOCAL
@@ -114,6 +112,13 @@ class OctaDocsPlugin(BasePlugin):
 
     def on_files(self, files: Files, config: Config):
         """Extract metadata from files and compose the site graph."""
+        # Load the Octadocs vocabulary into graph
+        self.octiron.update_from_file(
+            path=Path(__file__).parent / 'octadocs.yaml',
+            local_iri=rdflib.URIRef('https://ns.octadocs.io/'),
+            global_url='/octadocs.yaml',
+        )
+
         for mkdocs_file in files:
             self.octiron.update_from_file(
                 path=Path(mkdocs_file.abs_src_path),
@@ -121,13 +126,7 @@ class OctaDocsPlugin(BasePlugin):
                 global_url=f'/{mkdocs_file.url}',
             )
 
-        # After all files are imported, run inference rules.
         self.octiron.apply_inference()
-
-        # Save the graph somewhere
-        path = f'/tmp/flake8.codes/dump-{time.time()}.n3'
-        logger.error(f'Dumping: {path}')
-        self.octiron.graph.serialize(destination=path, format='n3')
 
     def on_page_markdown(
         self,
@@ -216,9 +215,5 @@ class OctaDocsPlugin(BasePlugin):
                 graph=self.octiron.graph,
                 navigation=nav,
             ).generate()
-
-        NavigationToGraphReader(
-            graph=self.octiron.graph,
-        ).update_graph(nav)
 
         return nav
