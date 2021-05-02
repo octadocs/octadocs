@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 
 import yaml
-from octadocs.types import Context
 from octadocs.octiron.yaml_extensions import convert_dollar_signs
+from octadocs.types import Context
 
 
 def context_from_json(path: Path) -> Context:

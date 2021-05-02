@@ -23,12 +23,7 @@ from octadocs.octiron.plugins import (
     TurtleLoader,
     YAMLLoader,
 )
-from octadocs.types import (
-    DEFAULT_CONTEXT,
-    DEFAULT_NAMESPACES,
-    Context,
-    OCTA,
-)
+from octadocs.types import DEFAULT_CONTEXT, DEFAULT_NAMESPACES, OCTA, Context
 from urlpath import URL
 
 if sys.version_info >= (3, 8):

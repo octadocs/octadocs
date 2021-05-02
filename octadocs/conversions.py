@@ -1,9 +1,9 @@
-from typing import Optional, Iterator
+from typing import Iterator, Optional
 
 import rdflib
 from mkdocs.structure.pages import Page
-from octadocs.types import Triple, Quad, LOCAL
 from octadocs.query import SelectResult, query
+from octadocs.types import LOCAL, Quad, Triple
 from rdflib import URIRef
 
 

@@ -13,9 +13,9 @@ from mkdocs.structure.pages import Page
 from octadocs.conversions import src_path_to_iri
 from octadocs.navigation.processor import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
-from octadocs.types import LOCAL
 from octadocs.query import Query, query
 from octadocs.stored_query import StoredQuery
+from octadocs.types import LOCAL
 from typing_extensions import TypedDict
 
 logger = logging.getLogger(__name__)
