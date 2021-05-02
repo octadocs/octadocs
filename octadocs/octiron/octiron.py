@@ -26,8 +26,9 @@ from octadocs.octiron.types import (
     DEFAULT_NAMESPACES,
     Context,
     Quad,
-    Triple,
+    Triple, OCTA,
 )
+from urlpath import URL
 
 if sys.version_info >= (3, 8):
     from functools import cached_property  # noqa
@@ -200,10 +201,50 @@ class Octiron:   # noqa: WPS214
 
         self.graph.addN(quads)
 
+        self.add_metadata(
+            local_iri=local_iri,
+        )
+
         # Store the file last modification time
         self.last_modified_timestamp_per_file[local_iri] = (
             file_last_modification_time
         )
+
+    def add_metadata(self, local_iri: rdflib.URIRef) -> None:
+        """Store metadata about a source file."""
+        local_url = URL(local_iri.toPython())
+        parent_iri = rdflib.URIRef(str(local_url.parent))
+        file_name = rdflib.Literal(local_url.name)
+        directory_name = rdflib.Literal(local_url.parent.name)
+
+        quads = [
+            (
+                local_iri,
+                rdflib.RDF.type,
+                OCTA.Directory,
+                local_iri,
+            ),
+            (
+                parent_iri,
+                OCTA.isParentOf,
+                local_iri,
+                local_iri,
+            ),
+            (
+                parent_iri,
+                OCTA.fileName,
+                directory_name,
+                local_iri,
+            ),
+            (
+                local_iri,
+                OCTA.fileName,
+                file_name,
+                local_iri,
+            ),
+        ]
+
+        self.graph.addN(quads)
 
     def clear_default_graph(self) -> None:
         """Remove all triples from the default graph."""
@@ -215,6 +256,7 @@ class Octiron:   # noqa: WPS214
         """Do whatever is needed after the graph was updated from a file."""
         # FIXME this should be customizable via dependency inversion. Right now
         #   this is hardcoded to run inference rules formulated as SPARQL files.
+        logger.info('Clearing the unnamed inference graph')
         self.clear_default_graph()
 
         logger.info('Inference: OWL RL')

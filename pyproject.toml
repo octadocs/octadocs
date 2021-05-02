@@ -5,7 +5,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "octadocs"
-version = "0.0.35"
+version = "0.0.36"
 description = "MkDocs wiki made smart"
 license = "MIT"
 
@@ -48,6 +48,7 @@ deepmerge = "^0.1.1"
 "backports.cached-property" = "^1.0.0"
 documented = "^0.1.1"
 singledispatchmethod = "^1.0"
+urlpath = "^1.1.7"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.790"

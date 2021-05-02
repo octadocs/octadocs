@@ -1,0 +1,72 @@
+$context:
+  schema: http://schema.org/
+  octa: https://ns.octadocs.io/
+  rdfs: http://www.w3.org/2000/01/rdf-schema#
+  rdf: https://www.w3.org/1999/02/22-rdf-syntax-ns#
+  xsd: https://www.w3.org/2001/XMLSchema#
+  owl: http://www.w3.org/2002/07/owl#
+
+  # Shorthands
+  subPropertyOf:
+    $id: rdfs:subPropertyOf
+    $type: $id
+  subClassOf:
+    $id: rdfs:subClassOf
+    $type: $id
+
+  domain:
+    $id: rdfs:domain
+    $type: $id
+  range:
+    $id: rdfs:range
+    $type: $id
+  label: rdfs:label
+  comment: rdfs:comment
+
+  inverseOf:
+    $id: owl:inverseOf
+    $type: $id
+
+  owl:onProperty:
+    $type: $id
+
+$included:
+  - $id: octa:Page
+    subClassOf: schema:WebPage
+
+  - $id: octa:title
+    subPropertyOf: schema:name
+
+  - $id: octa:url
+    label: Web-accessible URL path (usually relative, without the hostname) the page will have when the site is built.
+    subPropertyOf: schema:url
+
+  - $id: octa:subjectOf
+    label: Link from a Thing to the Page which describes it.
+    subPropertyOf: schema:subjectOf
+
+  - $id: octa:position
+    label: Position of the page in lists and directories.
+    subPropertyOf: schema:position
+
+  - $id: octa:about
+    label: Link from a Page to the Thing this page describes.
+    subPropertyOf: schema:about
+    inverseOf: octa:subjectOf
+
+  - $id: octa:template
+    domain: octa:Page
+    range: rdfs:Literal
+    label: HTML/Jinja2 template
+    comment: Path to an MkDocs template file used to render particular page, relative to the `templates` directory.
+
+  - $id: octa:isParentOf
+  - $id: octa:isChildOf
+    inverseOf: octa:isParentOf
+
+  - $id: octa:IndexPage
+    subClassOf: octa:Page
+    owl:equivalentClass:
+      $type: owl:Restriction
+      owl:onProperty: octa:fileName
+      owl:hasValue: "index.md"
