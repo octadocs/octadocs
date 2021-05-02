@@ -2,7 +2,7 @@ from typing import Iterator
 
 import yaml
 from octadocs.octiron.plugins import Loader
-from octadocs.octiron.types import OCTA, Triple
+from octadocs.types import OCTA, Triple
 from octadocs.octiron.yaml_extensions import SafeLoader, as_triple_stream
 from rdflib import RDF
 

@@ -3,7 +3,7 @@ Test for GitHub issue: https://github.com/RDFLib/rdflib/issues/1216
 """
 import pytest
 import rdflib
-from octadocs.octiron.types import LOCAL
+from octadocs.types import LOCAL
 
 DOCUMENT = f"""
 @base <{LOCAL}> .

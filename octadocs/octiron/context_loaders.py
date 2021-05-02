@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import yaml
-from octadocs.octiron.types import Context
+from octadocs.types import Context
 from octadocs.octiron.yaml_extensions import convert_dollar_signs
 
 

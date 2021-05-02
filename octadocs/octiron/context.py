@@ -1,5 +1,5 @@
 from deepmerge import always_merger
-from octadocs.octiron.types import Context
+from octadocs.types import Context
 
 
 def merge(first: Context, second: Context) -> Context:
