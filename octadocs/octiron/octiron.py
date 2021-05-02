@@ -6,28 +6,24 @@ from enum import Enum, auto
 from functools import reduce
 from pathlib import Path
 from types import MappingProxyType
-from typing import Dict, Iterable, Iterator, Optional, Type
+from typing import Dict, Iterable, Optional, Type
 
 import owlrl
 import rdflib
+from octadocs.conversions import triples_to_quads
 from octadocs.octiron.context import merge
 from octadocs.octiron.context_loaders import (
     context_from_json,
     context_from_yaml,
 )
+from octadocs.octiron.owlrl_named_graph import OWLRLExtensionNamedGraph
 from octadocs.octiron.plugins import (
     Loader,
     MarkdownLoader,
     TurtleLoader,
     YAMLLoader,
 )
-from octadocs.octiron.types import (
-    DEFAULT_CONTEXT,
-    DEFAULT_NAMESPACES,
-    Context,
-    Quad,
-    Triple, OCTA,
-)
+from octadocs.types import DEFAULT_CONTEXT, DEFAULT_NAMESPACES, OCTA, Context
 from urlpath import URL
 
 if sys.version_info >= (3, 8):
@@ -53,17 +49,6 @@ DELETE { ?s ?p ?o } WHERE {
     }
 }
 '''
-
-
-def triples_to_quads(
-    triples: Iterator[Triple],
-    graph: rdflib.URIRef,
-) -> Iterator[Quad]:
-    """Convert sequence of triples to sequence of quads."""
-    yield from (
-        triple.as_quad(graph)
-        for triple in triples
-    )
 
 
 class CacheStatus(Enum):
@@ -254,13 +239,8 @@ class Octiron:   # noqa: WPS214
 
     def apply_inference(self) -> None:  # noqa: WPS213
         """Do whatever is needed after the graph was updated from a file."""
-        # FIXME this should be customizable via dependency inversion. Right now
-        #   this is hardcoded to run inference rules formulated as SPARQL files.
-        logger.info('Clearing the unnamed inference graph')
-        self.clear_default_graph()
-
         logger.info('Inference: OWL RL')
-        owlrl.DeductiveClosure(owlrl.OWLRL_Extension).expand(self.graph)
+        owlrl.DeductiveClosure(OWLRLExtensionNamedGraph).expand(self.graph)
 
         # Fill in octa:about relationships.
         logger.info(

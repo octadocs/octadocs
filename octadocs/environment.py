@@ -1,7 +1,6 @@
 import re
 
-from octadocs.octiron.types import LOCAL
-from rdflib import URIRef
+from octadocs.types import LOCAL
 
 
 def iri_to_url(iri: str) -> str:
@@ -21,8 +20,3 @@ def iri_to_url(iri: str) -> str:
             '',
             iri,
         )
-
-
-def src_path_to_iri(src_path: str) -> URIRef:
-    """Convert src_path of a file to a Zet IRI."""
-    return URIRef(f'{LOCAL}{src_path}')

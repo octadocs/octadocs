@@ -10,7 +10,7 @@ import rdflib
 from boltons.iterutils import remap
 from documented import DocumentedError
 from octadocs.octiron.context import merge
-from octadocs.octiron.types import LOCAL, Context, Triple
+from octadocs.types import LOCAL, Context, Triple
 from pyld import jsonld
 
 try:  # noqa

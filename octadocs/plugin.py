@@ -10,12 +10,12 @@ from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Navigation
 from mkdocs.structure.pages import Page
-from octadocs.environment import src_path_to_iri
+from octadocs.conversions import src_path_to_iri
 from octadocs.navigation.processor import OctadocsNavigationProcessor
 from octadocs.octiron import Octiron
-from octadocs.octiron.types import LOCAL
 from octadocs.query import Query, query
 from octadocs.stored_query import StoredQuery
+from octadocs.types import LOCAL
 from typing_extensions import TypedDict
 
 logger = logging.getLogger(__name__)

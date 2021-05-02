@@ -6,8 +6,8 @@ import frontmatter
 import rdflib
 from documented import DocumentedError
 from octadocs.octiron.plugins import Loader
-from octadocs.octiron.types import OCTA, Triple
 from octadocs.octiron.yaml_extensions import as_triple_stream
+from octadocs.types import OCTA, Triple
 from yaml.scanner import ScannerError
 
 
