@@ -4,7 +4,6 @@ import rdflib
 from mkdocs.structure.pages import Page
 from octadocs.query import SelectResult, query
 from octadocs.types import LOCAL, Quad, Triple
-from rdflib import URIRef
 
 
 def iri_by_page(page: Page) -> rdflib.URIRef:
@@ -44,6 +43,6 @@ def triples_to_quads(
     )
 
 
-def src_path_to_iri(src_path: str) -> URIRef:
+def src_path_to_iri(src_path: str) -> rdflib.URIRef:
     """Convert src_path of a file to a Zet IRI."""
-    return URIRef(f'{LOCAL}{src_path}')
+    return rdflib.URIRef(f'{LOCAL}{src_path}')
